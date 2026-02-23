@@ -1,0 +1,22 @@
+{
+  "name": "football-scouting-platform",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev --workspace @scouting/web\" \"npm run dev --workspace @scouting/api\"",
+    "dev:web": "npm run dev --workspace @scouting/web",
+    "dev:api": "npm run dev --workspace @scouting/api",
+    "build": "npm run build --workspace @scouting/web && npm run build --workspace @scouting/api",
+    "build:web": "npm run build --workspace @scouting/web",
+    "build:api": "npm run build --workspace @scouting/api",
+    "start:web": "npm run start --workspace @scouting/web",
+    "start:api": "npm run start --workspace @scouting/api"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.1"
+  }
+}

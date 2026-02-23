@@ -1,0 +1,10 @@
+{
+    "name": "@scouting/web",
+    "version": "0.1.0",
+    "private": true,
+    "scripts": {
+      "dev": "next dev -p 3000",
+      "build": "next build",
+      "start": "next start -p ${PORT:-3000}"
+    }
+  }
