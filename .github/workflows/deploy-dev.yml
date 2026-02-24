@@ -9,6 +9,9 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     environment: dev
+    permissions:
+      id-token: write # Required for requesting the JWT for Azure OIDC
+      contents: read  # Required for actions/checkout
     
     steps:
       - name: Checkout repository
@@ -32,11 +35,17 @@ jobs:
       - name: Zip artifact for deployment
         run: zip -r release.zip . -x ".git/*"
 
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_9024FC09C73348E7B54CCC4C4BDCA0A0 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_CED7D04BF29B4110A52235021697196F }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_0E21B43B810543988F53E1140BFE04C3 }}
+
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'football-scouting-dev'
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_DEV }}
           package: release.zip
 
       - name: Set Startup Command (Migrate & Seed)
