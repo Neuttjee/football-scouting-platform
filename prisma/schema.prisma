@@ -3,99 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
-}
-
-enum Role {
-  ADMIN
-  TC_LID
-  SCOUT
-  LEZER
-}
-
-enum Voorkeursbeen {
-  LINKS
-  RECHTS
-  BEIDE
-  ONBEKEND
-}
-
-enum Status {
-  TE_VOLGEN
-  ACTIEF
-  PARKEREN
-  AFGEVALLEN
-  GESTOPT
-  GETEKEND
-}
-
-enum Processtap {
-  NV_T
-  LONGLIST
-  SHORTLIST
-  TC_BESPROKEN
-  APP_GESTUURD
-  TELEFONISCH_CONTACT
-  GESPREK_PLANNEN
-  GESPREK_GEPLAND
-  GESPREK_GEHAD
-  TRAINER_GESPROKEN
-  MEETRAINEN_GEPLAND
-  MEETRAINEN_GEDAAN
-  OVEREENKOMST_BESPROKEN
-  OVEREENKOMST_GETEKEND
-  AFGEHAAKT
-  NIET_HAALBAAR
-}
-
-enum Advies {
-  NOG_BEKIJKEN
-  BLIJVEN_VOLGEN
-  BENADEREN
-  MEETRAINEN
-  TEKENEN
-  VERLENGEN
-  AFSCHEID_NEMEN
-  AFWIJZEN
-}
-
-enum ContactType {
-  INTRO_BENADERING
-  FOLLOW_UP
-  GESPREK
-  MEETTRAINING
-  AANBOD
-  OVERIG
-}
-
-enum Kanaal {
-  WHATSAPP
-  TELEFOON
-  OP_DE_CLUB
-  TRAINING
-  VIA_DERDE
-  EMAIL
-  OVERIG
-}
-
-enum Uitkomst {
-  POSITIEF
-  NEUTRAAL
-  TWIJFEL
-  NEGATIEF
-}
-
-enum Prioriteit {
-  LAAG
-  NORMAAL
-  HOOG
-}
-
-enum TaakStatus {
-  OPEN
-  IN_UITVOERING
-  GEREED
 }
 
 model Club {
@@ -120,7 +29,7 @@ model User {
   name         String
   email        String   @unique
   passwordHash String
-  role         Role
+  role         String   @default("LEZER") // ADMIN, TC_LID, SCOUT, LEZER
   isActive     Boolean  @default(true)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
@@ -144,13 +53,13 @@ model Player {
   niveauCompetitie String?
   positie          String?
   nevenpositie     String?
-  voorkeursbeen    Voorkeursbeen @default(ONBEKEND)
+  voorkeursbeen    String        @default("ONBEKEND") // LINKS, RECHTS, BEIDE, ONBEKEND
   geboortedatum    DateTime?
   leeftijd         Int?
   contactpersoon   String?
-  status           Status        @default(TE_VOLGEN)
-  processtap       Processtap    @default(LONGLIST)
-  advies           Advies        @default(NOG_BEKIJKEN)
+  status           String        @default("TE_VOLGEN") // TE_VOLGEN, ACTIEF, PARKEREN, AFGEVALLEN, GESTOPT, GETEKEND
+  processtap       String        @default("LONGLIST") // LONGLIST, SHORTLIST, etc.
+  advies           String        @default("NOG_BEKIJKEN") // NOG_BEKIJKEN, BLIJVEN_VOLGEN, etc.
   laatsteUpdateAt  DateTime      @default(now())
   createdAt        DateTime      @default(now())
   updatedAt        DateTime      @updatedAt
@@ -169,14 +78,14 @@ model ContactMoment {
   clubId            String
   playerId          String
   datumTijd         DateTime    @default(now())
-  contactType       ContactType
+  contactType       String      // INTRO_BENADERING, FOLLOW_UP, GESPREK, MEETTRAINING, AANBOD, OVERIG
   contactTypeFree   String?
-  kanaal            Kanaal
+  kanaal            String      // WHATSAPP, TELEFOON, OP_DE_CLUB, TRAINING, VIA_DERDE, EMAIL, OVERIG
   kanaalFree        String?
-  uitkomst          Uitkomst?
-  samenvatting      String?     @db.Text
-  verslag           String?     @db.Text
-  reden             String?     @db.Text
+  uitkomst          String?     // POSITIEF, NEUTRAAL, TWIJFEL, NEGATIEF
+  samenvatting      String?
+  verslag           String?
+  reden             String?
   volgendeActieDatum DateTime?
   createdAt         DateTime    @default(now())
   createdByUserId   String
@@ -196,9 +105,9 @@ model Task {
   playerId        String?
   eigenaarUserId  String
   deadline        DateTime?
-  prioriteit      Prioriteit @default(NORMAAL)
-  status          TaakStatus @default(OPEN)
-  notitie         String?    @db.Text
+  prioriteit      String     @default("NORMAAL") // LAAG, NORMAAL, HOOG
+  status          String     @default("OPEN") // OPEN, IN_UITVOERING, GEREED
+  notitie         String?
   createdAt       DateTime   @default(now())
   createdByUserId String
   afgerondAt      DateTime?
