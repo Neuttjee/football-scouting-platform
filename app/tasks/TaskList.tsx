@@ -8,7 +8,7 @@ type Task = {
   title: string;
   isCompleted: boolean;
   assignedTo: { name: string } | null;
-  creator: { name: string } | null;
+  createdBy: { name: string } | null;
 };
 
 export function TaskList({ tasks }: { tasks: Task[] }) {
@@ -39,7 +39,7 @@ export function TaskList({ tasks }: { tasks: Task[] }) {
           </div>
           <div className="text-xs text-gray-500 flex flex-col md:flex-row md:space-x-4 space-y-1 md:space-y-0 ml-8 md:ml-0">
             {t.assignedTo && <span>Aan: {t.assignedTo.name}</span>}
-            <span>Van: {t.creator?.name || 'Onbekend'}</span>
+            <span>Van: {t.createdBy?.name || 'Onbekend'}</span>
           </div>
         </div>
       ))}

@@ -17,7 +17,7 @@ export default async function TasksPage() {
       { isCompleted: 'asc' },
       { createdAt: 'desc' }
     ],
-    include: { assignedTo: true, creator: true }
+    include: { assignedTo: true, createdBy: true }
   });
 
   return (

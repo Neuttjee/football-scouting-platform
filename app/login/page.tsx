@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
@@ -21,16 +20,18 @@ export default function LoginPage() {
     setError('')
 
     try {
-      const result = await signIn('credentials', {
-        email,
-        password,
-        redirect: false,
+      const res = await fetch('/api/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'login', email, password })
       })
 
-      if (result?.error) {
-        setError('Ongeldige inloggegevens of account is inactief.')
+      const data = await res.json()
+
+      if (!res.ok) {
+        setError(data.error || 'Ongeldige inloggegevens of account is inactief.')
       } else {
-        router.push('/')
+        router.push('/dashboard')
         router.refresh()
       }
     } catch (err) {

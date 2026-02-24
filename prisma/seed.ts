@@ -7,16 +7,16 @@ async function main() {
   console.log('Seeding database...')
 
   // 1. Create a club
-  const club = await prisma.club.upsert({
-    where: { slug: 'sv-hillegom' },
-    update: {},
-    create: {
-      name: 'SV Hillegom',
-      slug: 'sv-hillegom',
-      primaryColor: '#004aad',
-      secondaryColor: '#ffffff',
-    },
-  })
+  let club = await prisma.club.findFirst({ where: { name: 'SV Hillegom' } })
+  if (!club) {
+    club = await prisma.club.create({
+      data: {
+        name: 'SV Hillegom',
+        primaryColor: '#004aad',
+        secondaryColor: '#ffffff',
+      },
+    })
+  }
   
   console.log(`Club created: ${club.name}`)
 
@@ -40,69 +40,54 @@ async function main() {
   const player1 = await prisma.player.create({
     data: {
       clubId: club.id,
-      naam: 'Jan de Vries',
-      clubHuidig: 'VV Lisse',
-      team: 'Zondag 1',
-      niveauCompetitie: '1e Klasse',
-      positie: 'Aanvaller',
-      leeftijd: 24,
-      voorkeursbeen: 'RECHTS',
-      status: 'TE_VOLGEN',
-      processtap: 'LONGLIST',
-      advies: 'NOG_BEKIJKEN',
-      createdByUserId: admin.id,
+      name: 'Jan de Vries',
+      position: 'Aanvaller',
+      status: 'Te volgen',
+      step: 'Longlist',
+      createdById: admin.id,
     },
   })
 
   const player2 = await prisma.player.create({
     data: {
       clubId: club.id,
-      naam: 'Piet Bakker',
-      clubHuidig: 'FC Lisse',
-      team: 'O23',
-      niveauCompetitie: 'Divisie',
-      positie: 'Middenvelder',
-      leeftijd: 21,
-      voorkeursbeen: 'LINKS',
-      status: 'ACTIEF',
-      processtap: 'TELEFONISCH_CONTACT',
-      advies: 'BENADEREN',
-      createdByUserId: admin.id,
+      name: 'Piet Bakker',
+      position: 'Middenvelder',
+      status: 'Actief',
+      step: 'Gesprek',
+      createdById: admin.id,
     },
   })
 
-  console.log(`Players created: ${player1.naam}, ${player2.naam}`)
+  console.log(`Players created: ${player1.name}, ${player2.name}`)
 
   // 4. Create an example contact moment
   const contact = await prisma.contactMoment.create({
     data: {
       clubId: club.id,
       playerId: player2.id,
-      contactType: 'INTRO_BENADERING',
-      kanaal: 'TELEFOON',
-      uitkomst: 'POSITIEF',
-      samenvatting: 'Goed gesprek gehad, speler staat open voor een vervolggesprek.',
-      createdByUserId: admin.id,
+      type: 'Intro benadering',
+      channel: 'Telefoon',
+      outcome: 'Positief',
+      notes: 'Goed gesprek gehad, speler staat open voor een vervolggesprek.',
+      createdById: admin.id,
     },
   })
 
-  console.log(`Contact moment created for: ${player2.naam}`)
+  console.log(`Contact moment created for: ${player2.name}`)
 
   // 5. Create an example task
   const task = await prisma.task.create({
     data: {
       clubId: club.id,
-      titel: 'Plan vervolggesprek in met Piet Bakker',
-      playerId: player2.id,
-      eigenaarUserId: admin.id,
-      prioriteit: 'HOOG',
-      status: 'OPEN',
-      createdByUserId: admin.id,
-      deadline: new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000), // Next week
+      title: 'Plan vervolggesprek in met Piet Bakker',
+      description: 'Na telefonische introductie',
+      assignedToId: admin.id,
+      createdById: admin.id,
     },
   })
 
-  console.log(`Task created: ${task.titel}`)
+  console.log(`Task created: ${task.title}`)
   console.log('Seeding complete!')
 }
 

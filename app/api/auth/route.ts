@@ -9,7 +9,7 @@ export async function POST(req: Request) {
     const { action } = body;
 
     if (action === 'logout') {
-      clearSession();
+      await clearSession();
       return NextResponse.json({ success: true });
     }
 
