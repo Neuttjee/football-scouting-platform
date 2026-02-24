@@ -1,0 +1,213 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  TC_LID
+  SCOUT
+  LEZER
+}
+
+enum Voorkeursbeen {
+  LINKS
+  RECHTS
+  BEIDE
+  ONBEKEND
+}
+
+enum Status {
+  TE_VOLGEN
+  ACTIEF
+  PARKEREN
+  AFGEVALLEN
+  GESTOPT
+  GETEKEND
+}
+
+enum Processtap {
+  NV_T
+  LONGLIST
+  SHORTLIST
+  TC_BESPROKEN
+  APP_GESTUURD
+  TELEFONISCH_CONTACT
+  GESPREK_PLANNEN
+  GESPREK_GEPLAND
+  GESPREK_GEHAD
+  TRAINER_GESPROKEN
+  MEETRAINEN_GEPLAND
+  MEETRAINEN_GEDAAN
+  OVEREENKOMST_BESPROKEN
+  OVEREENKOMST_GETEKEND
+  AFGEHAAKT
+  NIET_HAALBAAR
+}
+
+enum Advies {
+  NOG_BEKIJKEN
+  BLIJVEN_VOLGEN
+  BENADEREN
+  MEETRAINEN
+  TEKENEN
+  VERLENGEN
+  AFSCHEID_NEMEN
+  AFWIJZEN
+}
+
+enum ContactType {
+  INTRO_BENADERING
+  FOLLOW_UP
+  GESPREK
+  MEETTRAINING
+  AANBOD
+  OVERIG
+}
+
+enum Kanaal {
+  WHATSAPP
+  TELEFOON
+  OP_DE_CLUB
+  TRAINING
+  VIA_DERDE
+  EMAIL
+  OVERIG
+}
+
+enum Uitkomst {
+  POSITIEF
+  NEUTRAAL
+  TWIJFEL
+  NEGATIEF
+}
+
+enum Prioriteit {
+  LAAG
+  NORMAAL
+  HOOG
+}
+
+enum TaakStatus {
+  OPEN
+  IN_UITVOERING
+  GEREED
+}
+
+model Club {
+  id             String          @id @default(cuid())
+  name           String
+  slug           String          @unique
+  logoUrl        String?
+  primaryColor   String?
+  secondaryColor String?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  
+  users          User[]
+  players        Player[]
+  contactMoments ContactMoment[]
+  tasks          Task[]
+}
+
+model User {
+  id           String   @id @default(cuid())
+  clubId       String
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         Role
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  club         Club     @relation(fields: [clubId], references: [id])
+  
+  createdPlayers        Player[]        @relation("PlayerCreator")
+  createdContactMoments ContactMoment[] @relation("ContactCreator")
+  createdTasks          Task[]          @relation("TaskCreator")
+  assignedTasks         Task[]          @relation("TaskOwner")
+
+  @@index([clubId])
+}
+
+model Player {
+  id               String        @id @default(cuid())
+  clubId           String
+  naam             String
+  clubHuidig       String?
+  team             String?
+  niveauCompetitie String?
+  positie          String?
+  nevenpositie     String?
+  voorkeursbeen    Voorkeursbeen @default(ONBEKEND)
+  geboortedatum    DateTime?
+  leeftijd         Int?
+  contactpersoon   String?
+  status           Status        @default(TE_VOLGEN)
+  processtap       Processtap    @default(LONGLIST)
+  advies           Advies        @default(NOG_BEKIJKEN)
+  laatsteUpdateAt  DateTime      @default(now())
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  createdByUserId  String
+
+  club             Club            @relation(fields: [clubId], references: [id])
+  createdBy        User            @relation("PlayerCreator", fields: [createdByUserId], references: [id])
+  contactMoments   ContactMoment[]
+  tasks            Task[]
+
+  @@index([clubId])
+}
+
+model ContactMoment {
+  id                String      @id @default(cuid())
+  clubId            String
+  playerId          String
+  datumTijd         DateTime    @default(now())
+  contactType       ContactType
+  contactTypeFree   String?
+  kanaal            Kanaal
+  kanaalFree        String?
+  uitkomst          Uitkomst?
+  samenvatting      String?     @db.Text
+  verslag           String?     @db.Text
+  reden             String?     @db.Text
+  volgendeActieDatum DateTime?
+  createdAt         DateTime    @default(now())
+  createdByUserId   String
+
+  club      Club   @relation(fields: [clubId], references: [id])
+  player    Player @relation(fields: [playerId], references: [id])
+  createdBy User   @relation("ContactCreator", fields: [createdByUserId], references: [id])
+
+  @@index([clubId])
+  @@index([playerId])
+}
+
+model Task {
+  id              String     @id @default(cuid())
+  clubId          String
+  titel           String
+  playerId        String?
+  eigenaarUserId  String
+  deadline        DateTime?
+  prioriteit      Prioriteit @default(NORMAAL)
+  status          TaakStatus @default(OPEN)
+  notitie         String?    @db.Text
+  createdAt       DateTime   @default(now())
+  createdByUserId String
+  afgerondAt      DateTime?
+
+  club      Club    @relation(fields: [clubId], references: [id])
+  player    Player? @relation(fields: [playerId], references: [id])
+  eigenaar  User    @relation("TaskOwner", fields: [eigenaarUserId], references: [id])
+  createdBy User    @relation("TaskCreator", fields: [createdByUserId], references: [id])
+
+  @@index([clubId])
+  @@index([eigenaarUserId])
+}
