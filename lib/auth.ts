@@ -1,82 +1,74 @@
-import { NextAuthOptions } from "next-auth"
-import CredentialsProvider from "next-auth/providers/credentials"
-import { PrismaClient } from "@prisma/client"
-import bcrypt from "bcrypt"
+import { SignJWT, jwtVerify } from 'jose';
+import { cookies } from 'next/headers';
+import { NextRequest, NextResponse } from 'next/server';
 
-const prisma = new PrismaClient()
+const secretKey = process.env.SESSION_SECRET || 'fallback-secret-key-that-is-at-least-32-chars-long';
+const key = new TextEncoder().encode(secretKey);
 
-export const authOptions: NextAuthOptions = {
-  providers: [
-    CredentialsProvider({
-      name: "Credentials",
-      credentials: {
-        email: { label: "Email", type: "email", placeholder: "admin@example.com" },
-        password: { label: "Wachtwoord", type: "password" }
-      },
-      async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          return null
-        }
+export async function encrypt(payload: any) {
+  return await new SignJWT(payload)
+    .setProtectedHeader({ alg: 'HS256' })
+    .setIssuedAt()
+    .setExpirationTime('24h')
+    .sign(key);
+}
 
-        const user = await prisma.user.findUnique({
-          where: {
-            email: credentials.email
-          },
-          include: {
-            club: true
-          }
-        })
+export async function decrypt(input: string): Promise<any> {
+  try {
+    const { payload } = await jwtVerify(input, key, {
+      algorithms: ['HS256'],
+    });
+    return payload;
+  } catch (error) {
+    return null;
+  }
+}
 
-        if (!user || !user.isActive) {
-          return null
-        }
+export async function getSession() {
+  const session = cookies().get('session')?.value;
+  if (!session) return null;
+  return await decrypt(session);
+}
 
-        const isPasswordValid = await bcrypt.compare(
-          credentials.password,
-          user.passwordHash
-        )
+export async function setSession(user: any) {
+  const expires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+  const session = await encrypt({ user, expires });
 
-        if (!isPasswordValid) {
-          return null
-        }
+  cookies().set('session', session, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    expires: expires,
+    sameSite: 'lax',
+    path: '/',
+  });
+}
 
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          role: user.role,
-          clubId: user.clubId,
-          clubName: user.club.name,
-        }
-      }
-    })
-  ],
-  callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id
-        token.role = user.role
-        token.clubId = user.clubId
-        token.clubName = user.clubName
-      }
-      return token
-    },
-    async session({ session, token }) {
-      if (token && session.user) {
-        session.user.id = token.id as string
-        session.user.role = token.role as string
-        session.user.clubId = token.clubId as string
-        session.user.clubName = token.clubName as string
-      }
-      return session
-    }
-  },
-  pages: {
-    signIn: '/login',
-  },
-  session: {
-    strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 days
-  },
-  secret: process.env.NEXTAUTH_SECRET,
+export async function updateSession(request: NextRequest) {
+  const session = request.cookies.get('session')?.value;
+  if (!session) return NextResponse.next();
+
+  const payload = await decrypt(session);
+  if (!payload) return NextResponse.next();
+
+  const res = NextResponse.next();
+  res.cookies.set({
+    name: 'session',
+    value: session,
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    path: '/',
+    maxAge: 24 * 60 * 60, // 24 hours
+  });
+  return res;
+}
+
+export function clearSession() {
+  cookies().set('session', '', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    expires: new Date(0),
+    sameSite: 'lax',
+    path: '/',
+  });
 }

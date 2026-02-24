@@ -1,41 +1,49 @@
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
-import { getToken } from 'next-auth/jwt'
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import { updateSession, decrypt } from './lib/auth';
 
 export async function middleware(request: NextRequest) {
-  const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET })
-  
-  const isAuthPage = request.nextUrl.pathname.startsWith('/login') || request.nextUrl.pathname.startsWith('/invite')
-  
-  if (isAuthPage) {
-    if (token) {
-      return NextResponse.redirect(new URL('/', request.url))
+  const session = request.cookies.get('session')?.value;
+  const { pathname } = request.nextUrl;
+
+  // Paths that don't require auth
+  if (
+    pathname.startsWith('/api/auth') || 
+    pathname.startsWith('/api/invite') && request.method === 'PUT' || // allow accepting invite without auth
+    pathname === '/login' ||
+    pathname === '/accept-invite' ||
+    pathname.startsWith('/_next') ||
+    pathname === '/favicon.ico'
+  ) {
+    return NextResponse.next();
+  }
+
+  // API Routes
+  if (pathname.startsWith('/api/')) {
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-    return null
-  }
-
-  if (!token) {
-    let from = request.nextUrl.pathname;
-    if (request.nextUrl.search) {
-      from += request.nextUrl.search;
+    const payload = await decrypt(session);
+    if (!payload) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-
-    return NextResponse.redirect(
-      new URL(`/login?from=${encodeURIComponent(from)}`, request.url)
-    );
+    return NextResponse.next();
   }
 
-  // Admin only routes protection
-  const isAdminRoute = request.nextUrl.pathname.startsWith('/instellingen')
-  if (isAdminRoute && token.role !== 'ADMIN') {
-    return NextResponse.redirect(new URL('/', request.url))
+  // Pages
+  if (!session) {
+    return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  return NextResponse.next()
+  const payload = await decrypt(session);
+  if (!payload) {
+    return NextResponse.redirect(new URL('/login', request.url));
+  }
+
+  // Update session expiration
+  return await updateSession(request);
 }
 
 export const config = {
-  matcher: [
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
-  ],
-}
+  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
+};

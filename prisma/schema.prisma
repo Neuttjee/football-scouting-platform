@@ -8,115 +8,110 @@ datasource db {
 }
 
 model Club {
-  id             String          @id @default(cuid())
+  id             String          @id @default(uuid())
   name           String
-  slug           String          @unique
-  logoUrl        String?
+  logo           String?
   primaryColor   String?
   secondaryColor String?
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  
+
   users          User[]
   players        Player[]
-  contactMoments ContactMoment[]
+  contacts       ContactMoment[]
   tasks          Task[]
+
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
 }
 
 model User {
-  id           String   @id @default(cuid())
-  clubId       String
-  name         String
-  email        String   @unique
-  passwordHash String
-  role         String   @default("LEZER") // ADMIN, TC_LID, SCOUT, LEZER
-  isActive     Boolean  @default(true)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id                   String    @id @default(uuid())
+  email                String    @unique
+  passwordHash         String?
+  name                 String
+  role                 String    // "ADMIN", "TC_LID", "SCOUT", "LEZER"
+  isActive             Boolean   @default(true)
 
-  club         Club     @relation(fields: [clubId], references: [id])
-  
-  createdPlayers        Player[]        @relation("PlayerCreator")
-  createdContactMoments ContactMoment[] @relation("ContactCreator")
-  createdTasks          Task[]          @relation("TaskCreator")
-  assignedTasks         Task[]          @relation("TaskOwner")
+  inviteToken          String?   @unique
+  inviteTokenExpires   DateTime?
 
-  @@index([clubId])
+  clubId               String
+  club                 Club      @relation(fields: [clubId], references: [id], onDelete: Cascade)
+
+  // 2FA Fields (Post-MVP)
+  twoFactorEnabled     Boolean   @default(false)
+  twoFactorSecret      String?
+  twoFactorBackupCodes String?
+  twoFactorVerifiedAt  DateTime?
+
+  // Audit Relations
+  playersCreated       Player[]        @relation("PlayerCreatedBy")
+  contactsCreated      ContactMoment[] @relation("ContactCreatedBy")
+  tasksCreated         Task[]          @relation("TaskCreatedBy")
+  tasksAssigned        Task[]          @relation("TaskAssignedTo")
+
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
 }
 
 model Player {
-  id               String        @id @default(cuid())
-  clubId           String
-  naam             String
-  clubHuidig       String?
-  team             String?
-  niveauCompetitie String?
-  positie          String?
-  nevenpositie     String?
-  voorkeursbeen    String        @default("ONBEKEND") // LINKS, RECHTS, BEIDE, ONBEKEND
-  geboortedatum    DateTime?
-  leeftijd         Int?
-  contactpersoon   String?
-  status           String        @default("TE_VOLGEN") // TE_VOLGEN, ACTIEF, PARKEREN, AFGEVALLEN, GESTOPT, GETEKEND
-  processtap       String        @default("LONGLIST") // LONGLIST, SHORTLIST, etc.
-  advies           String        @default("NOG_BEKIJKEN") // NOG_BEKIJKEN, BLIJVEN_VOLGEN, etc.
-  laatsteUpdateAt  DateTime      @default(now())
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
-  createdByUserId  String
+  id                    String   @id @default(uuid())
+  name                  String
+  position              String?
+  dateOfBirth           DateTime?
 
-  club             Club            @relation(fields: [clubId], references: [id])
-  createdBy        User            @relation("PlayerCreator", fields: [createdByUserId], references: [id])
-  contactMoments   ContactMoment[]
-  tasks            Task[]
+  // Target status logic
+  step                  String?
+  status                String?
+  statusManuallyChanged Boolean  @default(false)
 
-  @@index([clubId])
+  clubId                String
+  club                  Club     @relation(fields: [clubId], references: [id], onDelete: Cascade)
+
+  createdById           String?
+  createdBy             User?    @relation("PlayerCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+
+  contacts              ContactMoment[]
+
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
 }
 
 model ContactMoment {
-  id                String      @id @default(cuid())
-  clubId            String
-  playerId          String
-  datumTijd         DateTime    @default(now())
-  contactType       String      // INTRO_BENADERING, FOLLOW_UP, GESPREK, MEETTRAINING, AANBOD, OVERIG
-  contactTypeFree   String?
-  kanaal            String      // WHATSAPP, TELEFOON, OP_DE_CLUB, TRAINING, VIA_DERDE, EMAIL, OVERIG
-  kanaalFree        String?
-  uitkomst          String?     // POSITIEF, NEUTRAAL, TWIJFEL, NEGATIEF
-  samenvatting      String?
-  verslag           String?
-  reden             String?
-  volgendeActieDatum DateTime?
-  createdAt         DateTime    @default(now())
-  createdByUserId   String
+  id          String   @id @default(uuid())
+  type        String
+  channel     String
+  outcome     String?
+  reason      String?
+  notes       String?
 
-  club      Club   @relation(fields: [clubId], references: [id])
-  player    Player @relation(fields: [playerId], references: [id])
-  createdBy User   @relation("ContactCreator", fields: [createdByUserId], references: [id])
+  playerId    String
+  player      Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
 
-  @@index([clubId])
-  @@index([playerId])
+  clubId      String
+  club        Club     @relation(fields: [clubId], references: [id], onDelete: Cascade)
+
+  createdById String?
+  createdBy   User?    @relation("ContactCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Task {
-  id              String     @id @default(cuid())
-  clubId          String
-  titel           String
-  playerId        String?
-  eigenaarUserId  String
-  deadline        DateTime?
-  prioriteit      String     @default("NORMAAL") // LAAG, NORMAAL, HOOG
-  status          String     @default("OPEN") // OPEN, IN_UITVOERING, GEREED
-  notitie         String?
-  createdAt       DateTime   @default(now())
-  createdByUserId String
-  afgerondAt      DateTime?
+  id           String   @id @default(uuid())
+  title        String
+  description  String?
+  isCompleted  Boolean  @default(false)
 
-  club      Club    @relation(fields: [clubId], references: [id])
-  player    Player? @relation(fields: [playerId], references: [id])
-  eigenaar  User    @relation("TaskOwner", fields: [eigenaarUserId], references: [id])
-  createdBy User    @relation("TaskCreator", fields: [createdByUserId], references: [id])
+  clubId       String
+  club         Club     @relation(fields: [clubId], references: [id], onDelete: Cascade)
 
-  @@index([clubId])
-  @@index([eigenaarUserId])
+  assignedToId String?
+  assignedTo   User?    @relation("TaskAssignedTo", fields: [assignedToId], references: [id], onDelete: SetNull)
+
+  createdById  String?
+  createdBy    User?    @relation("TaskCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
