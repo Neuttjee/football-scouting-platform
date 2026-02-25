@@ -23,10 +23,20 @@ export function BrandingForm({ club }: { club: any }) {
           body: file,
         })
         const newBlob = await response.json()
+        
+        if (!response.ok) {
+          alert(`Upload mislukt: ${newBlob.error || 'Onbekende fout'}`)
+          setIsUploading(false)
+          return
+        }
+
         formData.set('logo', newBlob.url)
         setLogoUrl(newBlob.url)
       } catch (error) {
         console.error("Upload failed", error)
+        alert("Er is iets misgegaan bij het uploaden.")
+        setIsUploading(false)
+        return
       } finally {
         setIsUploading(false)
       }
