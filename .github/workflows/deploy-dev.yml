@@ -8,7 +8,6 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    environment: dev
     permissions:
       id-token: write # Required for requesting the JWT for Azure OIDC
       contents: read  # Required for actions/checkout

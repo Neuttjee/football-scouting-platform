@@ -8,9 +8,6 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    environment: 
-      name: prod
-      # GitHub Environment 'prod' should be configured with "Required reviewers" to enforce manual approval
     permissions:
       id-token: write # Required for requesting the JWT for Azure OIDC
       contents: read  # Required for actions/checkout
