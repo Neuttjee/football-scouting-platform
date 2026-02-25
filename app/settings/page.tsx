@@ -3,6 +3,8 @@ import prisma from '@/lib/prisma';
 import { redirect } from 'next/navigation';
 import { UserTable } from './UserTable';
 import { BrandingForm } from './BrandingForm';
+import { ThemeToggle } from '@/components/ThemeToggle';
+import { InviteUserModal } from './InviteUserModal';
 
 export default async function SettingsPage() {
   const session = await getSession();
@@ -15,7 +17,13 @@ export default async function SettingsPage() {
 
   return (
     <div className="space-y-8">
-      <h1 className="text-3xl font-bold">Instellingen</h1>
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold">Instellingen</h1>
+        <div className="flex items-center gap-4">
+          <span className="text-sm font-medium text-muted-foreground">Weergave:</span>
+          <ThemeToggle />
+        </div>
+      </div>
       
       <section className="bg-card p-6 rounded-lg shadow border">
         <h2 className="text-xl font-semibold mb-4">Club Branding</h2>
@@ -25,7 +33,7 @@ export default async function SettingsPage() {
       <section className="bg-card p-6 rounded-lg shadow border">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">Gebruikersbeheer</h2>
-          <button className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">Gebruiker Uitnodigen</button>
+          <InviteUserModal />
         </div>
         <UserTable users={users} currentUserId={session.user.id} />
       </section>

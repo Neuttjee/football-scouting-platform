@@ -1,0 +1,120 @@
+"use client"
+
+import * as React from "react"
+import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { updatePlayerProfile } from "../../actions"
+import { targetSteps, targetStatuses } from "@/lib/statusMapping"
+
+export function EditPlayerModal({ player }: { player: any }) {
+  const [open, setOpen] = React.useState(false)
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const formData = new FormData(e.currentTarget)
+    await updatePlayerProfile(player.id, formData)
+    setOpen(false)
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline">Bewerken (Modal)</Button>
+      </DialogTrigger>
+      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Bewerk Speler</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4 py-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">Naam *</label>
+              <input type="text" name="name" defaultValue={player.name} required className="w-full border rounded p-2 bg-background" />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium mb-1">Geboortedatum</label>
+              <input type="date" name="dateOfBirth" defaultValue={player.dateOfBirth ? new Date(player.dateOfBirth).toISOString().split('T')[0] : ''} className="w-full border rounded p-2 bg-background" />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Huidige Club</label>
+              <input type="text" name="currentClub" defaultValue={player.currentClub || ''} className="w-full border rounded p-2 bg-background" />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Team</label>
+              <input type="text" name="team" defaultValue={player.team || ''} className="w-full border rounded p-2 bg-background" />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Niveau (Huidig)</label>
+              <input type="text" name="niveau" defaultValue={player.niveau || ''} className="w-full border rounded p-2 bg-background" />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Positie</label>
+              <input type="text" name="position" defaultValue={player.position || ''} className="w-full border rounded p-2 bg-background" />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Nevenpositie</label>
+              <input type="text" name="secondaryPosition" defaultValue={player.secondaryPosition || ''} className="w-full border rounded p-2 bg-background" />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Voorkeursbeen</label>
+              <select name="preferredFoot" defaultValue={player.preferredFoot || ''} className="w-full border rounded p-2 bg-background">
+                <option value="">Selecteer been...</option>
+                <option value="Rechts">Rechts</option>
+                <option value="Links">Links</option>
+                <option value="Tweebenig">Tweebenig</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Contactpersoon</label>
+              <input type="text" name="contactPerson" defaultValue={player.contactPerson || ''} className="w-full border rounded p-2 bg-background" />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Advies</label>
+              <input type="text" name="advies" defaultValue={player.advies || ''} className="w-full border rounded p-2 bg-background" />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Processtap</label>
+              <select name="step" defaultValue={player.step || ''} className="w-full border rounded p-2 bg-background">
+                <option value="">Selecteer processtap...</option>
+                {targetSteps.map(s => <option key={s} value={s}>{s}</option>)}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Status (Override)</label>
+              <select name="status" defaultValue={player.statusManuallyChanged ? (player.status || '') : ''} className="w-full border rounded p-2 text-muted-foreground bg-background">
+                <option value="">Automatisch bepalen via processtap</option>
+                {targetStatuses.map(s => <option key={s} value={s}>{s}</option>)}
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">Korte Notities</label>
+            <textarea name="notes" defaultValue={player.notes || ''} className="w-full border rounded p-2 bg-background" rows={3}></textarea>
+          </div>
+
+          <div className="pt-4 flex justify-end">
+            <Button type="submit">Opslaan</Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
+}

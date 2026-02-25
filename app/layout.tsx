@@ -38,7 +38,7 @@ export default async function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           {session ? (
             <div className="flex h-screen overflow-hidden">
-              <Sidebar role={session.user.role} clubName={club?.name} />
+              <Sidebar role={session.user.role} clubName={club?.name} clubLogo={club?.logo} />
               <div className="flex-1 flex flex-col overflow-hidden">
                 <Topbar />
                 <main className="flex-1 overflow-y-auto pb-16 md:pb-0 relative bg-muted/20">

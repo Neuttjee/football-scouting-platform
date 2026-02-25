@@ -14,7 +14,7 @@ export async function updatePlayer(playerId: string, formData: FormData) {
   await savePlayer(playerId, formData);
 }
 
-async function savePlayer(playerId: string | null, formData: FormData) {
+async function savePlayerLogic(playerId: string | null, formData: FormData) {
   const session = await getSession();
   if (!session) throw new Error('Unauthorized');
 
@@ -25,6 +25,12 @@ async function savePlayer(playerId: string | null, formData: FormData) {
   const team = formData.get('team') as string;
   const step = formData.get('step') as string || null;
   const statusInput = formData.get('status') as string || null;
+  
+  const currentClub = formData.get('currentClub') as string || null;
+  const advies = formData.get('advies') as string || null;
+  const niveau = formData.get('niveau') as string || null;
+  const contactPerson = formData.get('contactPerson') as string || null;
+  const notes = formData.get('notes') as string || null;
   
   let dateOfBirth: Date | null = null;
   const dobStr = formData.get('dateOfBirth') as string;
@@ -56,7 +62,12 @@ async function savePlayer(playerId: string | null, formData: FormData) {
         dateOfBirth,
         step,
         status: finalStatus,
-        statusManuallyChanged
+        statusManuallyChanged,
+        currentClub,
+        advies,
+        niveau,
+        contactPerson,
+        notes
       }
     });
   } else {
@@ -72,12 +83,65 @@ async function savePlayer(playerId: string | null, formData: FormData) {
         step,
         status: finalStatus,
         statusManuallyChanged,
+        currentClub,
+        advies,
+        niveau,
+        contactPerson,
+        notes,
         clubId: session.user.clubId,
         createdById: session.user.id
       }
     });
   }
+}
 
+export async function createPlayer(formData: FormData) {
+  await savePlayerLogic(null, formData);
   revalidatePath('/players');
   redirect('/players');
+}
+
+export async function updatePlayer(playerId: string, formData: FormData) {
+  await savePlayerLogic(playerId, formData);
+  revalidatePath('/players');
+  redirect('/players');
+}
+
+export async function updatePlayerProfile(playerId: string, formData: FormData) {
+  await savePlayerLogic(playerId, formData);
+  revalidatePath(`/players/${playerId}/profile`);
+  redirect(`/players/${playerId}/profile`);
+}
+
+export async function updatePlayerField(playerId: string, field: string, value: string | null) {
+  const session = await getSession();
+  if (!session) throw new Error('Unauthorized');
+  
+  if (field === 'step') {
+    const mappedStatus = mapTargetStepToStatus(value);
+    await prisma.player.update({
+      where: { id: playerId, clubId: session.user.clubId },
+      data: {
+        step: value,
+        status: mappedStatus,
+        statusManuallyChanged: false,
+      }
+    });
+  } else if (field === 'status') {
+    await prisma.player.update({
+      where: { id: playerId, clubId: session.user.clubId },
+      data: {
+        status: value,
+        statusManuallyChanged: true,
+      }
+    });
+  } else {
+    await prisma.player.update({
+      where: { id: playerId, clubId: session.user.clubId },
+      data: {
+        [field]: value
+      }
+    });
+  }
+  revalidatePath('/players');
 }

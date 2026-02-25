@@ -4,6 +4,8 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { EditPlayerModal } from './EditPlayerModal';
+import { TaskList } from '@/app/tasks/TaskList';
 
 export default async function PlayerProfilePage({
   params,
@@ -23,6 +25,11 @@ export default async function PlayerProfilePage({
         include: {
           createdBy: { select: { name: true } }
         }
+      },
+      tasks: {
+        where: { isCompleted: false },
+        orderBy: { createdAt: 'desc' },
+        include: { assignedTo: true, createdBy: true, player: true }
       }
     }
   });
@@ -37,12 +44,16 @@ export default async function PlayerProfilePage({
 
   return (
     <div className="space-y-6">
+      <div className="flex items-center space-x-4 mb-2">
+        <Link href="/players" className="text-muted-foreground hover:text-foreground transition-colors">
+          ← Terug naar spelers
+        </Link>
+      </div>
+
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">{player.name}</h1>
         <div className="space-x-2">
-          <Button asChild variant="outline">
-            <Link href={`/players/${player.id}`}>Bewerken</Link>
-          </Button>
+          <EditPlayerModal player={player} />
           <Button asChild>
             <Link href={`/players/${player.id}/contacts`}>Contact Toevoegen</Link>
           </Button>
@@ -62,8 +73,14 @@ export default async function PlayerProfilePage({
               <div className="text-muted-foreground">Geboortedatum</div>
               <div>{player.dateOfBirth ? new Date(player.dateOfBirth).toLocaleDateString('nl-NL') : '-'}</div>
               
+              <div className="text-muted-foreground">Huidige Club</div>
+              <div>{player.currentClub || '-'}</div>
+
               <div className="text-muted-foreground">Team</div>
               <div>{player.team || '-'}</div>
+
+              <div className="text-muted-foreground">Niveau (Huidig)</div>
+              <div>{player.niveau || '-'}</div>
 
               <div className="text-muted-foreground">Positie</div>
               <div>{player.position || '-'}</div>
@@ -73,7 +90,17 @@ export default async function PlayerProfilePage({
 
               <div className="text-muted-foreground">Voorkeursbeen</div>
               <div>{player.preferredFoot || '-'}</div>
+
+              <div className="text-muted-foreground">Contactpersoon</div>
+              <div>{player.contactPerson || '-'}</div>
             </div>
+            
+            {player.notes && (
+              <div className="mt-4 pt-4 border-t">
+                <div className="text-muted-foreground text-sm mb-1">Notities</div>
+                <div className="text-sm bg-muted/50 p-3 rounded-md">{player.notes}</div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -93,6 +120,9 @@ export default async function PlayerProfilePage({
                   <span className="text-xs text-orange-500" title="Handmatig aangepast">⚠️</span>
                 )}
               </div>
+
+              <div className="text-muted-foreground">Advies</div>
+              <div className="font-medium">{player.advies || '-'}</div>
             </div>
           </CardContent>
         </Card>
@@ -100,7 +130,20 @@ export default async function PlayerProfilePage({
 
       <Card>
         <CardHeader>
-          <CardTitle>Contacten Tijdlijn</CardTitle>
+          <CardTitle>Openstaande Taken ({player.tasks.length})</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {player.tasks.length === 0 ? (
+            <p className="text-sm text-muted-foreground">Geen openstaande taken voor deze speler.</p>
+          ) : (
+            <TaskList tasks={player.tasks} />
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Contacten Tijdlijn ({player.contacts.length})</CardTitle>
         </CardHeader>
         <CardContent>
           {player.contacts.length === 0 ? (

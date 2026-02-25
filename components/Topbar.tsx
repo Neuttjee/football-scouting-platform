@@ -2,9 +2,9 @@
 
 import * as React from "react"
 import { useRouter } from "next/navigation"
-import { Search } from "lucide-react"
+import { Search, Settings } from "lucide-react"
 import { Input } from "@/components/ui/input"
-import { ThemeToggle } from "@/components/ThemeToggle"
+import Link from "next/link"
 
 export function Topbar() {
   const router = useRouter()
@@ -20,21 +20,26 @@ export function Topbar() {
   }
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b bg-background px-4 md:px-8 shadow-sm">
+    <header 
+      className="sticky top-0 z-30 flex h-16 w-full items-center justify-between shadow-sm px-4 md:px-8"
+      style={{ backgroundColor: 'var(--primary-color)', color: 'white' }}
+    >
       <div className="flex flex-1 items-center gap-4">
         <form onSubmit={handleSearch} className="relative w-full max-w-md">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             type="search"
             placeholder="Zoek spelers..."
-            className="w-full bg-background pl-9 md:w-[300px] lg:w-[400px]"
+            className="w-full bg-background text-foreground pl-9 md:w-[300px] lg:w-[400px]"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
         </form>
       </div>
       <div className="flex items-center gap-4">
-        <ThemeToggle />
+        <Link href="/settings" className="p-2 hover:bg-white/10 rounded-full transition-colors">
+          <Settings className="h-5 w-5 text-white" />
+        </Link>
       </div>
     </header>
   )

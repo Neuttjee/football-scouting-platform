@@ -3,16 +3,9 @@ import prisma from '@/lib/prisma';
 import Link from 'next/link';
 import { PlayersTable } from './PlayersTable';
 
-export default async function PlayersPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ q?: string }>
-}) {
+export default async function PlayersPage() {
   const session = await getSession();
   if (!session) return null;
-
-  const params = await searchParams;
-  const initialQuery = params.q || "";
 
   const players = await prisma.player.findMany({
     where: { clubId: session.user.clubId },
@@ -24,6 +17,12 @@ export default async function PlayersPage({
       step: true,
       status: true,
       statusManuallyChanged: true,
+      currentClub: true,
+      team: true,
+      secondaryPosition: true,
+      preferredFoot: true,
+      dateOfBirth: true,
+      advies: true,
     }
   });
 
@@ -36,7 +35,7 @@ export default async function PlayersPage({
         </Link>
       </div>
 
-      <PlayersTable data={players} initialQuery={initialQuery} />
+      <PlayersTable data={players} />
     </div>
   );
 }

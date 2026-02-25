@@ -25,30 +25,30 @@ export default async function DashboardPage() {
       <h1 className="text-3xl font-bold">Dashboard</h1>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white p-6 rounded-lg shadow border border-gray-100 flex flex-col items-center justify-center">
-          <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wider">Aantal Spelers</h2>
-          <p className="text-5xl font-bold mt-2 text-blue-600">{playerCount}</p>
+        <div className="bg-card p-6 rounded-lg shadow-sm border flex flex-col items-center justify-center">
+          <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Aantal Spelers</h2>
+          <p className="text-5xl font-bold mt-2 text-blue-600 dark:text-blue-400">{playerCount}</p>
         </div>
         
-        <div className="bg-white p-6 rounded-lg shadow border border-gray-100 flex flex-col items-center justify-center">
-          <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wider">Open Taken (Club)</h2>
-          <p className="text-5xl font-bold mt-2 text-green-600">{taskCount}</p>
+        <div className="bg-card p-6 rounded-lg shadow-sm border flex flex-col items-center justify-center">
+          <h2 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Open Taken (Club)</h2>
+          <p className="text-5xl font-bold mt-2 text-green-600 dark:text-green-400">{taskCount}</p>
         </div>
       </div>
 
-      <div className="bg-white p-6 rounded-lg shadow border border-gray-100">
+      <div className="bg-card p-6 rounded-lg shadow-sm border">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold text-gray-900">Mijn Open Taken</h2>
-          <Link href="/tasks" className="text-sm text-blue-600 hover:underline">Alle taken →</Link>
+          <h2 className="text-xl font-bold text-foreground">Mijn Open Taken</h2>
+          <Link href="/tasks" className="text-sm text-blue-600 hover:underline dark:text-blue-400">Alle taken →</Link>
         </div>
         <div className="space-y-3">
           {myTasks.length === 0 && (
-            <p className="text-gray-500 text-sm">Je hebt geen openstaande taken.</p>
+            <p className="text-muted-foreground text-sm">Je hebt geen openstaande taken.</p>
           )}
           {myTasks.map(t => (
-            <div key={t.id} className="flex items-center space-x-3 p-3 bg-gray-50 rounded border border-gray-100">
+            <div key={t.id} className="flex items-center space-x-3 p-3 bg-muted/50 rounded border">
               <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-              <span className="text-gray-800 font-medium">{t.title}</span>
+              <span className="text-foreground font-medium">{t.title}</span>
             </div>
           ))}
         </div>

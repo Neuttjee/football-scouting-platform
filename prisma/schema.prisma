@@ -63,6 +63,13 @@ model Player {
   team                  String?
   dateOfBirth           DateTime?
 
+  // New fields
+  currentClub           String?
+  advies                String?
+  niveau                String?
+  contactPerson         String?
+  notes                 String?
+
   // Target status logic
   step                  String?
   status                String?
@@ -75,6 +82,7 @@ model Player {
   createdBy             User?    @relation("PlayerCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
 
   contacts              ContactMoment[]
+  tasks                 Task[]
 
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
@@ -102,20 +110,25 @@ model ContactMoment {
 }
 
 model Task {
-  id           String   @id @default(uuid())
-  title        String
-  description  String?
-  isCompleted  Boolean  @default(false)
+  id                     String   @id @default(uuid())
+  title                  String
+  description            String?
+  isCompleted            Boolean  @default(false)
+  dueDate                DateTime?
+  assignedToExternalName String?
 
-  clubId       String
-  club         Club     @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  clubId                 String
+  club                   Club     @relation(fields: [clubId], references: [id], onDelete: Cascade)
 
-  assignedToId String?
-  assignedTo   User?    @relation("TaskAssignedTo", fields: [assignedToId], references: [id], onDelete: SetNull)
+  assignedToId           String?
+  assignedTo             User?    @relation("TaskAssignedTo", fields: [assignedToId], references: [id], onDelete: SetNull)
 
-  createdById  String?
-  createdBy    User?    @relation("TaskCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  createdById            String?
+  createdBy              User?    @relation("TaskCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
 
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  playerId               String?
+  player                 Player?  @relation(fields: [playerId], references: [id], onDelete: SetNull)
+
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
 }

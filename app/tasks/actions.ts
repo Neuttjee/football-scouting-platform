@@ -11,12 +11,23 @@ export async function createTask(formData: FormData) {
   const title = formData.get('title') as string;
   const description = formData.get('description') as string | null;
   const assignedToId = formData.get('assignedToId') as string;
+  const assignedToExternalName = formData.get('assignedToExternalName') as string;
+  const playerId = formData.get('playerId') as string;
+  const dueDateStr = formData.get('dueDate') as string;
+
+  let dueDate: Date | null = null;
+  if (dueDateStr) {
+    dueDate = new Date(dueDateStr);
+  }
 
   await prisma.task.create({
     data: {
       title,
       description,
       assignedToId: assignedToId || null,
+      assignedToExternalName: assignedToExternalName || null,
+      playerId: playerId || null,
+      dueDate,
       clubId: session.user.clubId,
       createdById: session.user.id
     }

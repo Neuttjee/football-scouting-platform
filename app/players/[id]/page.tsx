@@ -78,6 +78,31 @@ export default async function EditPlayerPage({ params }: { params: { id: string 
           <p className="text-xs text-gray-500 mt-1">Laat leeg om status automatisch te laten bepalen op basis van de processtap. Huidige status: {player.status || 'Geen'}</p>
         </div>
 
+        <div>
+          <label className="block text-sm font-medium mb-1">Huidige Club</label>
+          <input type="text" name="currentClub" defaultValue={player.currentClub || ''} className="w-full border rounded p-2" />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">Niveau (Huidig)</label>
+          <input type="text" name="niveau" defaultValue={player.niveau || ''} className="w-full border rounded p-2" />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">Contactpersoon</label>
+          <input type="text" name="contactPerson" defaultValue={player.contactPerson || ''} className="w-full border rounded p-2" />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">Advies</label>
+          <input type="text" name="advies" defaultValue={player.advies || ''} className="w-full border rounded p-2" />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">Korte Notities</label>
+          <textarea name="notes" defaultValue={player.notes || ''} className="w-full border rounded p-2" rows={3}></textarea>
+        </div>
+
         <div className="pt-4 flex justify-end">
           <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Opslaan</button>
         </div>
