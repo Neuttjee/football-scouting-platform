@@ -38,30 +38,20 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_CED7D04BF29B4110A52235021697196F }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_0E21B43B810543988F53E1140BFE04C3 }}
 
-      - name: Zip artifact for deployment
-        run: zip -r release.zip . -x ".git/*"
-
       - name: Prepare Azure App Service Settings
         run: |
           RG=$(az webapp list --query "[?name=='football-scouting-dev'].resourceGroup" -o tsv)
           if [ -n "$RG" ]; then
-            echo "Setting SCM_DO_BUILD_DURING_DEPLOYMENT to false to prevent Kudu from crashing on Free tier..."
-            az webapp config appsettings set --resource-group $RG --name football-scouting-dev --settings SCM_DO_BUILD_DURING_DEPLOYMENT=false
-            
-            echo "Restarting Web App to clear any stuck Kudu processes..."
+            az webapp config appsettings set --resource-group $RG --name football-scouting-dev --settings WEBSITE_WEBDEPLOY_USE_SCM=true SCM_DO_BUILD_DURING_DEPLOYMENT=false
             az webapp restart --name football-scouting-dev --resource-group $RG
-            sleep 15
+            sleep 20
           fi
 
-      - name: Deploy via Azure CLI (Native)
-        run: |
-          RG=$(az webapp list --query "[?name=='football-scouting-dev'].resourceGroup" -o tsv)
-          if [ -n "$RG" ]; then
-            echo "Deploying release.zip via native az cli..."
-            az webapp deploy --resource-group $RG --name football-scouting-dev --src-path release.zip --type zip
-          else
-            echo "Web app football-scouting-dev not found."
-          fi
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: 'football-scouting-dev'
+          package: .
 
       - name: Set Startup Command (Migrate & Seed)
         run: |
