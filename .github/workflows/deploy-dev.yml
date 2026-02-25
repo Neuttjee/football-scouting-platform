@@ -41,13 +41,22 @@ jobs:
       - name: Zip artifact for deployment
         run: zip -r release.zip . -x ".git/*"
 
+      - name: Prepare Azure App Service Settings
+        run: |
+          RG=$(az webapp list --query "[?name=='football-scouting-dev'].resourceGroup" -o tsv)
+          if [ -n "$RG" ]; then
+            echo "Setting SCM_DO_BUILD_DURING_DEPLOYMENT to false to prevent Kudu from crashing on Free tier..."
+            az webapp config appsettings set --resource-group $RG --name football-scouting-dev --settings SCM_DO_BUILD_DURING_DEPLOYMENT=false
+            
+            echo "Restarting Web App to clear any stuck Kudu processes..."
+            az webapp restart --name football-scouting-dev --resource-group $RG
+            sleep 15
+          fi
+
       - name: Deploy via Azure CLI (Native)
         run: |
           RG=$(az webapp list --query "[?name=='football-scouting-dev'].resourceGroup" -o tsv)
           if [ -n "$RG" ]; then
-            echo "Starting Web App just in case..."
-            az webapp start --name football-scouting-dev --resource-group $RG || true
-            
             echo "Deploying release.zip via native az cli..."
             az webapp deploy --resource-group $RG --name football-scouting-dev --src-path release.zip --type zip
           else
