@@ -137,3 +137,26 @@ export async function updatePlayerField(playerId: string, field: string, value: 
   }
   revalidatePath('/players');
 }
+
+export async function searchPlayers(query: string) {
+  const session = await getSession();
+  if (!session) return [];
+  
+  if (!query || query.trim() === '') return [];
+
+  const players = await prisma.player.findMany({
+    where: {
+      clubId: session.user.clubId,
+      name: { contains: query, mode: 'insensitive' }
+    },
+    select: {
+      id: true,
+      name: true,
+      currentClub: true,
+      position: true
+    },
+    take: 5
+  });
+
+  return players;
+}
