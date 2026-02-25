@@ -52,6 +52,7 @@ jobs:
         with:
           app-name: 'football-scouting-dev'
           package: .
+          clean: true
 
       - name: Set Startup Command (Migrate & Seed)
         run: |
