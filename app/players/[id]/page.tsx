@@ -37,6 +37,26 @@ export default async function EditPlayerPage({ params }: { params: { id: string 
         </div>
 
         <div>
+          <label className="block text-sm font-medium mb-1">Nevenpositie</label>
+          <input type="text" name="secondaryPosition" defaultValue={player.secondaryPosition || ''} className="w-full border rounded p-2" />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">Voorkeursbeen</label>
+          <select name="preferredFoot" defaultValue={player.preferredFoot || ''} className="w-full border rounded p-2">
+            <option value="">Selecteer been...</option>
+            <option value="Rechts">Rechts</option>
+            <option value="Links">Links</option>
+            <option value="Tweebenig">Tweebenig</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">Team</label>
+          <input type="text" name="team" defaultValue={player.team || ''} className="w-full border rounded p-2" />
+        </div>
+
+        <div>
           <label className="block text-sm font-medium mb-1">Geboortedatum</label>
           <input type="date" name="dateOfBirth" defaultValue={player.dateOfBirth ? player.dateOfBirth.toISOString().split('T')[0] : ''} className="w-full border rounded p-2" />
         </div>

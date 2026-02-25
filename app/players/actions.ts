@@ -20,6 +20,9 @@ async function savePlayer(playerId: string | null, formData: FormData) {
 
   const name = formData.get('name') as string;
   const position = formData.get('position') as string;
+  const secondaryPosition = formData.get('secondaryPosition') as string;
+  const preferredFoot = formData.get('preferredFoot') as string;
+  const team = formData.get('team') as string;
   const step = formData.get('step') as string || null;
   const statusInput = formData.get('status') as string || null;
   
@@ -47,6 +50,9 @@ async function savePlayer(playerId: string | null, formData: FormData) {
       data: {
         name,
         position,
+        secondaryPosition,
+        preferredFoot,
+        team,
         dateOfBirth,
         step,
         status: finalStatus,
@@ -59,6 +65,9 @@ async function savePlayer(playerId: string | null, formData: FormData) {
       data: {
         name,
         position,
+        secondaryPosition,
+        preferredFoot,
+        team,
         dateOfBirth,
         step,
         status: finalStatus,

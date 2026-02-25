@@ -22,6 +22,26 @@ export default function NewPlayerPage() {
         </div>
 
         <div>
+          <label className="block text-sm font-medium mb-1">Nevenpositie</label>
+          <input type="text" name="secondaryPosition" className="w-full border rounded p-2" />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">Voorkeursbeen</label>
+          <select name="preferredFoot" className="w-full border rounded p-2">
+            <option value="">Selecteer been...</option>
+            <option value="Rechts">Rechts</option>
+            <option value="Links">Links</option>
+            <option value="Tweebenig">Tweebenig</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">Team</label>
+          <input type="text" name="team" className="w-full border rounded p-2" />
+        </div>
+
+        <div>
           <label className="block text-sm font-medium mb-1">Geboortedatum</label>
           <input type="date" name="dateOfBirth" className="w-full border rounded p-2" />
         </div>

@@ -42,9 +42,21 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex h-screen w-full items-center justify-center bg-gray-50 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1 text-center">
+    <div className="flex h-screen w-full items-center justify-center bg-background p-4">
+      <Card className="w-full max-w-md shadow-lg">
+        <CardHeader className="space-y-4 text-center">
+          <div className="flex justify-center mb-2">
+            {/* Placeholder voor het statische logo in de public map */}
+            <img 
+              src="/logo.png" 
+              alt="Scouting Platform Logo" 
+              className="h-16 w-auto object-contain"
+              onError={(e) => {
+                // Fallback als logo.png nog niet bestaat
+                (e.target as HTMLImageElement).style.display = 'none';
+              }}
+            />
+          </div>
           <CardTitle className="text-2xl font-bold tracking-tight">Welkom</CardTitle>
           <CardDescription>
             Log in op je club dashboard
@@ -74,13 +86,13 @@ export default function LoginPage() {
               />
             </div>
             {error && (
-              <div className="text-sm text-red-500 font-medium">
+              <div className="text-sm text-destructive font-medium">
                 {error}
               </div>
             )}
           </CardContent>
-          <CardFooter>
-            <Button type="submit" className="w-full" disabled={loading}>
+          <CardFooter className="pt-8 pb-6">
+            <Button type="submit" className="w-full h-11 text-base" disabled={loading}>
               {loading ? 'Bezig met inloggen...' : 'Inloggen'}
             </Button>
           </CardFooter>

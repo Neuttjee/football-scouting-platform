@@ -1,14 +1,30 @@
 import { getSession } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import Link from 'next/link';
+import { PlayersTable } from './PlayersTable';
 
-export default async function PlayersPage() {
+export default async function PlayersPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>
+}) {
   const session = await getSession();
   if (!session) return null;
 
+  const params = await searchParams;
+  const initialQuery = params.q || "";
+
   const players = await prisma.player.findMany({
     where: { clubId: session.user.clubId },
-    orderBy: { updatedAt: 'desc' }
+    orderBy: { updatedAt: 'desc' },
+    select: {
+      id: true,
+      name: true,
+      position: true,
+      step: true,
+      status: true,
+      statusManuallyChanged: true,
+    }
   });
 
   return (
@@ -20,43 +36,7 @@ export default async function PlayersPage() {
         </Link>
       </div>
 
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="bg-gray-50 border-b">
-              <th className="p-3 text-sm font-semibold text-gray-700">Naam</th>
-              <th className="p-3 text-sm font-semibold text-gray-700">Positie</th>
-              <th className="p-3 text-sm font-semibold text-gray-700">Processtap</th>
-              <th className="p-3 text-sm font-semibold text-gray-700">Status</th>
-              <th className="p-3 text-sm font-semibold text-gray-700 text-right">Acties</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y">
-            {players.map(p => (
-              <tr key={p.id} className="hover:bg-gray-50">
-                <td className="p-3 text-sm">{p.name}</td>
-                <td className="p-3 text-sm">{p.position || '-'}</td>
-                <td className="p-3 text-sm">{p.step || '-'}</td>
-                <td className="p-3 text-sm">
-                  {p.status || '-'}
-                  {p.statusManuallyChanged && (
-                    <span className="ml-2 text-xs text-orange-500" title="Handmatig aangepast">⚠️</span>
-                  )}
-                </td>
-                <td className="p-3 text-sm text-right space-x-2">
-                  <Link href={`/players/${p.id}`} className="text-blue-600 hover:underline">Bewerk</Link>
-                  <Link href={`/players/${p.id}/contacts`} className="text-gray-600 hover:underline">Contacten</Link>
-                </td>
-              </tr>
-            ))}
-            {players.length === 0 && (
-              <tr>
-                <td colSpan={5} className="p-4 text-center text-gray-500">Geen spelers gevonden.</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+      <PlayersTable data={players} initialQuery={initialQuery} />
     </div>
   );
 }

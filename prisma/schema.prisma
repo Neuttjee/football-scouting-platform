@@ -13,6 +13,7 @@ model Club {
   logo           String?
   primaryColor   String?
   secondaryColor String?
+  tertiaryColor  String?
 
   users          User[]
   players        Player[]
@@ -57,6 +58,9 @@ model Player {
   id                    String   @id @default(uuid())
   name                  String
   position              String?
+  secondaryPosition     String?
+  preferredFoot         String?
+  team                  String?
   dateOfBirth           DateTime?
 
   // Target status logic

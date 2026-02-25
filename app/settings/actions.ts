@@ -10,10 +10,17 @@ export async function updateClubBranding(formData: FormData) {
 
   const primaryColor = formData.get('primaryColor') as string;
   const secondaryColor = formData.get('secondaryColor') as string;
+  const tertiaryColor = formData.get('tertiaryColor') as string;
+  const logo = formData.get('logo') as string;
+
+  const data: any = { primaryColor, secondaryColor, tertiaryColor };
+  if (logo) {
+    data.logo = logo;
+  }
 
   await prisma.club.update({
     where: { id: session.user.clubId },
-    data: { primaryColor, secondaryColor },
+    data,
   });
 
   revalidatePath('/settings');
