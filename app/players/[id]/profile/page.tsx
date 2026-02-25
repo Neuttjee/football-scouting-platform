@@ -43,145 +43,177 @@ export default async function PlayerProfilePage({
     : null;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="flex items-center space-x-4 mb-2">
-        <Link href="/players" className="text-muted-foreground hover:text-foreground transition-colors">
+        <Link href="/players" className="text-text-muted hover:text-text-primary transition-colors text-sm uppercase tracking-wider font-medium">
           ← Terug naar spelers
         </Link>
       </div>
 
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">{player.name}</h1>
-        <div className="space-x-2">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-bg-card p-6 rounded-xl border border-border-dark">
+        <div>
+          <h1 className="text-4xl font-bold text-text-primary mb-1">{player.name}</h1>
+          <div className="flex items-center gap-3 text-sm text-text-secondary">
+            <span>{player.currentClub || 'Geen club'}</span>
+            <span className="w-1 h-1 rounded-full bg-border-dark"></span>
+            <span>{player.position || 'Geen positie'}</span>
+            {age && (
+              <>
+                <span className="w-1 h-1 rounded-full bg-border-dark"></span>
+                <span className="font-mono">{age} jaar</span>
+              </>
+            )}
+          </div>
+        </div>
+        <div className="flex space-x-3">
           <EditPlayerModal player={player} />
-          <Button asChild>
+          <Button asChild className="bg-accent-primary hover:bg-accent-glow text-white shadow-[0_0_15px_rgba(var(--primary-rgb),0.3)] transition-all">
             <Link href={`/players/${player.id}/contacts`}>Contact Toevoegen</Link>
           </Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Algemene Info</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <div className="grid grid-cols-2 gap-2 text-sm">
-              <div className="text-muted-foreground">Leeftijd</div>
-              <div>{age ? `${age} jaar` : '-'}</div>
-              
-              <div className="text-muted-foreground">Geboortedatum</div>
-              <div>{player.dateOfBirth ? new Date(player.dateOfBirth).toLocaleDateString('nl-NL') : '-'}</div>
-              
-              <div className="text-muted-foreground">Huidige Club</div>
-              <div>{player.currentClub || '-'}</div>
-
-              <div className="text-muted-foreground">Team</div>
-              <div>{player.team || '-'}</div>
-
-              <div className="text-muted-foreground">Niveau (Huidig)</div>
-              <div>{player.niveau || '-'}</div>
-
-              <div className="text-muted-foreground">Positie</div>
-              <div>{player.position || '-'}</div>
-
-              <div className="text-muted-foreground">Nevenpositie</div>
-              <div>{player.secondaryPosition || '-'}</div>
-
-              <div className="text-muted-foreground">Voorkeursbeen</div>
-              <div>{player.preferredFoot || '-'}</div>
-
-              <div className="text-muted-foreground">Contactpersoon</div>
-              <div>{player.contactPerson || '-'}</div>
-            </div>
-            
-            {player.notes && (
-              <div className="mt-4 pt-4 border-t">
-                <div className="text-muted-foreground text-sm mb-1">Notities</div>
-                <div className="text-sm bg-muted/50 p-3 rounded-md">{player.notes}</div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="md:col-span-2 space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-accent-primary uppercase tracking-widest text-xs">Algemene Info</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 text-sm">
+                <div>
+                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Geboortedatum</div>
+                  <div className="font-medium text-text-primary font-mono">{player.dateOfBirth ? new Date(player.dateOfBirth).toLocaleDateString('nl-NL') : '-'}</div>
+                </div>
+                <div>
+                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Team</div>
+                  <div className="font-medium text-text-primary">{player.team || '-'}</div>
+                </div>
+                <div>
+                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Niveau (Huidig)</div>
+                  <div className="font-medium text-text-primary">{player.niveau || '-'}</div>
+                </div>
+                <div>
+                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Nevenpositie</div>
+                  <div className="font-medium text-text-primary">{player.secondaryPosition || '-'}</div>
+                </div>
+                <div>
+                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Voorkeursbeen</div>
+                  <div className="font-medium text-text-primary">{player.preferredFoot || '-'}</div>
+                </div>
+                <div>
+                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Contactpersoon</div>
+                  <div className="font-medium text-text-primary">{player.contactPerson || '-'}</div>
+                </div>
               </div>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Scouting Status</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <div className="grid grid-cols-2 gap-2 text-sm">
-              <div className="text-muted-foreground">Processtap</div>
-              <div className="font-medium">{player.step || '-'}</div>
               
-              <div className="text-muted-foreground">Status</div>
-              <div className="font-medium flex items-center gap-2">
-                {player.status || '-'}
-                {player.statusManuallyChanged && (
-                  <span className="text-xs text-orange-500" title="Handmatig aangepast">⚠️</span>
-                )}
+              {player.notes && (
+                <div className="mt-6 pt-6 border-t border-border-dark">
+                  <div className="text-text-muted uppercase tracking-wider text-xs mb-2">Notities</div>
+                  <div className="text-sm bg-bg-secondary p-4 rounded-lg border border-border-dark text-text-secondary leading-relaxed">{player.notes}</div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-accent-primary uppercase tracking-widest text-xs">Openstaande Taken ({player.tasks.length})</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {player.tasks.length === 0 ? (
+                <p className="text-sm text-text-muted">Geen openstaande taken voor deze speler.</p>
+              ) : (
+                <TaskList tasks={player.tasks} />
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-accent-primary uppercase tracking-widest text-xs">Contacten Tijdlijn ({player.contacts.length})</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {player.contacts.length === 0 ? (
+                <p className="text-sm text-text-muted">Nog geen contactmomenten geregistreerd.</p>
+              ) : (
+                <div className="space-y-6">
+                  {player.contacts.map((contact) => (
+                    <div key={contact.id} className="border-l-2 border-accent-primary/50 pl-5 pb-2 relative">
+                      <div className="absolute w-3 h-3 bg-accent-primary rounded-full -left-[7px] top-1 shadow-[0_0_10px_rgba(var(--primary-rgb),0.5)]"></div>
+                      <div className="flex justify-between items-start mb-2">
+                        <div className="font-bold text-text-primary">{contact.type} <span className="text-text-muted font-normal">({contact.channel})</span></div>
+                        <div className="text-xs text-text-muted font-mono">
+                          {new Date(contact.createdAt).toLocaleDateString('nl-NL')}
+                        </div>
+                      </div>
+                      <div className="text-sm text-text-secondary mb-3">
+                        Door: <span className="text-text-primary">{contact.createdBy?.name || 'Onbekend'}</span>
+                      </div>
+                      <div className="bg-bg-secondary p-4 rounded-lg border border-border-dark space-y-2">
+                        {contact.outcome && (
+                          <div className="text-sm">
+                            <span className="text-text-muted uppercase tracking-wider text-xs mr-2">Uitkomst:</span> <span className="text-text-primary">{contact.outcome}</span>
+                          </div>
+                        )}
+                        {contact.reason && (
+                          <div className="text-sm">
+                            <span className="text-text-muted uppercase tracking-wider text-xs mr-2">Reden:</span> <span className="text-text-primary">{contact.reason}</span>
+                          </div>
+                        )}
+                        {contact.notes && (
+                          <div className="text-sm mt-3 pt-3 border-t border-border-dark text-text-secondary">
+                            {contact.notes}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="space-y-6">
+          <Card className="border-accent-primary/30 shadow-[0_0_30px_rgba(var(--primary-rgb),0.05)]">
+            <CardHeader>
+              <CardTitle className="text-accent-primary uppercase tracking-widest text-xs">Scouting Status</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div>
+                <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Processtap</div>
+                <div className="font-bold text-lg text-text-primary">{player.step || '-'}</div>
               </div>
-
-              <div className="text-muted-foreground">Advies</div>
-              <div className="font-medium">{player.advies || '-'}</div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Openstaande Taken ({player.tasks.length})</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {player.tasks.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Geen openstaande taken voor deze speler.</p>
-          ) : (
-            <TaskList tasks={player.tasks} />
-          )}
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Contacten Tijdlijn ({player.contacts.length})</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {player.contacts.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Nog geen contactmomenten geregistreerd.</p>
-          ) : (
-            <div className="space-y-4">
-              {player.contacts.map((contact) => (
-                <div key={contact.id} className="border-l-2 border-primary pl-4 pb-4">
-                  <div className="flex justify-between items-start mb-1">
-                    <div className="font-medium">{contact.type} ({contact.channel})</div>
-                    <div className="text-xs text-muted-foreground">
-                      {new Date(contact.createdAt).toLocaleDateString('nl-NL')}
-                    </div>
-                  </div>
-                  <div className="text-sm text-muted-foreground mb-2">
-                    Door: {contact.createdBy?.name || 'Onbekend'}
-                  </div>
-                  {contact.outcome && (
-                    <div className="text-sm mb-1">
-                      <span className="font-medium">Uitkomst:</span> {contact.outcome}
-                    </div>
-                  )}
-                  {contact.reason && (
-                    <div className="text-sm mb-1">
-                      <span className="font-medium">Reden:</span> {contact.reason}
-                    </div>
-                  )}
-                  {contact.notes && (
-                    <div className="text-sm mt-2 bg-muted p-3 rounded-md">
-                      {contact.notes}
-                    </div>
+              
+              <div>
+                <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Status</div>
+                <div className="font-bold text-lg flex items-center gap-2 text-text-primary">
+                  {player.status || '-'}
+                  {player.statusManuallyChanged && (
+                    <span className="text-xs text-accent-secondary bg-accent-secondary/10 px-2 py-0.5 rounded" title="Handmatig aangepast">Handmatig</span>
                   )}
                 </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+              </div>
+
+              <div>
+                <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Advies</div>
+                <div className="font-bold text-lg text-text-primary">{player.advies || '-'}</div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Placeholder for future Radar Chart */}
+          <Card className="opacity-50 border-dashed">
+            <CardHeader>
+              <CardTitle className="text-text-muted uppercase tracking-widest text-xs">Radar Chart (Binnenkort)</CardTitle>
+            </CardHeader>
+            <CardContent className="flex items-center justify-center h-48">
+              <div className="text-text-muted text-sm">Visualisatie data volgt</div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 }
