@@ -34,9 +34,6 @@ jobs:
       - name: Build application
         run: npm run build
 
-      - name: Zip artifact for deployment
-        run: zip -r release.zip . -x ".git/*"
-
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -48,10 +45,12 @@ jobs:
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'football-scouting-test'
-          package: release.zip
+          slot-name: 'Production'
+          package: .
 
       - name: Set Startup Command (Migrate & Seed)
         uses: azure/appservice-settings@v1
         with:
           app-name: 'football-scouting-test'
+          slot-name: 'Production'
           app-settings-json: '[{ "name": "STARTUP_COMMAND", "value": "npx prisma migrate deploy && npx prisma db seed && npm run start" }]'

@@ -31,9 +31,6 @@ jobs:
       - name: Build application
         run: npm run build
 
-      - name: Zip artifact for deployment
-        run: zip -r release.zip . -x ".git/*"
-
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -46,10 +43,12 @@ jobs:
         with:
           # Als je prod app service anders heet, pas dit hier aan (bijv 'football-scouting-platform')
           app-name: 'football-scouting-platform' 
-          package: release.zip
+          slot-name: 'Production'
+          package: .
 
       - name: Set Startup Command (Migrate ONLY, No Seed)
         uses: azure/appservice-settings@v1
         with:
           app-name: 'football-scouting-platform'
+          slot-name: 'Production'
           app-settings-json: '[{ "name": "STARTUP_COMMAND", "value": "npx prisma migrate deploy && npm run start" }]'
