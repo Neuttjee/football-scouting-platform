@@ -25,7 +25,7 @@ export function EditPlayerModal({ player }: { player: any }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">Bewerken (Modal)</Button>
+        <Button className="bg-bg-secondary text-text-primary border border-border-dark hover:border-accent-primary hover:text-accent-primary transition-colors">Bewerken</Button>
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
@@ -111,7 +111,7 @@ export function EditPlayerModal({ player }: { player: any }) {
           </div>
 
           <div className="pt-4 flex justify-end">
-            <Button type="submit">Opslaan</Button>
+            <Button type="submit" className="btn-premium text-white">Opslaan</Button>
           </div>
         </form>
       </DialogContent>

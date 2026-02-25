@@ -100,7 +100,7 @@ export function BrandingForm({ club }: { club: any }) {
         </div>
       </div>
 
-      <button type="submit" disabled={isUploading} className="bg-accent-primary text-white px-6 py-2 rounded hover:bg-accent-glow transition disabled:opacity-50 font-medium">
+      <button type="submit" disabled={isUploading} className="btn-premium text-white px-6 py-2 rounded-lg transition disabled:opacity-50 font-medium">
         {isUploading ? 'Bezig met uploaden...' : 'Branding Opslaan'}
       </button>
     </form>

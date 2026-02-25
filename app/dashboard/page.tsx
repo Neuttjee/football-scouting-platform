@@ -25,18 +25,18 @@ export default async function DashboardPage() {
       <h1 className="text-3xl font-bold text-text-primary">Dashboard</h1>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-bg-card p-6 rounded-xl border border-border-dark flex flex-col items-start justify-center transition-all duration-300 hover:border-accent-primary hover:shadow-[0_0_20px_rgba(var(--primary-rgb),0.15)]">
+        <div className="card-premium p-6 rounded-xl flex flex-col items-start justify-center transition-all duration-300 hover:border-accent-primary hover:shadow-[0_0_20px_rgba(var(--primary-rgb),0.15)]">
           <h2 className="text-xs font-medium text-text-muted uppercase tracking-wider">Aantal Spelers</h2>
           <p className="text-4xl font-bold mt-2 text-text-primary font-mono">{playerCount}</p>
         </div>
         
-        <div className="bg-bg-card p-6 rounded-xl border border-border-dark flex flex-col items-start justify-center transition-all duration-300 hover:border-accent-primary hover:shadow-[0_0_20px_rgba(var(--primary-rgb),0.15)]">
+        <div className="card-premium p-6 rounded-xl flex flex-col items-start justify-center transition-all duration-300 hover:border-accent-primary hover:shadow-[0_0_20px_rgba(var(--primary-rgb),0.15)]">
           <h2 className="text-xs font-medium text-text-muted uppercase tracking-wider">Open Taken (Club)</h2>
           <p className="text-4xl font-bold mt-2 text-text-primary font-mono">{taskCount}</p>
         </div>
       </div>
 
-      <div className="bg-bg-card p-6 rounded-xl border border-border-dark transition-all duration-300 hover:border-accent-primary hover:shadow-[0_0_20px_rgba(var(--primary-rgb),0.15)]">
+      <div className="card-premium p-6 rounded-xl transition-all duration-300 hover:border-accent-primary hover:shadow-[0_0_20px_rgba(var(--primary-rgb),0.15)]">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-lg font-bold text-text-primary">Mijn Open Taken</h2>
           <Link href="/tasks" className="text-sm text-accent-primary hover:text-accent-glow transition-colors">Alle taken →</Link>

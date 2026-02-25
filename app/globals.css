@@ -140,6 +140,14 @@
   --text-primary: #FFFFFF;
   --text-secondary: #A1A1AA;
   --text-muted: #52525B;
+  
+  /* Premium Gradients */
+  --color-primary-light: color-mix(in srgb, var(--primary-color, #FF6A00) 65%, white);
+  --color-primary-dark: color-mix(in srgb, var(--primary-color, #FF6A00) 85%, black);
+
+  --gradient-bg: linear-gradient(180deg, #050505 0%, #0B0B0C 60%, #111113 100%);
+  --gradient-card: linear-gradient(180deg, #111113 0%, #0B0B0C 100%);
+  --gradient-button: linear-gradient(135deg, var(--color-primary-light) 0%, var(--primary-color, #FF6A00) 50%, var(--color-primary-dark) 100%);
 }
 
 @layer base {
@@ -147,6 +155,25 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply text-foreground;
+    background: var(--gradient-bg);
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+}
+
+@layer components {
+  .btn-premium {
+    background: var(--gradient-button);
+    border: 1px solid rgba(255,255,255,0.08);
+    transition: all 0.3s ease;
+  }
+  .btn-premium:hover:not(:disabled) {
+    box-shadow: 0 0 20px rgba(var(--primary-rgb, 255, 106, 0), 0.35);
+    filter: brightness(1.1);
+  }
+  .card-premium {
+    background: var(--gradient-card);
+    border: 1px solid #232326;
   }
 }

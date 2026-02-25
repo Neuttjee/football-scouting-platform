@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { EditPlayerModal } from './EditPlayerModal';
+import { NewContactModal } from './NewContactModal';
 import { TaskList } from '@/app/tasks/TaskList';
 
 export default async function PlayerProfilePage({
@@ -50,7 +51,7 @@ export default async function PlayerProfilePage({
         </Link>
       </div>
 
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-bg-card p-6 rounded-xl border border-border-dark">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 card-premium p-6 rounded-xl">
         <div>
           <h1 className="text-4xl font-bold text-text-primary mb-1">{player.name}</h1>
           <div className="flex items-center gap-3 text-sm text-text-secondary">
@@ -67,9 +68,7 @@ export default async function PlayerProfilePage({
         </div>
         <div className="flex space-x-3">
           <EditPlayerModal player={player} />
-          <Button asChild className="bg-accent-primary hover:bg-accent-glow text-white shadow-[0_0_15px_rgba(var(--primary-rgb),0.3)] transition-all">
-            <Link href={`/players/${player.id}/contacts`}>Contact Toevoegen</Link>
-          </Button>
+          <NewContactModal playerId={player.id} />
         </div>
       </div>
 

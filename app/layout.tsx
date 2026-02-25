@@ -54,7 +54,7 @@ export default async function RootLayout({
               <div className="flex-1 flex flex-col overflow-hidden">
                 <Topbar />
                 <main className="flex-1 overflow-y-auto pb-16 md:pb-0 relative bg-bg-secondary">
-                  <div className="p-4 md:p-8 max-w-7xl mx-auto">
+                  <div className="p-4 md:p-8 w-full max-w-[1600px] mx-auto">
                     {children}
                   </div>
                 </main>

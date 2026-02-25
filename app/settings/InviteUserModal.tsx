@@ -52,7 +52,7 @@ export function InviteUserModal() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-accent-primary text-white hover:bg-accent-glow transition">
+        <Button className="btn-premium text-white transition">
           Gebruiker Uitnodigen
         </Button>
       </DialogTrigger>
@@ -88,7 +88,7 @@ export function InviteUserModal() {
           </div>
 
           <div className="pt-4 flex justify-end">
-            <Button type="submit" disabled={loading} className="bg-accent-primary text-white hover:bg-accent-glow transition">
+            <Button type="submit" disabled={loading} className="btn-premium text-white transition">
               {loading ? 'Bezig met uitnodigen...' : 'Uitnodiging Versturen'}
             </Button>
           </div>

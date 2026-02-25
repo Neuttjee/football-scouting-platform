@@ -20,12 +20,12 @@ export default async function SettingsPage() {
         <h1 className="text-3xl font-bold">Instellingen</h1>
       </div>
       
-      <section className="bg-card p-6 rounded-lg shadow border">
+      <section className="card-premium p-6 rounded-lg shadow">
         <h2 className="text-xl font-semibold mb-4">Club Branding</h2>
         <BrandingForm club={club} />
       </section>
 
-      <section className="bg-card p-6 rounded-lg shadow border">
+      <section className="card-premium p-6 rounded-lg shadow">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">Gebruikersbeheer</h2>
           <InviteUserModal />

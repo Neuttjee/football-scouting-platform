@@ -19,7 +19,7 @@ export default async function ContactsPage() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Contactmomenten</h1>
-        <Link href="/players" className="bg-accent-primary text-white px-4 py-2 rounded hover:bg-accent-glow transition text-sm">
+        <Link href="/players" className="btn-premium text-white px-4 py-2 rounded-lg transition text-sm">
           Nieuw Contactmoment
         </Link>
       </div>
