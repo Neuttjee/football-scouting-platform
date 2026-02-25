@@ -41,27 +41,21 @@ jobs:
       - name: Zip artifact for deployment
         run: zip -r release.zip . -x ".git/*"
 
-      - name: Deploy via Azure CLI (ZipDeploy)
-        uses: azure/cli@v2
-        with:
-          azcliversion: latest
-          inlineScript: |
-            RG=$(az webapp list --query "[?name=='football-scouting-platform'].resourceGroup" -o tsv)
-            if [ -n "$RG" ]; then
-              echo "Starting Web App just in case..."
-              az webapp start --name football-scouting-platform --resource-group $RG || true
-              
-              echo "Deploying release.zip via ZipDeploy..."
-              az webapp deployment source config-zip --resource-group $RG --name football-scouting-platform --src release.zip
-            else
-              echo "Web app not found."
-              exit 1
-            fi
+      - name: Deploy via Azure CLI (Native)
+        run: |
+          RG=$(az webapp list --query "[?name=='football-scouting-platform'].resourceGroup" -o tsv)
+          if [ -n "$RG" ]; then
+            echo "Starting Web App just in case..."
+            az webapp start --name football-scouting-platform --resource-group $RG || true
+            
+            echo "Deploying release.zip via native az cli..."
+            az webapp deploy --resource-group $RG --name football-scouting-platform --src-path release.zip --type zip
+          else
+            echo "Web app not found."
+            exit 1
+          fi
 
       - name: Set Startup Command (Migrate ONLY, No Seed)
-        uses: azure/cli@v2
-        with:
-          azcliversion: latest
-          inlineScript: |
-            RG=$(az webapp list --query "[?name=='football-scouting-platform'].resourceGroup" -o tsv)
-            az webapp config set --resource-group $RG --name football-scouting-platform --startup-file "npx prisma migrate deploy && npm run start"
+        run: |
+          RG=$(az webapp list --query "[?name=='football-scouting-platform'].resourceGroup" -o tsv)
+          az webapp config set --resource-group $RG --name football-scouting-platform --startup-file "npx prisma migrate deploy && npm run start"
