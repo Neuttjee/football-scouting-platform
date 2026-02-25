@@ -9,7 +9,6 @@ import {
   getCoreRowModel,
   getFacetedUniqueValues,
   getFilteredRowModel,
-  getFacetedUniqueValues,
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
