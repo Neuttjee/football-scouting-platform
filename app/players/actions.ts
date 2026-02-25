@@ -6,14 +6,6 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { mapTargetStepToStatus } from '@/lib/statusMapping';
 
-export async function createPlayer(formData: FormData) {
-  await savePlayer(null, formData);
-}
-
-export async function updatePlayer(playerId: string, formData: FormData) {
-  await savePlayer(playerId, formData);
-}
-
 async function savePlayerLogic(playerId: string | null, formData: FormData) {
   const session = await getSession();
   if (!session) throw new Error('Unauthorized');
