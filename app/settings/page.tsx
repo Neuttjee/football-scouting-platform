@@ -3,7 +3,6 @@ import prisma from '@/lib/prisma';
 import { redirect } from 'next/navigation';
 import { UserTable } from './UserTable';
 import { BrandingForm } from './BrandingForm';
-import { ThemeToggle } from '@/components/ThemeToggle';
 import { InviteUserModal } from './InviteUserModal';
 
 export default async function SettingsPage() {
@@ -19,10 +18,6 @@ export default async function SettingsPage() {
     <div className="space-y-8">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Instellingen</h1>
-        <div className="flex items-center gap-4">
-          <span className="text-sm font-medium text-muted-foreground">Weergave:</span>
-          <ThemeToggle />
-        </div>
       </div>
       
       <section className="bg-card p-6 rounded-lg shadow border">

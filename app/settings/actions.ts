@@ -9,11 +9,9 @@ export async function updateClubBranding(formData: FormData) {
   if (!session || session.user.role !== 'ADMIN') throw new Error('Unauthorized');
 
   const primaryColor = formData.get('primaryColor') as string;
-  const secondaryColor = formData.get('secondaryColor') as string;
-  const tertiaryColor = formData.get('tertiaryColor') as string;
   const logo = formData.get('logo') as string;
 
-  const data: any = { primaryColor, secondaryColor, tertiaryColor };
+  const data: any = { primaryColor };
   if (logo) {
     data.logo = logo;
   }

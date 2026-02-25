@@ -13,7 +13,6 @@ async function main() {
       data: {
         name: 'SV Hillegom',
         primaryColor: '#004aad',
-        secondaryColor: '#ffffff',
       },
     })
   }

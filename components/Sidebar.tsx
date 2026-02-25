@@ -42,7 +42,7 @@ export function Sidebar({ role, clubName, clubLogo }: SidebarProps) {
               className={`block p-2 rounded transition-colors ${
                 isActive 
                   ? 'text-accent-primary bg-accent-primary/10' 
-                  : 'text-text-secondary hover:text-text-primary hover:bg-bg-card'
+                  : 'text-text-secondary hover:text-accent-primary hover:bg-accent-primary/10'
               }`}
               style={isActive ? { color: 'var(--primary-color)', backgroundColor: 'rgba(var(--primary-rgb), 0.12)' } : {}}
             >

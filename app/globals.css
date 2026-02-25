@@ -102,7 +102,7 @@
   --card-foreground: #FFFFFF;
   --popover: #111113;
   --popover-foreground: #FFFFFF;
-  --primary: var(--primary-color, #FF3B30);
+  --primary: var(--primary-color, #FF6A00);
   --primary-foreground: #FFFFFF;
   --secondary: #18181B;
   --secondary-foreground: #FFFFFF;
@@ -110,23 +110,23 @@
   --muted-foreground: #A1A1AA;
   --accent: #18181B;
   --accent-foreground: #FFFFFF;
-  --destructive: #FF3B30;
+  --destructive: #FF6A00;
   --border: #232326;
   --input: #232326;
-  --ring: var(--primary-color, #FF3B30);
-  --chart-1: #FF3B30;
+  --ring: var(--primary-color, #FF6A00);
+  --chart-1: #FF6A00;
   --chart-2: #FF6A00;
   --chart-3: #FACC15;
   --chart-4: #34D399;
   --chart-5: #60A5FA;
   --sidebar: #050505;
   --sidebar-foreground: #FFFFFF;
-  --sidebar-primary: var(--primary-color, #FF3B30);
+  --sidebar-primary: var(--primary-color, #FF6A00);
   --sidebar-primary-foreground: #FFFFFF;
   --sidebar-accent: #111113;
   --sidebar-accent-foreground: #FFFFFF;
   --sidebar-border: #232326;
-  --sidebar-ring: var(--primary-color, #FF3B30);
+  --sidebar-ring: var(--primary-color, #FF6A00);
 
   /* Elite Ultra-Dark Theme Colors */
   --bg-primary: #050505;
@@ -134,9 +134,9 @@
   --bg-card: #111113;
   --bg-hover: #18181B;
   --border-dark: #232326;
-  --accent-primary: var(--primary-color, #FF3B30);
-  --accent-secondary: var(--secondary-color, #FF6A00);
-  --accent-glow: var(--primary-color, #FF3B30);
+  --accent-primary: var(--primary-color, #FF6A00);
+  --accent-secondary: var(--primary-color, #FF6A00);
+  --accent-glow: var(--primary-color, #FF6A00);
   --text-primary: #FFFFFF;
   --text-secondary: #A1A1AA;
   --text-muted: #52525B;

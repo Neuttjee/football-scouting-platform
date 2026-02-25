@@ -12,8 +12,6 @@ model Club {
   name           String
   logo           String?
   primaryColor   String?
-  secondaryColor String?
-  tertiaryColor  String?
 
   users          User[]
   players        Player[]

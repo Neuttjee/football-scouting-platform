@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 // Helper to convert hex to rgb for the glow effect
 function hexToRgb(hex: string) {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : '255, 59, 48';
+  return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : '255, 106, 0'; // Default to #FF6A00
 }
 
 export default async function RootLayout({
@@ -36,13 +36,12 @@ export default async function RootLayout({
     });
   }
 
-  const primaryColor = club?.primaryColor || '#FF3B30';
+  const primaryColor = club?.primaryColor || '#FF6A00'; // Default to orange
 
   // Whitelabel styling variables
   const customStyles = {
     '--primary-color': primaryColor,
     '--primary-rgb': hexToRgb(primaryColor),
-    '--secondary-color': club?.secondaryColor || '#FF6A00',
   } as React.CSSProperties;
 
   return (

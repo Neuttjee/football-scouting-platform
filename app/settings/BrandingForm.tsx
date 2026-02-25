@@ -64,24 +64,12 @@ export function BrandingForm({ club }: { club: any }) {
         <div>
           <label className="block text-sm font-medium mb-1">Primaire Kleur</label>
           <div className="flex gap-4 items-center">
-            <input type="color" name="primaryColor" defaultValue={club?.primaryColor || '#3b82f6'} className="h-10 w-full border rounded cursor-pointer" />
-          </div>
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">Secundaire Kleur</label>
-          <div className="flex gap-4 items-center">
-            <input type="color" name="secondaryColor" defaultValue={club?.secondaryColor || '#1e40af'} className="h-10 w-full border rounded cursor-pointer" />
-          </div>
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">Tertiaire Kleur</label>
-          <div className="flex gap-4 items-center">
-            <input type="color" name="tertiaryColor" defaultValue={club?.tertiaryColor || '#ffffff'} className="h-10 w-full border rounded cursor-pointer" />
+            <input type="color" name="primaryColor" defaultValue={club?.primaryColor || '#FF6A00'} className="h-10 w-full border rounded cursor-pointer" />
           </div>
         </div>
       </div>
 
-      <button type="submit" disabled={isUploading} className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition disabled:opacity-50">
+      <button type="submit" disabled={isUploading} className="bg-accent-primary text-white px-4 py-2 rounded hover:bg-accent-glow transition disabled:opacity-50">
         {isUploading ? 'Bezig met uploaden...' : 'Opslaan'}
       </button>
     </form>
