@@ -38,25 +38,30 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_CED7D04BF29B4110A52235021697196F }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_0E21B43B810543988F53E1140BFE04C3 }}
 
-      - name: Ensure Web App is Started
-        run: |
-          # Fetch the resource group of the app
-          RG=$(az webapp list --query "[?name=='football-scouting-platform'].resourceGroup" -o tsv)
-          if [ -n "$RG" ]; then
-            echo "Starting Web App football-scouting-platform in resource group $RG..."
-            az webapp start --name football-scouting-platform --resource-group $RG || echo "Failed to start, it might be suspended due to Free Tier quotas."
-          else
-            echo "Web app not found."
-          fi
+      - name: Zip artifact for deployment
+        run: zip -r release.zip . -x ".git/*"
 
-      - name: Deploy to Azure Web App
-        uses: azure/webapps-deploy@v3
+      - name: Deploy via Azure CLI (ZipDeploy)
+        uses: azure/cli@v2
         with:
-          app-name: 'football-scouting-platform' 
-          package: .
+          azcliversion: latest
+          inlineScript: |
+            RG=$(az webapp list --query "[?name=='football-scouting-platform'].resourceGroup" -o tsv)
+            if [ -n "$RG" ]; then
+              echo "Starting Web App just in case..."
+              az webapp start --name football-scouting-platform --resource-group $RG || true
+              
+              echo "Deploying release.zip via ZipDeploy..."
+              az webapp deployment source config-zip --resource-group $RG --name football-scouting-platform --src release.zip
+            else
+              echo "Web app not found."
+              exit 1
+            fi
 
       - name: Set Startup Command (Migrate ONLY, No Seed)
-        uses: azure/appservice-settings@v1
+        uses: azure/cli@v2
         with:
-          app-name: 'football-scouting-platform'
-          app-settings-json: '[{ "name": "STARTUP_COMMAND", "value": "npx prisma migrate deploy && npm run start" }]'
+          azcliversion: latest
+          inlineScript: |
+            RG=$(az webapp list --query "[?name=='football-scouting-platform'].resourceGroup" -o tsv)
+            az webapp config set --resource-group $RG --name football-scouting-platform --startup-file "npx prisma migrate deploy && npm run start"
