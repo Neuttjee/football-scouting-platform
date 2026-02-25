@@ -30,7 +30,7 @@ export default async function PlayersPage() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Spelers</h1>
-        <Link href="/players/new" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+        <Link href="/players/new" className="bg-accent-primary text-white px-4 py-2 rounded hover:bg-accent-glow transition">
           Nieuwe Speler
         </Link>
       </div>

@@ -12,8 +12,8 @@ export async function updateClubBranding(formData: FormData) {
   const logo = formData.get('logo') as string;
 
   const data: any = { primaryColor };
-  if (logo) {
-    data.logo = logo;
+  if (logo !== null && logo !== undefined) {
+    data.logo = logo === "" ? null : logo;
   }
 
   await prisma.club.update({

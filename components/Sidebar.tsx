@@ -25,12 +25,12 @@ export function Sidebar({ role, clubName, clubLogo }: SidebarProps) {
   }
 
   return (
-    <aside className="w-64 flex-col hidden md:flex min-h-screen bg-bg-primary border-r border-border-dark">
+    <aside className="w-48 flex-col hidden md:flex min-h-screen bg-bg-primary border-r border-border-dark">
       <div className="p-4 text-xl font-bold border-b border-border-dark flex items-center gap-3">
         {clubLogo && (
-          <img src={clubLogo} alt="Club Logo" className="h-16 w-16 object-contain rounded-md" />
+          <img src={clubLogo} alt="Club Logo" className="h-10 w-10 object-contain rounded-md" />
         )}
-        <span className="leading-tight text-text-primary">{clubName || 'Scouting Platform'}</span>
+        <span className="leading-tight text-text-primary text-sm">{clubName || 'Scouting Platform'}</span>
       </div>
       <nav className="flex-1 p-4 space-y-2">
         {navItems.map((item) => {
@@ -41,10 +41,10 @@ export function Sidebar({ role, clubName, clubLogo }: SidebarProps) {
               href={item.href} 
               className={`block p-2 rounded transition-colors ${
                 isActive 
-                  ? 'text-accent-primary bg-accent-primary/10' 
-                  : 'text-text-secondary hover:text-accent-primary hover:bg-accent-primary/10'
+                  ? 'text-accent-primary font-medium' 
+                  : 'text-text-secondary hover:text-accent-primary'
               }`}
-              style={isActive ? { color: 'var(--primary-color)', backgroundColor: 'rgba(var(--primary-rgb), 0.12)' } : {}}
+              style={isActive ? { color: 'var(--primary-color)' } : {}}
             >
               {item.label}
             </Link>

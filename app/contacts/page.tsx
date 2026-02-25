@@ -17,7 +17,12 @@ export default async function ContactsPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Contactmomenten</h1>
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold">Contactmomenten</h1>
+        <Link href="/players" className="bg-accent-primary text-white px-4 py-2 rounded hover:bg-accent-glow transition text-sm">
+          Nieuw Contactmoment
+        </Link>
+      </div>
 
       <div className="bg-card p-6 rounded-lg shadow-sm border">
         <div className="overflow-x-auto">
@@ -46,7 +51,7 @@ export default async function ContactsPage() {
                     {new Date(c.createdAt).toLocaleDateString('nl-NL')}
                   </td>
                   <td className="p-3">
-                    <Link href={`/players/${c.player.id}/profile`} className="text-blue-600 hover:underline dark:text-blue-400 font-medium">
+                    <Link href={`/players/${c.player.id}/profile`} className="text-accent-primary hover:text-accent-glow font-medium transition-colors">
                       {c.player.name}
                     </Link>
                   </td>
