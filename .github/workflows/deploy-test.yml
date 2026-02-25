@@ -45,12 +45,10 @@ jobs:
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'football-scouting-test'
-          slot-name: 'Production'
           package: .
 
       - name: Set Startup Command (Migrate & Seed)
         uses: azure/appservice-settings@v1
         with:
           app-name: 'football-scouting-test'
-          slot-name: 'Production'
           app-settings-json: '[{ "name": "STARTUP_COMMAND", "value": "npx prisma migrate deploy && npx prisma db seed && npm run start" }]'

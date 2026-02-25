@@ -38,17 +38,25 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_CED7D04BF29B4110A52235021697196F }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_0E21B43B810543988F53E1140BFE04C3 }}
 
+      - name: Ensure Web App is Started
+        run: |
+          # Fetch the resource group of the app
+          RG=$(az webapp list --query "[?name=='football-scouting-platform'].resourceGroup" -o tsv)
+          if [ -n "$RG" ]; then
+            echo "Starting Web App football-scouting-platform in resource group $RG..."
+            az webapp start --name football-scouting-platform --resource-group $RG || echo "Failed to start, it might be suspended due to Free Tier quotas."
+          else
+            echo "Web app not found."
+          fi
+
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
-          # Als je prod app service anders heet, pas dit hier aan (bijv 'football-scouting-platform')
           app-name: 'football-scouting-platform' 
-          slot-name: 'Production'
           package: .
 
       - name: Set Startup Command (Migrate ONLY, No Seed)
         uses: azure/appservice-settings@v1
         with:
           app-name: 'football-scouting-platform'
-          slot-name: 'Production'
           app-settings-json: '[{ "name": "STARTUP_COMMAND", "value": "npx prisma migrate deploy && npm run start" }]'
