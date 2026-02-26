@@ -3,6 +3,7 @@
 import * as React from "react"
 import { useState } from "react"
 import { updateClubBranding } from "./actions"
+import { DEFAULT_PRIMARY_COLOR } from "@/lib/branding"
 
 export function BrandingForm({ club }: { club: any }) {
   const [isUploading, setIsUploading] = useState(false)
@@ -53,7 +54,7 @@ export function BrandingForm({ club }: { club: any }) {
       setLogoUrl("");
       const formData = new FormData();
       const primaryColorInput = document.querySelector('input[name="primaryColor"]') as HTMLInputElement;
-      formData.set("primaryColor", primaryColorInput?.value || club?.primaryColor || "#FF6A00");
+      formData.set("primaryColor", primaryColorInput?.value || club?.primaryColor || DEFAULT_PRIMARY_COLOR);
       formData.set("logo", ""); // Empty string to clear
       await updateClubBranding(formData);
       alert("Logo verwijderd!");
@@ -94,7 +95,7 @@ export function BrandingForm({ club }: { club: any }) {
         <div className="flex-1">
           <label className="block text-sm font-medium mb-2">Primaire Kleur</label>
           <div className="flex gap-4 items-center">
-            <input type="color" name="primaryColor" defaultValue={club?.primaryColor || '#FF6A00'} className="h-10 w-full max-w-[100px] border-0 rounded cursor-pointer bg-transparent" />
+            <input type="color" name="primaryColor" defaultValue={club?.primaryColor || DEFAULT_PRIMARY_COLOR} className="h-10 w-full max-w-[100px] border-0 rounded cursor-pointer bg-transparent" />
             <span className="text-sm text-text-muted">Wordt gebruikt voor knoppen, actieve menu-items en accenten.</span>
           </div>
         </div>
