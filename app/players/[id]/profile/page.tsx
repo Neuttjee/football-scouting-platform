@@ -81,16 +81,24 @@ export default async function PlayerProfilePage({
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 text-sm">
                 <div>
-                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Geboortedatum</div>
-                  <div className="font-medium text-text-primary font-mono">{player.dateOfBirth ? new Date(player.dateOfBirth).toLocaleDateString('nl-NL') : '-'}</div>
+                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Club (Huidig)</div>
+                  <div className="font-medium text-text-primary">{player.currentClub || '-'}</div>
                 </div>
                 <div>
-                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Team</div>
+                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Team (Huidig)</div>
                   <div className="font-medium text-text-primary">{player.team || '-'}</div>
                 </div>
                 <div>
                   <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Niveau (Huidig)</div>
                   <div className="font-medium text-text-primary">{player.niveau || '-'}</div>
+                </div>
+                <div>
+                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Geboortedatum</div>
+                  <div className="font-medium text-text-primary font-mono">{player.dateOfBirth ? new Date(player.dateOfBirth).toLocaleDateString('nl-NL') : '-'}</div>
+                </div>
+                <div>
+                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Positie</div>
+                  <div className="font-medium text-text-primary">{player.position || '-'}</div>
                 </div>
                 <div>
                   <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Nevenpositie</div>
