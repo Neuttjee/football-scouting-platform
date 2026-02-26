@@ -3,12 +3,13 @@
 import prisma from '@/lib/prisma';
 import { getSession } from '@/lib/auth';
 import { revalidatePath } from 'next/cache';
+import { sanitizePrimaryColor } from '@/lib/branding';
 
 export async function updateClubBranding(formData: FormData) {
   const session = await getSession();
   if (!session || session.user.role !== 'ADMIN') throw new Error('Unauthorized');
 
-  const primaryColor = formData.get('primaryColor') as string;
+  const primaryColor = sanitizePrimaryColor(formData.get('primaryColor') as string);
   const logo = formData.get('logo') as string;
 
   const data: any = { primaryColor };
