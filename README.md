@@ -27,6 +27,14 @@ To learn more about Next.js, take a look at the following resources:
 - [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
 - [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
+## Clubkleur Theming Conventies
+
+- Gebruik altijd themaclasses voor clubaccenten: `text-accent-primary`, `bg-accent-primary`, `border-accent-primary`.
+- Gebruik `btn-premium` voor primaire CTA-knoppen met clubkleur-gradient.
+- Vermijd hardcoded accentkleuren zoals `#FF6A00`, `text-orange-*`, `bg-orange-*` of `border-orange-*` in componenten.
+- Gebruik `focus-visible:ring-accent-primary` voor consistente focus styling.
+- Clubkleur komt uit `club.primaryColor` en wordt in `app/layout.tsx` als CSS-variabele (`--primary-color`) op de app gezet.
+
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
 ## Deploy on Vercel

@@ -72,7 +72,7 @@ export function TaskList({ tasks }: { tasks: Task[] }) {
                         checked={t.isCompleted} 
                         onChange={(e) => handleToggle(t.id, e.target.checked)}
                         disabled={isPending}
-                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 disabled:opacity-50 cursor-pointer"
+                        className="h-4 w-4 rounded border-border-dark text-accent-primary focus:ring-accent-primary disabled:opacity-50 cursor-pointer"
                       />
                     </td>
                     <td className={`p-3 font-medium ${t.isCompleted ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
@@ -82,7 +82,7 @@ export function TaskList({ tasks }: { tasks: Task[] }) {
                       {t.player ? (
                         <Link 
                           href={`/players/${t.player.id}/profile`} 
-                          className="text-blue-600 hover:underline dark:text-blue-400"
+                          className="text-accent-primary hover:text-accent-glow underline-offset-2 hover:underline"
                           onClick={(e) => e.stopPropagation()}
                         >
                           {t.player.name}
@@ -115,7 +115,7 @@ export function TaskList({ tasks }: { tasks: Task[] }) {
               <div>
                 <h3 className="font-semibold text-lg">{selectedTask.title}</h3>
                 <div className="flex items-center gap-2 mt-2">
-                  <span className={`px-2 py-1 rounded text-xs font-medium ${selectedTask.isCompleted ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400'}`}>
+                  <span className={`px-2 py-1 rounded text-xs font-medium ${selectedTask.isCompleted ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-accent-primary/15 text-accent-primary border border-accent-primary/30'}`}>
                     {selectedTask.isCompleted ? 'Voltooid' : 'Openstaand'}
                   </span>
                 </div>
@@ -134,7 +134,7 @@ export function TaskList({ tasks }: { tasks: Task[] }) {
                   <div className="text-muted-foreground mb-1">Gekoppelde Speler</div>
                   <div className="font-medium">
                     {selectedTask.player ? (
-                      <Link href={`/players/${selectedTask.player.id}/profile`} className="text-blue-600 hover:underline dark:text-blue-400">
+                      <Link href={`/players/${selectedTask.player.id}/profile`} className="text-accent-primary hover:text-accent-glow underline-offset-2 hover:underline">
                         {selectedTask.player.name}
                       </Link>
                     ) : '-'}

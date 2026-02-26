@@ -50,7 +50,7 @@ export function ContactForm({ playerId }: { playerId: string }) {
         <textarea name="notes" rows={3} className="w-full border rounded p-2"></textarea>
       </div>
 
-      <button type="submit" className="w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">Toevoegen</button>
+      <button type="submit" className="w-full btn-premium text-white px-4 py-2 rounded transition-all">Toevoegen</button>
     </form>
   );
 }

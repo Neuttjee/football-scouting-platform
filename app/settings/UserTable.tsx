@@ -48,7 +48,7 @@ export function UserTable({ users, currentUserId }: { users: User[], currentUser
                   <button 
                     onClick={() => handleToggle(u.id, u.isActive)}
                     disabled={isPending}
-                    className="text-blue-600 hover:text-blue-800 disabled:opacity-50"
+                    className="text-accent-primary hover:text-accent-glow disabled:opacity-50"
                   >
                     {u.isActive ? 'Deactiveren' : 'Activeren'}
                   </button>
