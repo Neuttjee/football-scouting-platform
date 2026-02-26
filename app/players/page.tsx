@@ -7,24 +7,29 @@ export default async function PlayersPage() {
   const session = await getSession();
   if (!session) return null;
 
-  const players = await prisma.player.findMany({
-    where: { clubId: session.user.clubId },
-    orderBy: { updatedAt: 'desc' },
-    select: {
-      id: true,
-      name: true,
-      position: true,
-      step: true,
-      status: true,
-      statusManuallyChanged: true,
-      currentClub: true,
-      team: true,
-      secondaryPosition: true,
-      preferredFoot: true,
-      dateOfBirth: true,
-      advies: true,
-    }
-  });
+  const [players, clubUsers] = await Promise.all([
+    prisma.player.findMany({
+      where: { clubId: session.user.clubId },
+      orderBy: { updatedAt: 'desc' },
+      select: {
+        id: true,
+        name: true,
+        position: true,
+        step: true,
+        status: true,
+        currentClub: true,
+        team: true,
+        secondaryPosition: true,
+        preferredFoot: true,
+        dateOfBirth: true,
+        advies: true,
+      }
+    }),
+    prisma.user.findMany({
+      where: { clubId: session.user.clubId },
+      select: { id: true, name: true }
+    })
+  ]);
 
   return (
     <div className="space-y-6">
@@ -33,7 +38,7 @@ export default async function PlayersPage() {
         <NewPlayerModal />
       </div>
 
-      <PlayersTable data={players} />
+      <PlayersTable data={players} clubUsers={clubUsers} />
     </div>
   );
 }

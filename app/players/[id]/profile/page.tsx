@@ -47,7 +47,7 @@ export default async function PlayerProfilePage({
     <div className="space-y-8">
       <div className="flex items-center space-x-4 mb-2">
         <Link href="/players" className="text-text-muted hover:text-text-primary transition-colors text-sm uppercase tracking-wider font-medium">
-          ← Terug naar spelers
+          ← Terug
         </Link>
       </div>
 
