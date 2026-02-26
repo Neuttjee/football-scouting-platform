@@ -7,6 +7,7 @@ import { Sidebar } from '@/components/Sidebar';
 import { MobileNav } from '@/components/MobileNav';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { Topbar } from '@/components/Topbar';
+import { hexToRgb, sanitizePrimaryColor } from '@/lib/branding';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 const jetbrainsMono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono' });
@@ -15,12 +16,6 @@ export const metadata: Metadata = {
   title: 'Scouting Platform',
   description: 'Football Recruitment Platform',
 };
-
-// Helper to convert hex to rgb for the glow effect
-function hexToRgb(hex: string) {
-  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : '255, 106, 0'; // Default to #FF6A00
-}
 
 export default async function RootLayout({
   children,
@@ -36,7 +31,7 @@ export default async function RootLayout({
     });
   }
 
-  const primaryColor = club?.primaryColor || '#FF6A00'; // Default to orange
+  const primaryColor = sanitizePrimaryColor(club?.primaryColor);
 
   // Whitelabel styling variables
   const customStyles = {

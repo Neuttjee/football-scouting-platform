@@ -110,12 +110,12 @@
   --muted-foreground: #A1A1AA;
   --accent: #18181B;
   --accent-foreground: #FFFFFF;
-  --destructive: #FF6A00;
+  --destructive: var(--primary-color, #FF6A00);
   --border: #232326;
   --input: #232326;
   --ring: var(--primary-color, #FF6A00);
-  --chart-1: #FF6A00;
-  --chart-2: #FF6A00;
+  --chart-1: var(--primary-color, #FF6A00);
+  --chart-2: var(--primary-color, #FF6A00);
   --chart-3: #FACC15;
   --chart-4: #34D399;
   --chart-5: #60A5FA;
