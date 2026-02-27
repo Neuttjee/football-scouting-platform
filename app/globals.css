@@ -177,3 +177,24 @@
     border: 1px solid #232326;
   }
 }
+
+@layer utilities {
+  .text-primary-brand {
+    color: var(--primary-color, #FF6A00);
+  }
+
+  .nav-item-active {
+    position: relative;
+  }
+
+  .nav-item-active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.4rem;
+    bottom: 0.4rem;
+    width: 3px;
+    border-radius: 9999px;
+    background-color: var(--primary-color, #FF6A00);
+  }
+}

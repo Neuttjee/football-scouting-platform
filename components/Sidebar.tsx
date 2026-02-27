@@ -39,13 +39,13 @@ export function Sidebar({ role, clubName, clubLogo }: SidebarProps) {
             <Link 
               key={item.href}
               href={item.href} 
-              className={`block p-2 rounded transition-colors ${
+              className={`relative block pl-3 p-2 rounded transition-colors ${
                 isActive 
-                  ? 'text-text-primary font-medium' 
-                  : 'text-text-secondary hover:text-text-primary'
+                  ? 'nav-item-active text-primary-brand font-medium bg-bg-hover rounded-md'
+                  : 'text-text-secondary hover:text-primary-brand hover:bg-bg-hover rounded-md'
               }`}
             >
-              {isActive ? '| ' : ''}{item.label}
+              {item.label}
             </Link>
           );
         })}
