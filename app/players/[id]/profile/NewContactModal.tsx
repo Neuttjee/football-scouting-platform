@@ -10,6 +10,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { createContact } from "../contacts/actions"
+import { Plus } from "lucide-react"
 
 export function NewContactModal({ playerId }: { playerId: string }) {
   const [open, setOpen] = React.useState(false)
@@ -25,9 +26,13 @@ export function NewContactModal({ playerId }: { playerId: string }) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button className="btn-premium text-white transition-all">
-          Contact Toevoegen
+            <DialogTrigger asChild>
+        <Button
+          size="icon"
+          className="p-1.5 bg-accent-primary/10 text-accent-primary hover:bg-accent-primary/20 rounded-md transition-colors outline-none cursor-pointer focus:ring-accent-primary focus:ring-1 focus:ring-offset-2"
+          aria-label="Nieuw contactmoment toevoegen"
+        >
+          <Plus className="size-4" />
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-md bg-bg-card border-border-dark text-text-primary">

@@ -10,7 +10,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { createPlayer } from "./actions"
-import { targetSteps, targetStatuses } from "@/lib/statusMapping"
+import { targetSteps, targetStatuses, adviesOptions } from "@/lib/statusMapping"
 
 export function NewPlayerModal() {
   const [open, setOpen] = React.useState(false)
@@ -85,36 +85,59 @@ export function NewPlayerModal() {
               <input type="text" name="contactPerson" className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-visible:ring-accent-primary" />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium mb-1 text-text-secondary">Advies</label>
-              <input type="text" name="advies" className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-visible:ring-accent-primary" />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-1 text-text-secondary">Processtap</label>
-              <select name="step" className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-visible:ring-accent-primary">
-                <option value="">Selecteer processtap...</option>
-                {targetSteps.map(s => <option key={s} value={s}>{s}</option>)}
-              </select>
-            </div>
-
+            {/* Status eerst */}
             <div>
               <label className="block text-sm font-medium mb-1 text-text-secondary">
-                Status
+              Status
+              </label>
+            <select
+            name="status"
+            className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-visible:ring-accent-primary"
+            >
+            <option value="">Selecteer status...</option>
+            {targetStatuses.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+          </select>
+        </div>
+
+            {/* Dan processtap */}
+            <div>
+              <label className="block text-sm font-medium mb-1 text-text-secondary">
+                Processtap
               </label>
               <select
-                name="status"
+                name="step"
                 className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-visible:ring-accent-primary"
               >
-                <option value="">Geen status geselecteerd</option>
-                {targetStatuses.map((s) => (
+                <option value="">Selecteer processtap...</option>
+                {targetSteps.map((s) => (
                   <option key={s} value={s}>
                     {s}
                   </option>
                 ))}
               </select>
             </div>
-          </div>
+
+            {/* Dan advies, nu als lijst */}
+            <div>
+              <label className="block text-sm font-medium mb-1 text-text-secondary">
+                Advies
+              </label>
+              <select
+                name="advies"
+                className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-visible:ring-accent-primary"
+              >
+                <option value="">Selecteer advies...</option>
+                {adviesOptions.map((a) => (
+                  <option key={a} value={a}>
+                    {a}
+                  </option>
+                ))}
+              </select>
+            </div>
 
           <div>
             <label className="block text-sm font-medium mb-1 text-text-secondary">Korte Notities</label>
@@ -123,6 +146,7 @@ export function NewPlayerModal() {
 
           <div className="pt-4 flex justify-end">
             <Button type="submit" className="btn-premium text-white">Opslaan</Button>
+          </div>
           </div>
         </form>
       </DialogContent>

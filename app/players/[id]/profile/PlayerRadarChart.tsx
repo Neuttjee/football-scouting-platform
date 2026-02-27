@@ -47,9 +47,9 @@ export function PlayerRadarChart({ scores }: PlayerRadarChartProps) {
     });
   }, [scores]);
 
-  const size = 220;
+  const size = 260;
   const center = size / 2;
-  const radius = 80;
+  const radius = 100;
   const levels = 5; // aantal ringen (1–5)
   const angleStep = (2 * Math.PI) / LABELS.length;
 
@@ -135,8 +135,13 @@ export function PlayerRadarChart({ scores }: PlayerRadarChartProps) {
   ));
 
   return (
-    <div className="w-full h-64">
-      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+    <div className="w-full h-72 flex items-center justify-center">
+      <svg
+        width={size}
+        height={size}
+        viewBox={`0 0 ${size} ${size}`}
+        style={{ filter: "blur(1px)", opacity: 0.7 }}
+      >
         <g>
           {gridPolygons}
           {axes}
