@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { EditPlayerModal } from './EditPlayerModal';
 import { NewContactModal } from './NewContactModal';
+import { NewPlayerTaskModal } from './NewPlayerTaskModal';
 import { TaskList } from '@/app/tasks/TaskList';
 
 export default async function PlayerProfilePage({
@@ -68,7 +69,6 @@ export default async function PlayerProfilePage({
         </div>
         <div className="flex space-x-3">
           <EditPlayerModal player={player} />
-          <NewContactModal playerId={player.id} />
         </div>
       </div>
 
@@ -125,20 +125,27 @@ export default async function PlayerProfilePage({
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-accent-primary uppercase tracking-widest text-xs">Openstaande Taken ({player.tasks.length})</CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-accent-primary uppercase tracking-widest text-xs">
+                  Openstaande Taken ({player.tasks.length})
+                </CardTitle>
+                <NewPlayerTaskModal
+                  playerId={player.id}
+                  playerName={player.name}
+                />
+              </div>
             </CardHeader>
             <CardContent>
-              {player.tasks.length === 0 ? (
-                <p className="text-sm text-text-muted">Geen openstaande taken voor deze speler.</p>
-              ) : (
-                <TaskList tasks={player.tasks} />
-              )}
-            </CardContent>
           </Card>
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-accent-primary uppercase tracking-widest text-xs">Contacten Tijdlijn ({player.contacts.length})</CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-accent-primary uppercase tracking-widest text-xs">
+                  Contacten Tijdlijn ({player.contacts.length})
+                </CardTitle>
+                <NewContactModal playerId={player.id} />
+              </div>
             </CardHeader>
             <CardContent>
               {player.contacts.length === 0 ? (
