@@ -21,15 +21,25 @@ export function NewPlayerTaskModal({
     playerName: string;
     clubUsers: { id: string; name: string }[];
   }) {
-  const [open, setOpen] = React.useState(false);
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    formData.append("playerId", playerId);
-    await createTask(formData);
-    setOpen(false);
-  };
+    const [open, setOpen] = React.useState(false);
+    const [assigneeType, setAssigneeType] = React.useState<"none" | "user" | "external">("none");
+    const [selectedUserId, setSelectedUserId] = React.useState<string>("");
+    const [externalName, setExternalName] = React.useState<string>("");
+  
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      const formData = new FormData(e.currentTarget);
+      formData.append("playerId", playerId);
+  
+      if (assigneeType === "user" && selectedUserId) {
+        formData.append("assignedToId", selectedUserId);
+      } else if (assigneeType === "external" && externalName.trim()) {
+        formData.append("assignedToExternalName", externalName.trim());
+      }
+  
+      await createTask(formData);
+      setOpen(false);
+    };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -71,32 +81,53 @@ export function NewPlayerTaskModal({
               />
             </div>
 
-            <div>
+            <div className="md:col-span-2 space-y-2">
               <label className="block text-sm font-medium mb-1 text-text-secondary">
-                Toewijzen aan (Gebruiker)
+                Toewijzen aan
               </label>
               <select
-                name="assignedToId"
                 className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-visible:ring-accent-primary"
+                value={
+                  assigneeType === "user"
+                    ? selectedUserId || ""
+                    : assigneeType === "external"
+                    ? "external"
+                    : "none"
+                }
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val === "none") {
+                    setAssigneeType("none");
+                    setSelectedUserId("");
+                    setExternalName("");
+                  } else if (val === "external") {
+                    setAssigneeType("external");
+                    setSelectedUserId("");
+                  } else {
+                    setAssigneeType("user");
+                    setSelectedUserId(val);
+                    setExternalName("");
+                  }
+                }}
               >
-                <option value="">Niet toegewezen</option>
+                <option value="none">Niet toegewezen</option>
                 {clubUsers.map((u) => (
                   <option key={u.id} value={u.id}>
                     {u.name}
                   </option>
                 ))}
+                <option value="external">Ander (naam typen)</option>
               </select>
-            </div>
 
-            <div>
-              <label className="block text-sm font-medium mb-1 text-text-secondary">
-                Of toewijzen aan (Externe persoon)
-              </label>
-              <input
-                type="text"
-                name="assignedToExternalName"
-                className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-visible:ring-accent-primary"
-              />
+              {assigneeType === "external" && (
+                <input
+                  type="text"
+                  placeholder="Naam externe persoon"
+                  className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-visible:ring-accent-primary"
+                  value={externalName}
+                  onChange={(e) => setExternalName(e.target.value)}
+                />
+              )}
             </div>
           </div>
         </form>
