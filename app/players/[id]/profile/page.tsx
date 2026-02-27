@@ -8,6 +8,7 @@ import { EditPlayerModal } from './EditPlayerModal';
 import { NewContactModal } from './NewContactModal';
 import { NewPlayerTaskModal } from './NewPlayerTaskModal';
 import { TaskList } from '@/app/tasks/TaskList';
+import { PlayerRadarChart } from "./PlayerRadarChart";
 
 export default async function PlayerProfilePage({
   params,
@@ -209,19 +210,15 @@ export default async function PlayerProfilePage({
               <CardTitle className="text-accent-primary uppercase tracking-widest text-xs">Scouting Status</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div>
-                <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Processtap</div>
-                <div className="font-bold text-lg text-text-primary">{player.step || '-'}</div>
-              </div>
               
               <div>
                 <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Status</div>
-                <div className="font-bold text-lg flex items-center gap-2 text-text-primary">
-                  {player.status || '-'}
-                  {player.statusManuallyChanged && (
-                    <span className="text-xs text-accent-secondary bg-accent-secondary/10 px-2 py-0.5 rounded" title="Handmatig aangepast">Handmatig</span>
-                  )}
-                </div>
+                <div className="font-bold text-lg flex items-center gap-2 text-text-primary"></div>
+              </div>
+
+              <div>
+                <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Processtap</div>
+                <div className="font-bold text-lg text-text-primary">{player.step || '-'}</div>
               </div>
 
               <div>
@@ -232,12 +229,14 @@ export default async function PlayerProfilePage({
           </Card>
 
           {/* Placeholder for future Radar Chart */}
-          <Card className="opacity-50 border-dashed">
+          <Card className="border-accent-primary/30 shadow-[0_0_30px_rgba(var(--primary-rgb),0.05)]">
             <CardHeader>
-              <CardTitle className="text-text-muted uppercase tracking-widest text-xs">Radar Chart (Binnenkort)</CardTitle>
+              <CardTitle className="text-accent-primary uppercase tracking-widest text-xs">
+                Radar Chart (Binnenkort)
+              </CardTitle>
             </CardHeader>
-            <CardContent className="flex items-center justify-center h-48">
-              <div className="text-text-muted text-sm">Visualisatie data volgt</div>
+          <CardContent className="h-64">
+              <PlayerRadarChart />
             </CardContent>
           </Card>
         </div>
