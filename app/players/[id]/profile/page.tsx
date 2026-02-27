@@ -205,7 +205,7 @@ export default async function PlayerProfilePage({
         </div>
 
         <div className="space-y-6">
-          <Card className="border-accent-primary/30 border-dashed shadow-[0_0_30px_rgba(var(--primary-rgb),0.05)]">
+          <Card className="border-accent-primary/30 shadow-[0_0_30px_rgba(var(--primary-rgb),0.05)]">
             <CardHeader>
               <CardTitle className="text-accent-primary uppercase tracking-widest text-xs">Scouting Status</CardTitle>
             </CardHeader>
@@ -213,7 +213,7 @@ export default async function PlayerProfilePage({
               
               <div>
                 <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Status</div>
-                <div className="font-bold text-lg flex items-center gap-2 text-text-primary"></div>
+                <div className="font-bold text-lg flex items-center gap-2 text-text-primary">{player.status || '-'}</div>
               </div>
 
               <div>
@@ -228,8 +228,7 @@ export default async function PlayerProfilePage({
             </CardContent>
           </Card>
 
-          {/* Placeholder for future Radar Chart */}
-          <Card className="border-accent-primary/30 shadow-[0_0_30px_rgba(var(--primary-rgb),0.05)]">
+          <Card className="border-accent-primary/30 border-dashed shadow-[0_0_30px_rgba(var(--primary-rgb),0.05)]">
             <CardHeader>
               <CardTitle className="text-accent-primary uppercase tracking-widest text-xs">
                 Radar Chart (Binnenkort)

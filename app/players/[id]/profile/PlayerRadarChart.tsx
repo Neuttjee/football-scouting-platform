@@ -99,6 +99,19 @@ export function PlayerRadarChart({ scores }: PlayerRadarChartProps) {
   // Waarden naar punten
   const valuePoints = values.map((v, i) => polarToCartesian(v, i));
   const valuePolygonPoints = valuePoints.map((p) => `${p.x},${p.y}`).join(" ");
+  const valueNumberLabels = valuePoints.map((p, i) => (
+    <text
+      key={i}
+      x={p.x}
+      y={p.y - 10}
+      fill="#e5e7eb"
+      fontSize={10}
+      textAnchor="middle"
+      dominantBaseline="middle"
+    >
+      {values[i]}
+    </text>
+  ));
 
   // Label‑tekst buiten de buitenste ring
   const labelElements = LABELS.map((key, i) => {
@@ -140,18 +153,18 @@ export function PlayerRadarChart({ scores }: PlayerRadarChartProps) {
         width={size}
         height={size}
         viewBox={`0 0 ${size} ${size}`}
-        style={{ filter: "blur(1px)", opacity: 0.7 }}
+        style={{ opacity: 0.4 }}
       >
         <g>
           {gridPolygons}
-          {axes}
           <polygon
             points={valuePolygonPoints}
-            fill="rgba(var(--primary-rgb, 255, 106, 0), 0.15)"
-            stroke="var(--primary-color, #FF6A00)"
-            strokeWidth={2}
+            fill="rgba(var(--primary-rgb, 255, 106, 0), 0.08)"
+            stroke="rgba(255, 106, 0, 0.5)"
+            strokeWidth={1}
           />
           {pointElements}
+          {valueNumberLabels}
           {labelElements}
         </g>
       </svg>
