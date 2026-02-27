@@ -325,7 +325,8 @@ export function getColumns(clubUsers: any[]): ColumnDef<Player>[] {
     {
       accessorKey: "name",
       header: "Naam",
-      enableColumnFilter: false,
+      enableColumnFilter: true,
+      filterFn: "includesString",
       cell: ({ row }) => {
         const player = row.original;
         const age = player.dateOfBirth ? Math.floor((new Date().getTime() - new Date(player.dateOfBirth).getTime()) / 3.15576e+10) : null;
@@ -337,7 +338,7 @@ export function getColumns(clubUsers: any[]): ColumnDef<Player>[] {
                 {player.name}
               </Link>
             </HoverCardTrigger>
-            <HoverCardContent className="w-80 bg-bg-card border-border-dark shadow-[0_0_30px_rgba(0,0,0,0.5)] z-50">
+            <HoverCardContent className="w-80 bg-bg-card border-accent-primary shadow-[0_0_30px_rgba(0,0,0,0.5)] z-50">
               <div className="flex justify-between space-x-4">
                 <div className="space-y-1">
                   <h4 className="text-sm font-semibold text-text-primary">{player.name}</h4>
@@ -388,7 +389,7 @@ export function getColumns(clubUsers: any[]): ColumnDef<Player>[] {
       accessorKey: "secondaryPosition",
       header: "Nevenpositie",
       filterFn: "arrIncludesSome",
-      cell: ({ row }) => <span className="text-accent-primary font-medium">{row.getValue("secondaryPosition") || "-"}</span>,
+      cell: ({ row }) => <span className="text-text-secondary">{row.getValue("secondaryPosition") || "-"}</span>,
     },
     {
       accessorKey: "preferredFoot",

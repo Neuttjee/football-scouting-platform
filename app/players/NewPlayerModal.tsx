@@ -29,7 +29,7 @@ export function NewPlayerModal() {
           Nieuwe Speler
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto bg-bg-card border-border-dark text-text-primary">
+      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto bg-bg-card border-accent-primary text-text-primary">
         <DialogHeader>
           <DialogTitle className="text-text-primary">Nieuwe Speler Toevoegen</DialogTitle>
         </DialogHeader>
