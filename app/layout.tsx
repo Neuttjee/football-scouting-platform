@@ -40,9 +40,20 @@ export default async function RootLayout({
   } as React.CSSProperties;
 
   return (
-    <html lang="nl" suppressHydrationWarning>
-      <body className={`antialiased bg-background text-foreground ${inter.variable} ${jetbrainsMono.variable} font-sans`} style={customStyles}>
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} disableTransitionOnChange>
+    <html
+      lang="nl"
+      suppressHydrationWarning
+      style={customStyles} // <<-- HIER staat nu de primary kleur
+    >
+      <body
+        className={`antialiased bg-background text-foreground ${inter.variable} ${jetbrainsMono.variable} font-sans`}
+      >
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem={false}
+          disableTransitionOnChange
+        >
           {session ? (
             <div className="flex h-screen overflow-hidden">
               <Sidebar role={session.user.role} clubName={club?.name} clubLogo={club?.logo} />
