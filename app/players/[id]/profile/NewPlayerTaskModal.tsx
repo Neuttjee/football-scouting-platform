@@ -10,6 +10,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { createTask } from "@/app/tasks/actions";
+import { Plus } from "lucide-react";
 
 export function NewPlayerTaskModal({ playerId, playerName }: { playerId: string; playerName: string }) {
   const [open, setOpen] = React.useState(false);
@@ -24,14 +25,15 @@ export function NewPlayerTaskModal({ playerId, playerName }: { playerId: string;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button
-          size="icon"
-          className="p-2 bg-accent-primary/10 text-accent-primary border border-accent-primary/40 hover:bg-accent-primary/20 rounded-full transition-colors"
-        >
-          +
-        </Button>
-      </DialogTrigger>
+            <DialogTrigger asChild>
+                <Button
+                    size="icon"
+                    className="p-1.5 bg-accent-primary/10 text-accent-primary hover:bg-accent-primary/20 rounded-md transition-colors outline-none cursor-pointer focus:ring-accent-primary focus:ring-1 focus:ring-offset-2"
+                    aria-label="Nieuwe taak toevoegen"
+                    >
+                    <Plus className="size-4" />
+                </Button>
+            </DialogTrigger>
       <DialogContent className="max-w-xl bg-bg-card border-accent-primary text-text-primary shadow-[0_0_15px_rgba(var(--primary-rgb),0.3)]">
         <DialogHeader>
           <DialogTitle>Nieuwe Taak voor {playerName}</DialogTitle>
