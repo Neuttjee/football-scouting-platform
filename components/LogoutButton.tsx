@@ -18,7 +18,7 @@ export function LogoutButton() {
   return (
     <button 
       onClick={handleLogout}
-      className="w-full text-left p-2 rounded transition-colors text-text-secondary hover:text-primary-brand"
+      className="w-full text-left p-2 rounded transition-colors text-text-secondary hover:text-primary-brand bg-bg-hover cursor-pointer"
     >
       Uitloggen
     </button>
