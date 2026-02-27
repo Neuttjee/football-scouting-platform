@@ -136,6 +136,14 @@ export default async function PlayerProfilePage({
               </div>
             </CardHeader>
             <CardContent>
+              {player.tasks.length === 0 ? (
+                <p className="text-sm text-text-muted">
+                  Geen openstaande taken voor deze speler.
+                </p>
+              ) : (
+                <TaskList tasks={player.tasks} />
+              )}
+            </CardContent>
           </Card>
 
           <Card>
