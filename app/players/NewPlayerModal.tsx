@@ -99,10 +99,19 @@ export function NewPlayerModal() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1 text-text-secondary">Status (Override)</label>
-              <select name="status" className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-muted focus-visible:ring-accent-primary">
-                <option value="">Automatisch bepalen via processtap</option>
-                {targetStatuses.map(s => <option key={s} value={s}>{s}</option>)}
+              <label className="block text-sm font-medium mb-1 text-text-secondary">
+                Status
+              </label>
+              <select
+                name="status"
+                className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-visible:ring-accent-primary"
+              >
+                <option value="">Geen status geselecteerd</option>
+                {targetStatuses.map((s) => (
+                  <option key={s} value={s}>
+                    {s}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
