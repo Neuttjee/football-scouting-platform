@@ -36,6 +36,11 @@ export default async function PlayerProfilePage({
     }
   });
 
+  const clubUsers = await prisma.user.findMany({
+    where: { clubId: session.user.clubId },
+    select: { id: true, name: true },
+  });
+
   if (!player) {
     redirect('/players');
   }
@@ -132,6 +137,7 @@ export default async function PlayerProfilePage({
                 <NewPlayerTaskModal
                   playerId={player.id}
                   playerName={player.name}
+                  clubUsers={clubUsers} 
                 />
               </div>
             </CardHeader>
@@ -152,7 +158,7 @@ export default async function PlayerProfilePage({
                 <CardTitle className="text-accent-primary uppercase tracking-widest text-xs">
                   Contacten Tijdlijn ({player.contacts.length})
                 </CardTitle>
-                <NewContactModal playerId={player.id} />
+                <NewContactModal playerId={player.id} clubUsers={clubUsers} />
               </div>
             </CardHeader>
             <CardContent>

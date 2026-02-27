@@ -12,7 +12,15 @@ import {
 import { createTask } from "@/app/tasks/actions";
 import { Plus } from "lucide-react";
 
-export function NewPlayerTaskModal({ playerId, playerName }: { playerId: string; playerName: string }) {
+export function NewPlayerTaskModal({
+    playerId,
+    playerName,
+    clubUsers,
+  }: {
+    playerId: string;
+    playerName: string;
+    clubUsers: { id: string; name: string }[];
+  }) {
   const [open, setOpen] = React.useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -36,10 +44,10 @@ export function NewPlayerTaskModal({ playerId, playerName }: { playerId: string;
             </DialogTrigger>
       <DialogContent className="max-w-xl bg-bg-card border-accent-primary text-text-primary shadow-[0_0_15px_rgba(var(--primary-rgb),0.3)]">
         <DialogHeader>
-          <DialogTitle>Nieuwe Taak voor {playerName}</DialogTitle>
+          <DialogTitle>Nieuwe taak voor {playerName}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium mb-1 text-text-secondary">
                 Taak omschrijving *
@@ -51,6 +59,7 @@ export function NewPlayerTaskModal({ playerId, playerName }: { playerId: string;
                 className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-visible:ring-accent-primary"
               />
             </div>
+
             <div>
               <label className="block text-sm font-medium mb-1 text-text-secondary">
                 Deadline
@@ -61,23 +70,34 @@ export function NewPlayerTaskModal({ playerId, playerName }: { playerId: string;
                 className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-visible:ring-accent-primary"
               />
             </div>
-          </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1 text-text-secondary">
-              Beschrijving
-            </label>
-            <textarea
-              name="description"
-              rows={3}
-              className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-visible:ring-accent-primary"
-            ></textarea>
-          </div>
+            <div>
+              <label className="block text-sm font-medium mb-1 text-text-secondary">
+                Toewijzen aan (Gebruiker)
+              </label>
+              <select
+                name="assignedToId"
+                className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-visible:ring-accent-primary"
+              >
+                <option value="">Niet toegewezen</option>
+                {clubUsers.map((u) => (
+                  <option key={u.id} value={u.id}>
+                    {u.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          <div className="pt-4 flex justify-end">
-            <Button type="submit" className="btn-premium text-white">
-              Taak toevoegen
-            </Button>
+            <div>
+              <label className="block text-sm font-medium mb-1 text-text-secondary">
+                Of toewijzen aan (Externe persoon)
+              </label>
+              <input
+                type="text"
+                name="assignedToExternalName"
+                className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-visible:ring-accent-primary"
+              />
+            </div>
           </div>
         </form>
       </DialogContent>
