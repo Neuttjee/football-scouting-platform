@@ -57,7 +57,7 @@ export function NewPlayerTaskModal({
           <DialogTitle>Nieuwe taak voor {playerName}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium mb-1 text-text-secondary">
                 Taak omschrijving *
@@ -129,6 +129,11 @@ export function NewPlayerTaskModal({
                 />
               )}
             </div>
+          </div>
+          <div className="pt-4 flex justify-end">
+            <Button type="submit" className="btn-premium text-white">
+              Toevoegen
+            </Button>
           </div>
         </form>
       </DialogContent>
