@@ -156,6 +156,7 @@ export function PlayerRadarChart({ scores }: PlayerRadarChartProps) {
         style={{ opacity: 0.4 }}
       >
         <g>
+          {gridPolygons[gridPolygons.length - 1]}
           <polygon
             points={valuePolygonPoints}
             fill="rgba(var(--primary-rgb, 255, 106, 0), 0.08)"
