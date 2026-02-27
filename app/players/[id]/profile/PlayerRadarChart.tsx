@@ -47,9 +47,9 @@ export function PlayerRadarChart({ scores }: PlayerRadarChartProps) {
     });
   }, [scores]);
 
-  const size = 260;
+  const size = 340;
   const center = size / 2;
-  const radius = 100;
+  const radius = 130;
   const levels = 5; // aantal ringen (1–5)
   const angleStep = (2 * Math.PI) / LABELS.length;
 
@@ -148,7 +148,7 @@ export function PlayerRadarChart({ scores }: PlayerRadarChartProps) {
   ));
 
   return (
-    <div className="w-full h-72 flex items-center justify-center">
+    <div className="w-full minh-80 flex items-center justify-center">
       <svg
         width={size}
         height={size}
@@ -160,7 +160,8 @@ export function PlayerRadarChart({ scores }: PlayerRadarChartProps) {
           <polygon
             points={valuePolygonPoints}
             fill="rgba(var(--primary-rgb, 255, 106, 0), 0.08)"
-            stroke="rgba(255, 106, 0, 0.5)"
+            stroke="var(--primary-color, #FF6A00)"
+            strokeOpacity={0.6}
             strokeWidth={1}
           />
           {pointElements}

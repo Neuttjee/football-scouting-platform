@@ -25,7 +25,7 @@ export function EditPlayerModal({ player }: { player: any }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-bg-secondary text-text-primary border border-border-dark hover:border-accent-primary hover:text-accent-primary transition-colors">Bewerken</Button>
+      <Button className="bg-bg-secondary text-text-primary border border-border-dark hover:bg-accent-primary hover:text-primary-foreground hover:border-accent-primary transition-colors">Bewerken</Button>
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
