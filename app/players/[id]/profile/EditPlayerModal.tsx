@@ -33,13 +33,19 @@ export function EditPlayerModal({ player }: { player: any }) {
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Bewerk Speler</DialogTitle>
+          <DialogTitle>Bewerk speler</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="md:col-span-2">
               <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Naam *</label>
-              <input type="text" name="name" defaultValue={player.name} required className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background" />
+              <input
+                type="text"
+                name="name"
+                defaultValue={player.name}
+                required
+                className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
+              />
             </div>
 
             <PlayerDobAgeFields
@@ -53,33 +59,62 @@ export function EditPlayerModal({ player }: { player: any }) {
 
             <div>
               <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Huidige Club</label>
-              <input type="text" name="currentClub" defaultValue={player.currentClub || ''} className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background" />
+              <input
+                type="text"
+                name="currentClub"
+                defaultValue={player.currentClub || ""}
+                className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
+              />
             </div>
 
             <div>
               <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Team</label>
-              <input type="text" name="team" defaultValue={player.team || ''} className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background" />
+              <input
+                type="text"
+                name="team"
+                defaultValue={player.team || ""}
+                className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
+              />
             </div>
 
             <div>
               <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Niveau (Huidig)</label>
-              <input type="text" name="niveau" defaultValue={player.niveau || ''} className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background" />
+              <input
+                type="text"
+                name="niveau"
+                defaultValue={player.niveau || ""}
+                className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
+              />
             </div>
 
             <div>
               <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Positie</label>
-              <input type="text" name="position" defaultValue={player.position || ''} className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background" />
+              <input
+                type="text"
+                name="position"
+                defaultValue={player.position || ""}
+                className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
+              />
             </div>
 
             <div>
               <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Nevenpositie</label>
-              <input type="text" name="secondaryPosition" defaultValue={player.secondaryPosition || ''} className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background" />
+              <input
+                type="text"
+                name="secondaryPosition"
+                defaultValue={player.secondaryPosition || ""}
+                className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
+              />
             </div>
 
             <div>
               <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Voorkeursbeen</label>
-              <select name="preferredFoot" defaultValue={player.preferredFoot || ''} className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background">
-                <option value="">Selecteer been...</option>
+              <select
+                name="preferredFoot"
+                defaultValue={player.preferredFoot || ""}
+                className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
+              >
+                <option value=""></option>
                 <option value="Rechts">Rechts</option>
                 <option value="Links">Links</option>
                 <option value="Tweebenig">Tweebenig</option>
@@ -88,7 +123,12 @@ export function EditPlayerModal({ player }: { player: any }) {
 
             <div>
               <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Contactpersoon</label>
-              <input type="text" name="contactPerson" defaultValue={player.contactPerson || ''} className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background" />
+              <input
+                type="text"
+                name="contactPerson"
+                defaultValue={player.contactPerson || ""}
+                className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
+              />
             </div>
 
             {/* Status eerst */}
@@ -97,9 +137,9 @@ export function EditPlayerModal({ player }: { player: any }) {
               <select
                 name="status"
                 defaultValue={player.status || ""}
-                className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
               >
-                <option value="">Selecteer status...</option>
+                <option value=""></option>
                 {targetStatuses.map((s) => (
                   <option key={s} value={s}>
                     {s}
@@ -114,9 +154,9 @@ export function EditPlayerModal({ player }: { player: any }) {
               <select
                 name="step"
                 defaultValue={player.step || ""}
-                className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
               >
-                <option value="">Selecteer processtap...</option>
+                <option value=""></option>
                 {targetSteps.map((s) => (
                   <option key={s} value={s}>
                     {s}
@@ -131,9 +171,9 @@ export function EditPlayerModal({ player }: { player: any }) {
               <select
                 name="advies"
                 defaultValue={player.advies || ""}
-                className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
               >
-                <option value="">Selecteer advies...</option>
+                <option value=""></option>
                 {adviesOptions.map((a) => (
                   <option key={a} value={a}>
                     {a}
@@ -145,11 +185,18 @@ export function EditPlayerModal({ player }: { player: any }) {
 
           <div>
             <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Korte Notities</label>
-            <textarea name="notes" defaultValue={player.notes || ''} className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background" rows={3}></textarea>
+            <textarea
+              name="notes"
+              defaultValue={player.notes || ""}
+              className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
+              rows={3}
+            ></textarea>
           </div>
 
           <div className="pt-4 flex justify-end">
-            <Button type="submit" className="btn-premium text-white">Opslaan</Button>
+            <Button type="submit" className="btn-premium text-white">
+              Opslaan
+            </Button>
           </div>
         </form>
       </DialogContent>

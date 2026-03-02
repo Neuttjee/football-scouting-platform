@@ -17,6 +17,17 @@ export function PlayerDobAgeFields({
     initialAge != null ? String(initialAge) : ""
   )
 
+  // Voor bestaande spelers met al een DOB maar nog geen opgeslagen leeftijd:
+  // vul het leeftijdveld eenmalig op basis van de geboortedatum.
+  React.useEffect(() => {
+    if (dob && !ageInput) {
+      const derived = calculateAgeFromISODateString(dob)
+      if (derived != null) {
+        setAgeInput(String(derived))
+      }
+    }
+  }, [dob, ageInput])
+
   const hasDob = !!dob
 
   const handleDobChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,7 +58,7 @@ export function PlayerDobAgeFields({
           name="dateOfBirth"
           value={dob}
           onChange={handleDobChange}
-          className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
         />
       </div>
       <div>
@@ -62,7 +73,11 @@ export function PlayerDobAgeFields({
           min={0}
           inputMode="numeric"
           readOnly={hasDob}
-          className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:opacity-70"
+          className={`w-full border border-border-dark rounded p-2 focus:border-accent-primary focus-visible:outline-none ${
+            hasDob
+              ? "bg-bg-secondary text-text-muted"
+              : "bg-background text-text-primary"
+          }`}
         />
       </div>
     </>

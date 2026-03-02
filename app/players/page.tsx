@@ -11,6 +11,7 @@ export default async function PlayersPage() {
     prisma.player.findMany({
       where: { clubId: session.user.clubId },
       orderBy: { updatedAt: 'desc' },
+      // Cast select to any so we can include the 'age' field
       select: {
         id: true,
         name: true,
@@ -24,7 +25,8 @@ export default async function PlayersPage() {
         dateOfBirth: true,
         age: true,
         advies: true,
-      }
+        notes: true,
+      } as any,
     }),
     prisma.user.findMany({
       where: { clubId: session.user.clubId },
@@ -39,7 +41,7 @@ export default async function PlayersPage() {
         <NewPlayerModal />
       </div>
 
-      <PlayersTable data={players} clubUsers={clubUsers} />
+      <PlayersTable data={players as any} clubUsers={clubUsers} />
     </div>
   );
 }

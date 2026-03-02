@@ -51,6 +51,7 @@ interface Player {
   step: string | null
   status: string | null
   advies: string | null
+  notes: string | null
 }
 
 const STATUS_OPTIONS = targetStatuses;
@@ -182,7 +183,7 @@ function PlayerActionsMenu({ player, clubUsers }: { player: Player, clubUsers: a
                   name="name"
                   defaultValue={player.name}
                   required
-                  className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                  className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
                 />
               </div>
               <PlayerDobAgeFields
@@ -199,7 +200,7 @@ function PlayerActionsMenu({ player, clubUsers }: { player: Player, clubUsers: a
                   type="text"
                   name="currentClub"
                   defaultValue={player.currentClub || ''}
-                  className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                  className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
                 />
               </div>
               <div>
@@ -208,7 +209,7 @@ function PlayerActionsMenu({ player, clubUsers }: { player: Player, clubUsers: a
                   type="text"
                   name="team"
                   defaultValue={player.team || ''}
-                  className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                  className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
                 />
               </div>
               <div>
@@ -217,7 +218,7 @@ function PlayerActionsMenu({ player, clubUsers }: { player: Player, clubUsers: a
                   type="text"
                   name="position"
                   defaultValue={player.position || ''}
-                  className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                  className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
                 />
               </div>
               <div>
@@ -226,7 +227,7 @@ function PlayerActionsMenu({ player, clubUsers }: { player: Player, clubUsers: a
                   type="text"
                   name="secondaryPosition"
                   defaultValue={player.secondaryPosition || ''}
-                  className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                  className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
                 />
               </div>
               <div>
@@ -234,9 +235,9 @@ function PlayerActionsMenu({ player, clubUsers }: { player: Player, clubUsers: a
                 <select
                   name="preferredFoot"
                   defaultValue={player.preferredFoot || ''}
-                  className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                  className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
                 >
-                  <option value="">Selecteer been...</option>
+                  <option value=""></option>
                   <option value="Rechts">Rechts</option>
                   <option value="Links">Links</option>
                   <option value="Tweebenig">Tweebenig</option>
@@ -247,9 +248,9 @@ function PlayerActionsMenu({ player, clubUsers }: { player: Player, clubUsers: a
                 <select
                   name="advies"
                   defaultValue={player.advies || ''}
-                  className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                  className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
                 >
-                  <option value="">Selecteer advies...</option>
+                  <option value=""></option>
                   {ADVIES_OPTIONS.map((a) => (
                     <option key={a} value={a}>
                       {a}
@@ -262,9 +263,9 @@ function PlayerActionsMenu({ player, clubUsers }: { player: Player, clubUsers: a
                 <select
                   name="step"
                   defaultValue={player.step || ''}
-                  className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                  className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
                 >
-                  <option value="">Selecteer processtap...</option>
+                  <option value=""></option>
                   {STEP_OPTIONS.map((s) => (
                     <option key={s} value={s}>
                       {s}
@@ -277,9 +278,9 @@ function PlayerActionsMenu({ player, clubUsers }: { player: Player, clubUsers: a
                 <select
                   name="status"
                   defaultValue={player.status || ''}
-                  className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                  className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
                 >
-                  <option value="">Selecteer status...</option>
+                  <option value=""></option>
                   {STATUS_OPTIONS.map((s) => (
                     <option key={s} value={s}>
                       {s}
@@ -287,6 +288,10 @@ function PlayerActionsMenu({ player, clubUsers }: { player: Player, clubUsers: a
                   ))}
                 </select>
               </div>
+            </div>
+            <div>
+              <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Korte Notities</label>
+              <textarea name="notes" className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none" rows={3}></textarea>
             </div>
             <div className="pt-4 flex justify-end">
               <Button type="submit" className="btn-premium text-white">
@@ -299,7 +304,7 @@ function PlayerActionsMenu({ player, clubUsers }: { player: Player, clubUsers: a
 
       <Dialog open={openTask} onOpenChange={setOpenTask}>
         <DialogContent className="max-w-xl bg-bg-card border-accent-primary text-text-primary shadow-[0_0_15px_rgba(var(--primary-rgb),0.3)]">
-          <DialogHeader><DialogTitle>Nieuwe Taak voor {player.name}</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>Nieuwe taak voor {player.name}</DialogTitle></DialogHeader>
           <form onSubmit={handleTask} className="space-y-4 py-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -323,7 +328,7 @@ function PlayerActionsMenu({ player, clubUsers }: { player: Player, clubUsers: a
               </div>
             </div>
             <div className="pt-4 flex justify-end">
-              <Button type="submit" className="btn-premium text-white">Taak Toevoegen</Button>
+              <Button type="submit" className="btn-premium text-white">Opslaan</Button>
             </div>
           </form>
         </DialogContent>
@@ -331,7 +336,7 @@ function PlayerActionsMenu({ player, clubUsers }: { player: Player, clubUsers: a
 
       <Dialog open={openContact} onOpenChange={setOpenContact}>
         <DialogContent className="max-w-md bg-bg-card border-accent-primary text-text-primary shadow-[0_0_15px_rgba(var(--primary-rgb),0.3)]">
-          <DialogHeader><DialogTitle>Nieuw Contactmoment</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>Nieuw contactmoment</DialogTitle></DialogHeader>
           <form onSubmit={handleContact} className="space-y-4 py-4">
             <div>
               <label className="block text-sm font-medium mb-1 text-text-secondary">Type *</label>
@@ -343,7 +348,7 @@ function PlayerActionsMenu({ player, clubUsers }: { player: Player, clubUsers: a
             <div>
               <label className="block text-sm font-medium mb-1 text-text-secondary">Kanaal *</label>
               <select name="channel" required className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-visible:ring-accent-primary">
-                <option value="">Selecteer...</option>
+                <option value=""></option>
                 {['Whatsapp', 'Telefoon', 'Op de club', 'Training', 'Via derde', 'E-mail', 'Overig'].map(t => <option key={t} value={t}>{t}</option>)}
               </select>
             </div>
@@ -365,7 +370,7 @@ function PlayerActionsMenu({ player, clubUsers }: { player: Player, clubUsers: a
               <textarea name="notes" rows={3} className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-visible:ring-accent-primary"></textarea>
             </div>
             <div className="pt-4 flex justify-end">
-              <Button type="submit" className="btn-premium text-white">Toevoegen</Button>
+              <Button type="submit" className="btn-premium text-white">Opslaan</Button>
             </div>
           </form>
         </DialogContent>
