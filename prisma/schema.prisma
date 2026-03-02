@@ -60,6 +60,7 @@ model Player {
   preferredFoot         String?
   team                  String?
   dateOfBirth           DateTime?
+  age                   Int?
 
   // New fields
   currentClub           String?

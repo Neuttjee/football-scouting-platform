@@ -35,6 +35,8 @@ import { updatePlayerField, updatePlayer } from "./actions"
 import { createTask } from "../tasks/actions"
 import { createContact } from "./[id]/contacts/actions"
 import { targetSteps, targetStatuses, adviesOptions } from "@/lib/statusMapping"
+import { calculateAgeFromDate } from "@/lib/age"
+import { PlayerDobAgeFields } from "./PlayerDobAgeFields"
 
 interface Player {
   id: string
@@ -45,6 +47,7 @@ interface Player {
   secondaryPosition: string | null
   preferredFoot: string | null
   dateOfBirth: Date | null
+  age: number | null
   step: string | null
   status: string | null
   advies: string | null
@@ -166,37 +169,73 @@ function PlayerActionsMenu({ player, clubUsers }: { player: Player, clubUsers: a
       </DropdownMenu>
 
       <Dialog open={openEdit} onOpenChange={setOpenEdit}>
-        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto bg-bg-card border-accent-primary text-text-primary shadow-[0_0_15px_rgba(var(--primary-rgb),0.3)]">
-          <DialogHeader><DialogTitle>Bewerk Speler</DialogTitle></DialogHeader>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto bg-bg-card border-accent-primary text-text-primary">
+          <DialogHeader>
+            <DialogTitle className="text-text-primary">Bewerk Speler</DialogTitle>
+          </DialogHeader>
           <form onSubmit={handleEdit} className="space-y-4 py-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="md:col-span-2">
+                <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Naam *</label>
+                <input
+                  type="text"
+                  name="name"
+                  defaultValue={player.name}
+                  required
+                  className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                />
+              </div>
+              <PlayerDobAgeFields
+                initialDateOfBirth={
+                  player.dateOfBirth
+                    ? new Date(player.dateOfBirth).toISOString().split("T")[0]
+                    : ""
+                }
+                initialAge={player.age}
+              />
               <div>
-                <label className="block text-sm font-medium mb-1">Naam *</label>
-                <input type="text" name="name" defaultValue={player.name} required className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-visible:ring-accent-primary" />
+                <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Huidige Club</label>
+                <input
+                  type="text"
+                  name="currentClub"
+                  defaultValue={player.currentClub || ''}
+                  className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Geboortedatum</label>
-                <input type="date" name="dateOfBirth" defaultValue={player.dateOfBirth ? new Date(player.dateOfBirth).toISOString().split('T')[0] : ''} className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-visible:ring-accent-primary" />
+                <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Team</label>
+                <input
+                  type="text"
+                  name="team"
+                  defaultValue={player.team || ''}
+                  className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Huidige Club</label>
-                <input type="text" name="currentClub" defaultValue={player.currentClub || ''} className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-visible:ring-accent-primary" />
+                <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Positie</label>
+                <input
+                  type="text"
+                  name="position"
+                  defaultValue={player.position || ''}
+                  className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Team</label>
-                <input type="text" name="team" defaultValue={player.team || ''} className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-visible:ring-accent-primary" />
+                <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Nevenpositie</label>
+                <input
+                  type="text"
+                  name="secondaryPosition"
+                  defaultValue={player.secondaryPosition || ''}
+                  className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Positie</label>
-                <input type="text" name="position" defaultValue={player.position || ''} className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-visible:ring-accent-primary" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Nevenpositie</label>
-                <input type="text" name="secondaryPosition" defaultValue={player.secondaryPosition || ''} className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-visible:ring-accent-primary" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Voorkeursbeen</label>
-                <select name="preferredFoot" defaultValue={player.preferredFoot || ''} className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-visible:ring-accent-primary">
+                <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Voorkeursbeen</label>
+                <select
+                  name="preferredFoot"
+                  defaultValue={player.preferredFoot || ''}
+                  className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                >
                   <option value="">Selecteer been...</option>
                   <option value="Rechts">Rechts</option>
                   <option value="Links">Links</option>
@@ -204,29 +243,55 @@ function PlayerActionsMenu({ player, clubUsers }: { player: Player, clubUsers: a
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Advies</label>
-                <select name="advies" defaultValue={player.advies || ''} className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-visible:ring-accent-primary">
+                <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Advies</label>
+                <select
+                  name="advies"
+                  defaultValue={player.advies || ''}
+                  className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                >
                   <option value="">Selecteer advies...</option>
-                  {ADVIES_OPTIONS.map(a => <option key={a} value={a}>{a}</option>)}
+                  {ADVIES_OPTIONS.map((a) => (
+                    <option key={a} value={a}>
+                      {a}
+                    </option>
+                  ))}
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Processtap</label>
-                <select name="step" defaultValue={player.step || ''} className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-visible:ring-accent-primary">
+                <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Processtap</label>
+                <select
+                  name="step"
+                  defaultValue={player.step || ''}
+                  className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                >
                   <option value="">Selecteer processtap...</option>
-                  {STEP_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
+                  {STEP_OPTIONS.map((s) => (
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
+                  ))}
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Status</label>
-                <select name="status" defaultValue={player.status || ''} className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-visible:ring-accent-primary">
+                <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Status</label>
+                <select
+                  name="status"
+                  defaultValue={player.status || ''}
+                  className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                >
                   <option value="">Selecteer status...</option>
-                  {STATUS_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
+                  {STATUS_OPTIONS.map((s) => (
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
             <div className="pt-4 flex justify-end">
-              <Button type="submit" className="btn-premium text-white">Opslaan</Button>
+              <Button type="submit" className="btn-premium text-white">
+                Opslaan
+              </Button>
             </div>
           </form>
         </DialogContent>
@@ -318,7 +383,9 @@ export function getColumns(clubUsers: any[]): ColumnDef<Player>[] {
       filterFn: "includesString",
       cell: ({ row }) => {
         const player = row.original;
-        const age = player.dateOfBirth ? Math.floor((new Date().getTime() - new Date(player.dateOfBirth).getTime()) / 3.15576e+10) : null;
+        const age = player.dateOfBirth
+          ? calculateAgeFromDate(new Date(player.dateOfBirth))
+          : player.age;
         
         return (
           <HoverCard>
@@ -391,8 +458,10 @@ export function getColumns(clubUsers: any[]): ColumnDef<Player>[] {
       header: "Leeftijd",
       filterFn: "arrIncludesSome",
       accessorFn: (row) => {
-        if (!row.dateOfBirth) return null;
-        return Math.floor((new Date().getTime() - new Date(row.dateOfBirth).getTime()) / 3.15576e+10);
+        if (row.dateOfBirth) {
+          return calculateAgeFromDate(new Date(row.dateOfBirth))
+        }
+        return row.age
       },
       cell: ({ row }) => <span className="font-mono text-accent-primary">{row.getValue("age") || "-"}</span>,
     },

@@ -29,6 +29,25 @@ async function savePlayerLogic(playerId: string | null, formData: FormData) {
     dateOfBirth = new Date(dobStr);
   }
 
+  let age: number | null = null;
+  const ageStr = formData.get('age') as string;
+  if (ageStr) {
+    const parsed = parseInt(ageStr, 10);
+    if (!Number.isNaN(parsed)) {
+      age = parsed;
+    }
+  }
+
+  if (dateOfBirth) {
+    const today = new Date();
+    let derivedAge = today.getFullYear() - dateOfBirth.getFullYear();
+    const monthDiff = today.getMonth() - dateOfBirth.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dateOfBirth.getDate())) {
+      derivedAge--;
+    }
+    age = derivedAge;
+  }
+
   // Geen automatische mapping meer:
   // - step wordt gewoon opgeslagen zoals gekozen
   // - status komt direct uit het formulier (statusInput)
@@ -44,6 +63,7 @@ async function savePlayerLogic(playerId: string | null, formData: FormData) {
         preferredFoot,
         team,
         dateOfBirth,
+        age,
         step,
         status: statusInput, // direct uit formulier
         currentClub,
@@ -51,7 +71,7 @@ async function savePlayerLogic(playerId: string | null, formData: FormData) {
         niveau,
         contactPerson,
         notes,
-      },
+      } as any,
     });
   } else {
     // Create
@@ -63,6 +83,7 @@ async function savePlayerLogic(playerId: string | null, formData: FormData) {
         preferredFoot,
         team,
         dateOfBirth,
+        age,
         step,
         status: statusInput, // direct uit formulier
         currentClub,
@@ -72,7 +93,7 @@ async function savePlayerLogic(playerId: string | null, formData: FormData) {
         notes,
         clubId: session.user.clubId,
         createdById: session.user.id,
-      },
+      } as any,
     });
   }
 }

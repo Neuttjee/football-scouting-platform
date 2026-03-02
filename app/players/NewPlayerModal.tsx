@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog"
 import { createPlayer } from "./actions"
 import { targetSteps, targetStatuses, adviesOptions } from "@/lib/statusMapping"
+import { PlayerDobAgeFields } from "./PlayerDobAgeFields"
 
 export function NewPlayerModal() {
   const [open, setOpen] = React.useState(false)
@@ -38,15 +39,17 @@ export function NewPlayerModal() {
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
+            <div className="md:col-span-2">
               <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Naam *</label>
-              <input type="text" name="name" required className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background" />
+              <input
+                type="text"
+                name="name"
+                required
+                className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              />
             </div>
-            
-            <div>
-              <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Geboortedatum</label>
-              <input type="date" name="dateOfBirth" className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background" />
-            </div>
+
+            <PlayerDobAgeFields />
 
             <div>
               <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Huidige Club</label>

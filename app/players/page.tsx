@@ -22,6 +22,7 @@ export default async function PlayersPage() {
         secondaryPosition: true,
         preferredFoot: true,
         dateOfBirth: true,
+        age: true,
         advies: true,
       }
     }),
