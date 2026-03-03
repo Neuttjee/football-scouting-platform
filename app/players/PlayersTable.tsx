@@ -306,7 +306,7 @@ function PlayerActionsMenu({ player, clubUsers }: { player: Player, clubUsers: a
         <DialogContent className="max-w-xl bg-bg-card border-accent-primary text-text-primary shadow-[0_0_15px_rgba(var(--primary-rgb),0.3)]">
           <DialogHeader><DialogTitle>Nieuwe taak voor {player.name}</DialogTitle></DialogHeader>
           <form onSubmit={handleTask} className="space-y-4 py-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-4">
               <div>
                 <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Taak omschrijving *</label>
                 <input type="text" name="title" required className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none" />

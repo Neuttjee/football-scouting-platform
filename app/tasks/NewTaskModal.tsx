@@ -33,7 +33,7 @@ export function NewTaskModal({ clubUsers, players }: { clubUsers: any[], players
           <DialogTitle className="text-text-primary">Nieuwe Taak</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium mb-1 text-text-secondary">Taak omschrijving *</label>
               <input type="text" name="title" required className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-visible:ring-accent-primary" placeholder="Bijv. Video bekijken van speler X" />

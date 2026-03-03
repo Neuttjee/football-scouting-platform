@@ -1,45 +1,60 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Button } from "@/components/ui/button"
+import * as React from "react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { createContact } from "../contacts/actions"
-import { Plus } from "lucide-react"
+} from "@/components/ui/dialog";
+import { createContactFromContactsPage } from "./actions";
 
-export function NewContactModal({ playerId }: { playerId: string }) {
-  const [open, setOpen] = React.useState(false)
-  const [outcome, setOutcome] = React.useState('')
-  const requiresReason = outcome === 'Afgehaakt' || outcome === 'Niet haalbaar'
+type PlayerOption = { id: string; name: string };
+
+export function NewContactModal({ players }: { players: PlayerOption[] }) {
+  const [open, setOpen] = React.useState(false);
+  const [outcome, setOutcome] = React.useState("");
+  const requiresReason = outcome === "Afgehaakt" || outcome === "Niet haalbaar";
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    const formData = new FormData(e.currentTarget)
-    await createContact(playerId, formData)
-    setOpen(false)
-  }
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    await createContactFromContactsPage(formData);
+    setOpen(false);
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button
-          size="icon"
-          className="p-1.5 bg-accent-primary/10 text-accent-primary hover:bg-accent-primary/20 rounded-md transition-colors outline-none cursor-pointer focus:ring-accent-primary focus:ring-1 focus:ring-offset-2"
-          aria-label="Nieuw contactmoment toevoegen"
-        >
-          <Plus className="size-4" />
+        <Button className="btn-premium text-white px-4 py-2 rounded-lg transition text-sm">
+          Nieuw contactmoment
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-md bg-bg-card border-border-dark text-text-primary">
+      <DialogContent className="max-w-md bg-bg-card border-accent-primary text-text-primary shadow-[0_0_15px_rgba(var(--primary-rgb),0.3)]">
         <DialogHeader>
           <DialogTitle className="text-text-primary">Nieuw contactmoment</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
+          <div>
+            <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
+              Speler *
+            </label>
+            <select
+              name="playerId"
+              required
+              className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
+            >
+              <option value="">Selecteer speler...</option>
+              {players.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
           <div>
             <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
               Type *
@@ -50,11 +65,13 @@ export function NewContactModal({ playerId }: { playerId: string }) {
               className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
             >
               <option value="">Selecteer...</option>
-              {['Intro benadering', 'Follow up', 'Gesprek', 'Meetraining', 'Aanbod', 'Overig'].map(t => (
-                <option key={t} value={t}>
-                  {t}
-                </option>
-              ))}
+              {["Intro benadering", "Follow up", "Gesprek", "Meetraining", "Aanbod", "Overig"].map(
+                (t) => (
+                  <option key={t} value={t}>
+                    {t}
+                  </option>
+                ),
+              )}
             </select>
           </div>
 
@@ -68,11 +85,13 @@ export function NewContactModal({ playerId }: { playerId: string }) {
               className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
             >
               <option value="">Selecteer...</option>
-              {['Whatsapp', 'Telefoon', 'Op de club', 'Training', 'Via derde', 'E-mail', 'Overig'].map(t => (
-                <option key={t} value={t}>
-                  {t}
-                </option>
-              ))}
+              {["Whatsapp", "Telefoon", "Op de club", "Training", "Via derde", "E-mail", "Overig"].map(
+                (t) => (
+                  <option key={t} value={t}>
+                    {t}
+                  </option>
+                ),
+              )}
             </select>
           </div>
 
@@ -83,22 +102,24 @@ export function NewContactModal({ playerId }: { playerId: string }) {
             <select
               name="outcome"
               value={outcome}
-              onChange={e => setOutcome(e.target.value)}
+              onChange={(e) => setOutcome(e.target.value)}
               className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
             >
               <option value="">Geen of onbekend</option>
-              {['Positief', 'Neutraal', 'Twijfel', 'Negatief', 'Afgehaakt', 'Niet haalbaar'].map(t => (
-                <option key={t} value={t}>
-                  {t}
-                </option>
-              ))}
+              {["Positief", "Neutraal", "Twijfel", "Negatief", "Afgehaakt", "Niet haalbaar"].map(
+                (t) => (
+                  <option key={t} value={t}>
+                    {t}
+                  </option>
+                ),
+              )}
             </select>
           </div>
 
           {requiresReason && (
             <div>
               <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
-                Reden (Verplicht bij Afgehaakt/Niet haalbaar) *
+                Reden (verplicht bij Afgehaakt / Niet haalbaar) *
               </label>
               <input
                 type="text"
@@ -117,7 +138,7 @@ export function NewContactModal({ playerId }: { playerId: string }) {
               name="notes"
               rows={3}
               className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
-            ></textarea>
+            />
           </div>
 
           <div className="pt-4 flex justify-end">
@@ -128,5 +149,5 @@ export function NewContactModal({ playerId }: { playerId: string }) {
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

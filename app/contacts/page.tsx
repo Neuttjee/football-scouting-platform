@@ -1,6 +1,7 @@
 import { getSession } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import Link from 'next/link';
+import { NewContactModal } from './NewContactModal';
 
 export default async function ContactsPage() {
   const session = await getSession();
@@ -15,13 +16,17 @@ export default async function ContactsPage() {
     }
   });
 
+  const players = await prisma.player.findMany({
+    where: { clubId: session.user.clubId },
+    select: { id: true, name: true },
+    orderBy: { name: 'asc' },
+  });
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Contactmomenten</h1>
-        <Link href="/players" className="btn-premium text-white px-4 py-2 rounded-lg transition text-sm">
-          Nieuw contactmoment
-        </Link>
+        <NewContactModal players={players} />
       </div>
 
       <div className="bg-card p-6 rounded-lg shadow-sm border">

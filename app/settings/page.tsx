@@ -42,30 +42,33 @@ export default async function SettingsPage() {
         <button disabled className="bg-muted text-muted-foreground px-4 py-2 rounded cursor-not-allowed">2FA Inschakelen</button>
       </section>
 
-      <section className="card-premium p-6 rounded-lg shadow">
-        <h2 className="text-xl font-semibold mb-2">Spelers importeren</h2>
-        <p className="text-sm text-text-secondary mb-4">
+      <section className="bg-card p-6 rounded-lg shadow border opacity-60">
+        <h2 className="text-xl font-semibold mb-2 flex items-center gap-2">
+          Spelers importeren
+          <span className="text-xs bg-muted text-muted-foreground px-2 py-1 rounded">Post MVP</span>
+        </h2>
+        <p className="text-sm text-muted-foreground mb-4">
           Importeer spelerslijsten vanuit Excel of CSV om externe scoutinglijsten of je eigen selectie snel in het platform te zetten.
         </p>
 
         <div className="flex flex-wrap items-center gap-3">
           <button
             type="button"
-            className="btn-premium text-white px-4 py-2 rounded-md"
+            className="bg-muted text-muted-foreground px-4 py-2 rounded cursor-not-allowed text-sm"
             disabled
           >
-            Import starten (binnenkort beschikbaar)
+            Import starten
           </button>
 
           <button
             type="button"
-            className="px-4 py-2 rounded-md border border-border-dark bg-bg-primary text-text-primary text-sm hover:bg-bg-hover transition-colors"
+            className="bg-muted text-muted-foreground px-4 py-2 rounded cursor-not-allowed text-sm"
             disabled
           >
             Voorbeeldbestand downloaden
           </button>
 
-          <span className="text-xs text-text-muted">
+          <span className="text-xs text-muted-foreground">
             Functionaliteit wordt binnenkort geactiveerd.
           </span>
         </div>
