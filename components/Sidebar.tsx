@@ -16,6 +16,8 @@ export function Sidebar({ role, clubName, clubLogo }: SidebarProps) {
   const navItems = [
     { href: '/dashboard', label: 'Dashboard' },
     { href: '/players', label: 'Spelers' },
+    { href: '/internal-players', label: 'Interne spelers' },
+    { href: '/squad-planning', label: 'Selectie planning' },
     { href: '/tasks', label: 'Taken' },
     { href: '/contacts', label: 'Contacten' },
   ];

@@ -13,8 +13,47 @@ import { updatePlayerProfile } from "../../actions"
 import { targetSteps, targetStatuses, adviesOptions } from "@/lib/statusMapping"
 import { PlayerDobAgeFields } from "../../PlayerDobAgeFields"
 
-export function EditPlayerModal({ player }: { player: any }) {
+type TeamOption = {
+  id: string
+  name: string
+  code: string | null
+}
+
+type EditablePlayer = {
+  id: string
+  name: string
+  type: "INTERNAL" | "EXTERNAL"
+  dateOfBirth: string | Date | null
+  age: number | null
+  currentClub: string | null
+  team: string | null
+  teamId: string | null
+  joinedAt: string | Date | null
+  contractEndDate: string | Date | null
+  optionYear: boolean
+  isTopTalent: boolean
+  niveau: string | null
+  position: string | null
+  secondaryPosition: string | null
+  preferredFoot: string | null
+  contactPerson: string | null
+  status: string | null
+  step: string | null
+  advies: string | null
+  notes: string | null
+}
+
+export function EditPlayerModal({
+  player,
+  teams,
+}: {
+  player: EditablePlayer
+  teams: TeamOption[]
+}) {
   const [open, setOpen] = React.useState(false)
+  const [playerType, setPlayerType] = React.useState<"EXTERNAL" | "INTERNAL">(
+    player.type === "INTERNAL" ? "INTERNAL" : "EXTERNAL"
+  )
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -37,6 +76,21 @@ export function EditPlayerModal({ player }: { player: any }) {
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
+                Type speler
+              </label>
+              <select
+                name="type"
+                value={playerType}
+                onChange={(e) => setPlayerType(e.target.value as "EXTERNAL" | "INTERNAL")}
+                className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
+              >
+                <option value="EXTERNAL">EXTERNAL</option>
+                <option value="INTERNAL">INTERNAL</option>
+              </select>
+            </div>
+
             <div className="md:col-span-2">
               <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Naam *</label>
               <input
@@ -57,25 +111,75 @@ export function EditPlayerModal({ player }: { player: any }) {
               initialAge={player.age ?? null}
             />
 
-            <div>
-              <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Huidige Club</label>
-              <input
-                type="text"
-                name="currentClub"
-                defaultValue={player.currentClub || ""}
-                className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
-              />
-            </div>
+            {playerType === "INTERNAL" ? (
+              <>
+                <div>
+                  <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Team</label>
+                  <select
+                    name="teamId"
+                    defaultValue={player.teamId || ""}
+                    className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
+                  >
+                    <option value=""></option>
+                    {teams.map((team) => (
+                      <option key={team.id} value={team.id}>
+                        {team.code || team.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Bij club sinds</label>
+                  <input
+                    type="date"
+                    name="joinedAt"
+                    defaultValue={player.joinedAt ? new Date(player.joinedAt).toISOString().split("T")[0] : ""}
+                    className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Contract tot</label>
+                  <input
+                    type="date"
+                    name="contractEndDate"
+                    defaultValue={player.contractEndDate ? new Date(player.contractEndDate).toISOString().split("T")[0] : ""}
+                    className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
+                  />
+                </div>
+                <div className="flex items-center gap-5 pt-6">
+                  <label className="text-sm text-text-secondary flex items-center gap-2">
+                    <input type="checkbox" name="optionYear" defaultChecked={!!player.optionYear} />
+                    Option year
+                  </label>
+                  <label className="text-sm text-text-secondary flex items-center gap-2">
+                    <input type="checkbox" name="isTopTalent" defaultChecked={!!player.isTopTalent} />
+                    Top talent
+                  </label>
+                </div>
+              </>
+            ) : (
+              <>
+                <div>
+                  <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Huidige Club</label>
+                  <input
+                    type="text"
+                    name="currentClub"
+                    defaultValue={player.currentClub || ""}
+                    className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
+                  />
+                </div>
 
-            <div>
-              <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Team</label>
-              <input
-                type="text"
-                name="team"
-                defaultValue={player.team || ""}
-                className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
-              />
-            </div>
+                <div>
+                  <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Team</label>
+                  <input
+                    type="text"
+                    name="team"
+                    defaultValue={player.team || ""}
+                    className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
+                  />
+                </div>
+              </>
+            )}
 
             <div>
               <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Niveau (Huidig)</label>
@@ -131,56 +235,60 @@ export function EditPlayerModal({ player }: { player: any }) {
               />
             </div>
 
-            {/* Status eerst */}
-            <div>
-              <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Status</label>
-              <select
-                name="status"
-                defaultValue={player.status || ""}
-                className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
-              >
-                <option value=""></option>
-                {targetStatuses.map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
-                ))}
-              </select>
-            </div>
+            {playerType === "EXTERNAL" && (
+              <>
+                {/* Status eerst */}
+                <div>
+                  <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Status</label>
+                  <select
+                    name="status"
+                    defaultValue={player.status || ""}
+                    className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
+                  >
+                    <option value=""></option>
+                    {targetStatuses.map((s) => (
+                      <option key={s} value={s}>
+                        {s}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-            {/* Dan processtap */}
-            <div>
-              <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Processtap</label>
-              <select
-                name="step"
-                defaultValue={player.step || ""}
-                className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
-              >
-                <option value=""></option>
-                {targetSteps.map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
-                ))}
-              </select>
-            </div>
+                {/* Dan processtap */}
+                <div>
+                  <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Processtap</label>
+                  <select
+                    name="step"
+                    defaultValue={player.step || ""}
+                    className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
+                  >
+                    <option value=""></option>
+                    {targetSteps.map((s) => (
+                      <option key={s} value={s}>
+                        {s}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-            {/* Dan advies als lijst */}
-            <div>
-              <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Advies</label>
-              <select
-                name="advies"
-                defaultValue={player.advies || ""}
-                className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
-              >
-                <option value=""></option>
-                {adviesOptions.map((a) => (
-                  <option key={a} value={a}>
-                    {a}
-                  </option>
-                ))}
-              </select>
-            </div>
+                {/* Dan advies als lijst */}
+                <div>
+                  <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Advies</label>
+                  <select
+                    name="advies"
+                    defaultValue={player.advies || ""}
+                    className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
+                  >
+                    <option value=""></option>
+                    {adviesOptions.map((a) => (
+                      <option key={a} value={a}>
+                        {a}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </>
+            )}
           </div>
 
           <div>

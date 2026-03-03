@@ -14,6 +14,8 @@ async function savePlayerLogic(playerId: string | null, formData: FormData) {
   const secondaryPosition = formData.get('secondaryPosition') as string;
   const preferredFoot = formData.get('preferredFoot') as string;
   const team = formData.get('team') as string;
+  const teamIdInput = (formData.get('teamId') as string | null) || null;
+  const playerTypeInput = (formData.get('type') as string | null) || 'EXTERNAL';
   const step = formData.get('step') as string || null;
   const statusInput = formData.get('status') as string || null;
 
@@ -22,11 +24,33 @@ async function savePlayerLogic(playerId: string | null, formData: FormData) {
   const niveau = formData.get('niveau') as string || null;
   const contactPerson = formData.get('contactPerson') as string || null;
   const notes = formData.get('notes') as string || null;
+  const optionYear = formData.get('optionYear') === 'on';
+  const isTopTalent = formData.get('isTopTalent') === 'on';
 
   let dateOfBirth: Date | null = null;
   const dobStr = formData.get('dateOfBirth') as string;
   if (dobStr) {
     dateOfBirth = new Date(dobStr);
+  }
+
+  const joinedAtStr = formData.get('joinedAt') as string;
+  const joinedAt = joinedAtStr ? new Date(joinedAtStr) : null;
+  const contractEndDateStr = formData.get('contractEndDate') as string;
+  const contractEndDate = contractEndDateStr ? new Date(contractEndDateStr) : null;
+
+  const safeType = playerTypeInput === 'INTERNAL' ? 'INTERNAL' : 'EXTERNAL';
+
+  let resolvedTeamId: string | null = null;
+  let resolvedTeamName: string | null = team || null;
+  if (teamIdInput) {
+    const selectedTeam = await prisma.team.findFirst({
+      where: { id: teamIdInput, clubId: session.user.clubId },
+      select: { id: true, name: true, code: true },
+    });
+    if (selectedTeam) {
+      resolvedTeamId = selectedTeam.id;
+      resolvedTeamName = selectedTeam.code || selectedTeam.name;
+    }
   }
 
   let age: number | null = null;
@@ -61,9 +85,15 @@ async function savePlayerLogic(playerId: string | null, formData: FormData) {
         position,
         secondaryPosition,
         preferredFoot,
-        team,
+        team: safeType === 'INTERNAL' ? resolvedTeamName : team,
+        teamId: safeType === 'INTERNAL' ? resolvedTeamId : null,
         dateOfBirth,
         age,
+        type: safeType,
+        joinedAt: safeType === 'INTERNAL' ? joinedAt : null,
+        contractEndDate: safeType === 'INTERNAL' ? contractEndDate : null,
+        optionYear: safeType === 'INTERNAL' ? optionYear : false,
+        isTopTalent: safeType === 'INTERNAL' ? isTopTalent : false,
         step,
         status: statusInput, // direct uit formulier
         currentClub,
@@ -71,7 +101,7 @@ async function savePlayerLogic(playerId: string | null, formData: FormData) {
         niveau,
         contactPerson,
         notes,
-      } as any,
+      },
     });
   } else {
     // Create
@@ -81,9 +111,15 @@ async function savePlayerLogic(playerId: string | null, formData: FormData) {
         position,
         secondaryPosition,
         preferredFoot,
-        team,
+        team: safeType === 'INTERNAL' ? resolvedTeamName : team,
+        teamId: safeType === 'INTERNAL' ? resolvedTeamId : null,
         dateOfBirth,
         age,
+        type: safeType,
+        joinedAt: safeType === 'INTERNAL' ? joinedAt : null,
+        contractEndDate: safeType === 'INTERNAL' ? contractEndDate : null,
+        optionYear: safeType === 'INTERNAL' ? optionYear : false,
+        isTopTalent: safeType === 'INTERNAL' ? isTopTalent : false,
         step,
         status: statusInput, // direct uit formulier
         currentClub,
@@ -93,7 +129,7 @@ async function savePlayerLogic(playerId: string | null, formData: FormData) {
         notes,
         clubId: session.user.clubId,
         createdById: session.user.id,
-      } as any,
+      },
     });
   }
 }

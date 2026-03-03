@@ -3,7 +3,6 @@ import prisma from '@/lib/prisma';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { EditPlayerModal } from './EditPlayerModal';
 import { NewContactModal } from './NewContactModal';
 import { NewPlayerTaskModal } from './NewPlayerTaskModal';
@@ -33,14 +32,24 @@ export default async function PlayerProfilePage({
         where: { isCompleted: false },
         orderBy: { createdAt: 'desc' },
         include: { assignedTo: true, createdBy: true, player: true }
-      }
+      },
+      teamRef: {
+        select: { id: true, name: true, code: true },
+      },
     }
   });
 
-  const clubUsers = await prisma.user.findMany({
-    where: { clubId: session.user.clubId },
-    select: { id: true, name: true },
-  });
+  const [clubUsers, teams] = await Promise.all([
+    prisma.user.findMany({
+      where: { clubId: session.user.clubId },
+      select: { id: true, name: true },
+    }),
+    prisma.team.findMany({
+      where: { clubId: session.user.clubId, isActive: true },
+      orderBy: [{ displayOrder: 'asc' }, { createdAt: 'asc' }],
+      select: { id: true, name: true, code: true },
+    }),
+  ]);
 
   if (!player) {
     redirect('/players');
@@ -48,7 +57,9 @@ export default async function PlayerProfilePage({
 
   const age = player.dateOfBirth
     ? Math.floor((new Date().getTime() - new Date(player.dateOfBirth).getTime()) / 3.15576e+10)
-    : null;
+    : player.age;
+
+  const internalTeamLabel = player.teamRef?.code || player.teamRef?.name || player.team || '-';
 
   return (
     <div className="space-y-8">
@@ -74,7 +85,7 @@ export default async function PlayerProfilePage({
           </div>
         </div>
         <div className="flex space-x-3">
-          <EditPlayerModal player={player} />
+          <EditPlayerModal player={player} teams={teams} />
         </div>
       </div>
 
@@ -205,28 +216,69 @@ export default async function PlayerProfilePage({
         </div>
 
         <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-accent-primary uppercase tracking-widest text-xs">Scouting Status</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              
-              <div>
-                <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Status</div>
-                <div className="font-bold text-lg flex items-center gap-2 text-text-primary">{player.status || '-'}</div>
-              </div>
+          {player.type === 'INTERNAL' ? (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-accent-primary uppercase tracking-widest text-xs">Interne Club</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div>
+                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Team</div>
+                  <div className="font-bold text-lg text-text-primary">{internalTeamLabel}</div>
+                </div>
+                <div>
+                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Bij club sinds</div>
+                  <div className="font-bold text-lg text-text-primary">
+                    {player.joinedAt ? new Date(player.joinedAt).toLocaleDateString('nl-NL') : '-'}
+                  </div>
+                </div>
+                <div>
+                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Beste positie</div>
+                  <div className="font-bold text-lg text-text-primary">{player.position || '-'}</div>
+                </div>
+                <div>
+                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Nevenpositie</div>
+                  <div className="font-bold text-lg text-text-primary">{player.secondaryPosition || '-'}</div>
+                </div>
+                <div>
+                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Contract tot</div>
+                  <div className="font-bold text-lg text-text-primary">
+                    {player.contractEndDate ? new Date(player.contractEndDate).toLocaleDateString('nl-NL') : '-'}
+                  </div>
+                </div>
+                <div>
+                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Option year</div>
+                  <div className="font-bold text-lg text-text-primary">{player.optionYear ? 'Ja' : 'Nee'}</div>
+                </div>
+                <div>
+                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Top talent</div>
+                  <div className="font-bold text-lg text-text-primary">{player.isTopTalent ? '⭐ Ja' : 'Nee'}</div>
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-accent-primary uppercase tracking-widest text-xs">Scouting Status</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div>
+                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Status</div>
+                  <div className="font-bold text-lg flex items-center gap-2 text-text-primary">{player.status || '-'}</div>
+                </div>
 
-              <div>
-                <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Processtap</div>
-                <div className="font-bold text-lg text-text-primary">{player.step || '-'}</div>
-              </div>
+                <div>
+                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Processtap</div>
+                  <div className="font-bold text-lg text-text-primary">{player.step || '-'}</div>
+                </div>
 
-              <div>
-                <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Advies</div>
-                <div className="font-bold text-lg text-text-primary">{player.advies || '-'}</div>
-              </div>
-            </CardContent>
-          </Card>
+                <div>
+                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Advies</div>
+                  <div className="font-bold text-lg text-text-primary">{player.advies || '-'}</div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           <Card className="border-border-dark border-dashed hover:border-accent-primary/50 shadow-[0_0_30px_rgba(var(--primary-rgb),0.05)]">
             <CardHeader>

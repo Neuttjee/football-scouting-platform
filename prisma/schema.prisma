@@ -7,13 +7,20 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum PlayerType {
+  INTERNAL
+  EXTERNAL
+}
+
 model Club {
   id             String          @id @default(uuid())
   name           String
   logo           String?
   primaryColor   String?
+  agingThreshold Int             @default(30)
 
   users          User[]
+  teams          Team[]
   players        Player[]
   contacts       ContactMoment[]
   tasks          Task[]
@@ -55,12 +62,19 @@ model User {
 model Player {
   id                    String   @id @default(uuid())
   name                  String
+  type                  PlayerType @default(EXTERNAL)
   position              String?
   secondaryPosition     String?
   preferredFoot         String?
   team                  String?
+  teamId                String?
+  teamRef               Team?    @relation(fields: [teamId], references: [id], onDelete: SetNull)
   dateOfBirth           DateTime?
   age                   Int?
+  joinedAt              DateTime?
+  contractEndDate       DateTime?
+  optionYear            Boolean  @default(false)
+  isTopTalent           Boolean  @default(false)
 
   // New fields
   currentClub           String?
@@ -85,6 +99,21 @@ model Player {
 
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
+}
+
+model Team {
+  id           String   @id @default(uuid())
+  clubId       String
+  club         Club     @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  name         String
+  code         String?
+  isActive     Boolean  @default(true)
+  displayOrder Int      @default(0)
+  players      Player[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([clubId, isActive, displayOrder])
 }
 
 model ContactMoment {

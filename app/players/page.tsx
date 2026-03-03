@@ -7,11 +7,10 @@ export default async function PlayersPage() {
   const session = await getSession();
   if (!session) return null;
 
-  const [players, clubUsers] = await Promise.all([
+  const [players, clubUsers, activeTeams] = await Promise.all([
     prisma.player.findMany({
       where: { clubId: session.user.clubId },
       orderBy: { updatedAt: 'desc' },
-      // Cast select to any so we can include the 'age' field
       select: {
         id: true,
         name: true,
@@ -24,24 +23,30 @@ export default async function PlayersPage() {
         preferredFoot: true,
         dateOfBirth: true,
         age: true,
+        type: true,
         advies: true,
         notes: true,
-      } as any,
+      },
     }),
     prisma.user.findMany({
       where: { clubId: session.user.clubId },
       select: { id: true, name: true }
-    })
+    }),
+    prisma.team.findMany({
+      where: { clubId: session.user.clubId, isActive: true },
+      orderBy: [{ displayOrder: 'asc' }, { createdAt: 'asc' }],
+      select: { id: true, name: true, code: true },
+    }),
   ]);
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Spelers</h1>
-        <NewPlayerModal />
+        <NewPlayerModal teams={activeTeams} />
       </div>
 
-      <PlayersTable data={players as any} clubUsers={clubUsers} />
+      <PlayersTable data={players} clubUsers={clubUsers} />
     </div>
   );
 }
