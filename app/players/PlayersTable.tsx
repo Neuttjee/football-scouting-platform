@@ -312,14 +312,14 @@ function PlayerActionsMenu({ player, clubUsers }: { player: Player, clubUsers: a
                 <input type="text" name="title" required className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none" />
               </div>
               <div>
-                <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Toewijzen aan (Gebruiker)</label>
+                <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Toewijzen (Gebruiker)</label>
                 <select name="assignedToId" className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none">
                   <option value="">Niet toegewezen</option>
                   {clubUsers.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Of toewijzen aan (Externe persoon)</label>
+                <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Toewijzen (Extern)</label>
                 <input type="text" name="assignedToExternalName" className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none" />
               </div>
               <div>
@@ -348,7 +348,7 @@ function PlayerActionsMenu({ player, clubUsers }: { player: Player, clubUsers: a
             <div>
               <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Kanaal *</label>
               <select name="channel" required className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none">
-                <option value=""></option>
+                <option value="">Selecteer...</option>
                 {['Whatsapp', 'Telefoon', 'Op de club', 'Training', 'Via derde', 'E-mail', 'Overig'].map(t => <option key={t} value={t}>{t}</option>)}
               </select>
             </div>

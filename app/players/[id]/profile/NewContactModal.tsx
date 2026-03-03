@@ -77,7 +77,7 @@ export function NewContactModal({ playerId }: { playerId: string }) {
           </div>
 
           <div className="pt-4 flex justify-end">
-            <Button type="submit" className="btn-premium text-white">Toevoegen</Button>
+            <Button type="submit" className="btn-premium text-white">Opslaan</Button>
           </div>
         </form>
       </DialogContent>

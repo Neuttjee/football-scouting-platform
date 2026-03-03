@@ -120,19 +120,24 @@ export function NewPlayerTaskModal({
               </select>
 
               {assigneeType === "external" && (
-                <input
-                  type="text"
-                  placeholder="Naam externe persoon"
-                  className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
-                  value={externalName}
-                  onChange={(e) => setExternalName(e.target.value)}
-                />
+                <div className="space-y-2">
+                  <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
+                    Toewijzen (Extern)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Naam externe persoon"
+                    className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
+                    value={externalName}
+                    onChange={(e) => setExternalName(e.target.value)}
+                  />
+                </div>
               )}
             </div>
           </div>
           <div className="pt-4 flex justify-end">
             <Button type="submit" className="btn-premium text-white">
-              Toevoegen
+              Opslaan
             </Button>
           </div>
         </form>

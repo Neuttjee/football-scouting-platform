@@ -53,12 +53,12 @@ export function InviteUserModal() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button className="btn-premium text-white transition">
-          Gebruiker Uitnodigen
+          Uitnodigen
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="max-w-xl bg-bg-card border-accent-primary text-text-primary shadow-[0_0_15px_rgba(var(--primary-rgb),0.3)]">
         <DialogHeader>
-          <DialogTitle>Nieuwe Gebruiker Uitnodigen</DialogTitle>
+          <DialogTitle>Gebruiker uitnodigen</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
           {error && (
@@ -68,18 +68,34 @@ export function InviteUserModal() {
           )}
           
           <div>
-            <label className="block text-sm font-medium mb-1">Naam</label>
-            <input type="text" name="name" required className="w-full border rounded p-2 bg-background" placeholder="Naam van de gebruiker" />
+            <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Naam</label>
+              <input
+                type="text"
+                name="name"
+                required
+                className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
+                placeholder="Naam van de gebruiker"
+              />
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">E-mailadres</label>
-            <input type="email" name="email" required className="w-full border rounded p-2 bg-background" placeholder="e-mail@voorbeeld.nl" />
+            <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">E-mailadres</label>
+              <input
+                type="email"
+                name="email"
+                required
+                className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
+                placeholder="e-mail@voorbeeld.nl"
+              />
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Rol</label>
-            <select name="role" required className="w-full border rounded p-2 bg-background">
+            <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Rol</label>
+              <select
+                name="role"
+                required
+                className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
+              >
               <option value="SCOUT">Scout</option>
               <option value="TC_LID">TC Lid</option>
               <option value="ADMIN">Beheerder (Admin)</option>
