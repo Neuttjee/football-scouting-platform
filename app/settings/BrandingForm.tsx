@@ -93,7 +93,7 @@ export function BrandingForm({ club }: { club: any }) {
         </div>
         
         <div className="flex-1">
-          <label className="block text-sm font-medium mb-2">Primaire Kleur</label>
+          <label className="block text-sm font-medium mb-2">Primaire kleur</label>
           <div className="flex gap-4 items-center">
             <input type="color" name="primaryColor" defaultValue={club?.primaryColor || DEFAULT_PRIMARY_COLOR} className="h-10 w-full max-w-[100px] border-0 rounded cursor-pointer bg-transparent" />
             <span className="text-sm text-text-muted">Wordt gebruikt voor knoppen, actieve menu-items en accenten.</span>
@@ -102,7 +102,7 @@ export function BrandingForm({ club }: { club: any }) {
       </div>
 
       <button type="submit" disabled={isUploading} className="btn-premium text-white px-6 py-2 rounded-lg transition disabled:opacity-50 font-medium">
-        {isUploading ? 'Bezig met uploaden...' : 'Branding Opslaan'}
+        {isUploading ? 'Bezig met uploaden...' : 'Opslaan'}
       </button>
     </form>
   )
