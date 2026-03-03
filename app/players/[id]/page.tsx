@@ -21,7 +21,7 @@ export default async function EditPlayerPage({ params }: { params: { id: string 
     <div className="max-w-2xl mx-auto space-y-6">
       <div className="flex items-center space-x-4">
         <Link href="/players" className="text-gray-500 hover:text-gray-900">← Terug</Link>
-        <h1 className="text-3xl font-bold">Bewerk Speler</h1>
+        <h1 className="text-3xl font-bold">Bewerk speler</h1>
       </div>
 
       <form action={updatePlayerWithId} className="bg-white p-6 rounded-lg shadow space-y-4">

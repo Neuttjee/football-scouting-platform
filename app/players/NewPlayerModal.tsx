@@ -30,12 +30,12 @@ export function NewPlayerModal() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button className="btn-premium text-white transition">
-          Nieuwe Speler
+          Speler toevoegen
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto bg-bg-card border-accent-primary text-text-primary">
         <DialogHeader>
-          <DialogTitle className="text-text-primary">Nieuwe speler toevoegen</DialogTitle>
+          <DialogTitle className="text-text-primary">Speler toevoegen</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
