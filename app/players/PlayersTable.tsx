@@ -308,23 +308,23 @@ function PlayerActionsMenu({ player, clubUsers }: { player: Player, clubUsers: a
           <form onSubmit={handleTask} className="space-y-4 py-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-1 text-text-secondary">Taak omschrijving *</label>
-                <input type="text" name="title" required className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-visible:ring-accent-primary" />
+                <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Taak omschrijving *</label>
+                <input type="text" name="title" required className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none" />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1 text-text-secondary">Toewijzen aan (Gebruiker)</label>
-                <select name="assignedToId" className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-visible:ring-accent-primary">
+                <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Toewijzen aan (Gebruiker)</label>
+                <select name="assignedToId" className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none">
                   <option value="">Niet toegewezen</option>
                   {clubUsers.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1 text-text-secondary">Of toewijzen aan (Externe persoon)</label>
-                <input type="text" name="assignedToExternalName" className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-visible:ring-accent-primary" />
+                <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Of toewijzen aan (Externe persoon)</label>
+                <input type="text" name="assignedToExternalName" className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none" />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1 text-text-secondary">Deadline</label>
-                <input type="date" name="dueDate" className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-visible:ring-accent-primary" />
+                <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Deadline</label>
+                <input type="date" name="dueDate" className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none" />
               </div>
             </div>
             <div className="pt-4 flex justify-end">
@@ -339,35 +339,35 @@ function PlayerActionsMenu({ player, clubUsers }: { player: Player, clubUsers: a
           <DialogHeader><DialogTitle>Nieuw contactmoment</DialogTitle></DialogHeader>
           <form onSubmit={handleContact} className="space-y-4 py-4">
             <div>
-              <label className="block text-sm font-medium mb-1 text-text-secondary">Type *</label>
-              <select name="type" required className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-visible:ring-accent-primary">
+              <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Type *</label>
+              <select name="type" required className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none">
                 <option value="">Selecteer...</option>
                 {['Intro benadering', 'Follow up', 'Gesprek', 'Meetraining', 'Aanbod', 'Overig'].map(t => <option key={t} value={t}>{t}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1 text-text-secondary">Kanaal *</label>
-              <select name="channel" required className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-visible:ring-accent-primary">
+              <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Kanaal *</label>
+              <select name="channel" required className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none">
                 <option value=""></option>
                 {['Whatsapp', 'Telefoon', 'Op de club', 'Training', 'Via derde', 'E-mail', 'Overig'].map(t => <option key={t} value={t}>{t}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1 text-text-secondary">Uitkomst</label>
-              <select name="outcome" value={outcome} onChange={e => setOutcome(e.target.value)} className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-visible:ring-accent-primary">
+              <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Uitkomst</label>
+              <select name="outcome" value={outcome} onChange={e => setOutcome(e.target.value)} className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none">
                 <option value="">Geen of onbekend</option>
                 {['Positief', 'Neutraal', 'Twijfel', 'Negatief', 'Afgehaakt', 'Niet haalbaar'].map(t => <option key={t} value={t}>{t}</option>)}
               </select>
             </div>
             {requiresReason && (
               <div>
-                <label className="block text-sm font-medium mb-1 text-text-secondary">Reden (Verplicht bij Afgehaakt/Niet haalbaar) *</label>
-                <input type="text" name="reason" required={requiresReason} className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-visible:ring-accent-primary" />
+                <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Reden (Verplicht bij Afgehaakt/Niet haalbaar) *</label>
+                <input type="text" name="reason" required={requiresReason} className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none" />
               </div>
             )}
             <div>
-              <label className="block text-sm font-medium mb-1 text-text-secondary">Notities</label>
-              <textarea name="notes" rows={3} className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-visible:ring-accent-primary"></textarea>
+              <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Notities</label>
+              <textarea name="notes" rows={3} className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"></textarea>
             </div>
             <div className="pt-4 flex justify-end">
               <Button type="submit" className="btn-premium text-white">Opslaan</Button>

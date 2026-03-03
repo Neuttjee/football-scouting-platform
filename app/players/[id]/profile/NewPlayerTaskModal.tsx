@@ -59,34 +59,34 @@ export function NewPlayerTaskModal({
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
         <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-1 text-text-secondary">
+              <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
                 Taak omschrijving *
               </label>
               <input
                 type="text"
                 name="title"
                 required
-                className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-visible:ring-accent-primary"
+                className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1 text-text-secondary">
+              <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
                 Deadline
               </label>
               <input
                 type="date"
                 name="dueDate"
-                className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-visible:ring-accent-primary"
+                className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
               />
             </div>
 
             <div className="md:col-span-2 space-y-2">
-              <label className="block text-sm font-medium mb-1 text-text-secondary">
+              <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
                 Toewijzen aan
               </label>
               <select
-                className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-visible:ring-accent-primary"
+                className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
                 value={
                   assigneeType === "user"
                     ? selectedUserId || ""
@@ -123,7 +123,7 @@ export function NewPlayerTaskModal({
                 <input
                   type="text"
                   placeholder="Naam externe persoon"
-                  className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-visible:ring-accent-primary"
+                  className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
                   value={externalName}
                   onChange={(e) => setExternalName(e.target.value)}
                 />
