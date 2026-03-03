@@ -41,6 +41,35 @@ export default async function SettingsPage() {
         <p className="text-sm text-muted-foreground mb-4">De architectuur is voorbereid voor TOTP 2FA (bv. Google Authenticator). Deze functionaliteit wordt in een latere fase geactiveerd.</p>
         <button disabled className="bg-muted text-muted-foreground px-4 py-2 rounded cursor-not-allowed">2FA Inschakelen</button>
       </section>
+
+      <section className="card-premium p-6 rounded-lg shadow">
+        <h2 className="text-xl font-semibold mb-2">Spelers importeren</h2>
+        <p className="text-sm text-text-secondary mb-4">
+          Importeer spelerslijsten vanuit Excel of CSV om externe scoutinglijsten of je eigen selectie snel in het platform te zetten.
+        </p>
+
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            className="btn-premium text-white px-4 py-2 rounded-md"
+            disabled
+          >
+            Import starten (binnenkort beschikbaar)
+          </button>
+
+          <button
+            type="button"
+            className="px-4 py-2 rounded-md border border-border-dark bg-bg-primary text-text-primary text-sm hover:bg-bg-hover transition-colors"
+            disabled
+          >
+            Voorbeeldbestand downloaden
+          </button>
+
+          <span className="text-xs text-text-muted">
+            Functionaliteit wordt binnenkort geactiveerd.
+          </span>
+        </div>
+      </section>
     </div>
   );
 }

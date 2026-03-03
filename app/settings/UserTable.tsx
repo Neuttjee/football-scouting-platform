@@ -21,6 +21,8 @@ type User = {
   email: string;
   role: string;
   isActive: boolean;
+  passwordHash: string | null;
+  inviteToken: string | null;
 };
 
 export function UserTable({ users, currentUserId }: { users: User[], currentUserId: string }) {
@@ -114,15 +116,21 @@ export function UserTable({ users, currentUserId }: { users: User[], currentUser
                   {u.role}
                 </TableCell>
                 <TableCell className="py-2 px-2 text-sm">
-                  <span
-                    className={`px-2 py-1 rounded text-xs ${
-                      u.isActive
-                        ? "bg-green-100 text-green-800"
-                        : "bg-red-100 text-red-800"
-                    }`}
-                  >
-                    {u.isActive ? "Actief" : "Inactief"}
-                  </span>
+                  {(!u.passwordHash && u.inviteToken) ? (
+                    <span className="px-2 py-1 rounded text-xs bg-yellow-100 text-yellow-800">
+                      Uitgenodigd
+                    </span>
+                  ) : (
+                    <span
+                      className={`px-2 py-1 rounded text-xs ${
+                        u.isActive
+                          ? "bg-green-100 text-green-800"
+                          : "bg-red-100 text-red-800"
+                      }`}
+                    >
+                      {u.isActive ? "Actief" : "Inactief"}
+                    </span>
+                  )}
                 </TableCell>
                 <TableCell className="py-2 px-2 text-sm text-right">
                   {u.id !== currentUserId && (

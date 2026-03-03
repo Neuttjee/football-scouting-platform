@@ -105,7 +105,7 @@ export function InviteUserModal() {
 
           <div className="pt-4 flex justify-end">
             <Button type="submit" disabled={loading} className="btn-premium text-white transition">
-              {loading ? 'Bezig met uitnodigen...' : 'Uitnodiging Versturen'}
+              {loading ? 'Bezig met uitnodigen...' : 'Versturen'}
             </Button>
           </div>
         </form>

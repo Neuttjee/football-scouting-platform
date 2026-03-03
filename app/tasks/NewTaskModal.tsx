@@ -25,7 +25,7 @@ export function NewTaskModal({ clubUsers, players }: { clubUsers: any[], players
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button className="btn-premium text-white transition">
-          Taak Toevoegen
+          Taak toevoegen
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-xl bg-bg-card border-border-dark text-text-primary">
