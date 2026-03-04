@@ -94,7 +94,7 @@ export function PlayersPageClient({
 
         {/* Midden: Intern/Extern toggle */}
         <div className="justify-self-center">
-          <PlayerTypeToggle value={view} onChange={handleViewChange} size="md" />
+          <PlayerTypeToggle value={view} onChange={handleViewChange} size="sm" />
         </div>
 
         {/* Rechts: nieuwe speler button in beide views */}
