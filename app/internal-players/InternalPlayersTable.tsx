@@ -69,8 +69,8 @@ const INTERNAL_COLUMNS: ColumnDef<InternalPlayer>[] = [
           </Link>
           {p.isTopTalent && (
             <Star
-              className="ml-1 size-4 text-accent-primary"
-              fill="var(--primary-color, #FF6A00)"
+              className="ml-1 size-4 text-[#FFD700]"
+              fill="#FFD700"
             />
           )}
         </div>

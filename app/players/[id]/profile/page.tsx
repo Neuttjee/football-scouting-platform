@@ -8,6 +8,7 @@ import { NewContactModal } from './NewContactModal';
 import { NewPlayerTaskModal } from './NewPlayerTaskModal';
 import { TaskList } from '@/app/tasks/TaskList';
 import { PlayerRadarChart } from "./PlayerRadarChart";
+import { Star } from "lucide-react";
 
 export default async function PlayerProfilePage({
   params,
@@ -63,19 +64,36 @@ export default async function PlayerProfilePage({
 
   const internalTeamLabel = player.teamRef?.code || player.teamRef?.name || player.team || '-';
 
+  const backHref = player.type === 'INTERNAL' ? '/players?view=internal' : '/players';
+
+  const currentClubLabel =
+    player.type === 'INTERNAL'
+      ? (player.currentClub || session.user.clubName || 'Geen club')
+      : (player.currentClub || 'Geen club');
+
   return (
     <div className="space-y-8">
       <div className="flex items-center space-x-4 mb-2">
-        <Link href="/players" className="text-text-muted hover:text-text-primary transition-colors text-sm uppercase tracking-wider font-medium">
+        <Link href={backHref} className="text-text-muted hover:text-text-primary transition-colors text-sm uppercase tracking-wider font-medium">
           ← Terug
         </Link>
       </div>
 
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 card-premium p-6 rounded-xl">
         <div>
-          <h1 className="text-4xl font-bold text-text-primary mb-1">{player.name}</h1>
+          <div className="flex items-center gap-2 mb-1">
+            <h1 className="text-4xl font-bold text-text-primary">
+              {player.name}
+            </h1>
+            {player.type === 'INTERNAL' && player.isTopTalent && (
+              <Star
+                className="mt-1 size-5 text-[#FFD700]"
+                fill="#FFD700"
+              />
+            )}
+          </div>
           <div className="flex items-center gap-3 text-sm text-text-secondary">
-            <span>{player.currentClub || 'Geen club'}</span>
+            <span>{currentClubLabel}</span>
             <span className="w-1 h-1 rounded-full bg-border-dark"></span>
             <span>{player.position || 'Geen positie'}</span>
             {age && (
@@ -101,7 +119,7 @@ export default async function PlayerProfilePage({
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 text-sm">
                 <div>
                   <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Club (Huidig)</div>
-                  <div className="font-medium text-text-primary">{player.currentClub || '-'}</div>
+                  <div className="font-medium text-text-primary">{currentClubLabel || '-'}</div>
                 </div>
                 <div>
                   <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Team (Huidig)</div>
@@ -226,70 +244,63 @@ export default async function PlayerProfilePage({
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div>
-                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">
-                    Team
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div>
+                    <div className="text-text-muted uppercase tracking-wider text-xs mb-1">
+                      Team
+                    </div>
+                    <div className="font-bold text-lg text-text-primary">
+                      {internalTeamLabel}
+                    </div>
                   </div>
-                  <div className="font-bold text-lg text-text-primary">
-                    {internalTeamLabel}
-                  </div>
-                </div>
 
-                <div>
-                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">
-                    Bij club sinds
+                  <div>
+                    <div className="text-text-muted uppercase tracking-wider text-xs mb-1">
+                      Bij club sinds
+                    </div>
+                    <div className="font-bold text-lg text-text-primary">
+                      {player.joinedAt
+                        ? new Date(player.joinedAt).toLocaleDateString('nl-NL')
+                        : '-'}
+                    </div>
                   </div>
-                  <div className="font-bold text-lg text-text-primary">
-                    {player.joinedAt
-                      ? new Date(player.joinedAt).toLocaleDateString('nl-NL')
-                      : '-'}
-                  </div>
-                </div>
 
-                <div>
-                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">
-                    Contract tot
+                  <div>
+                    <div className="text-text-muted uppercase tracking-wider text-xs mb-1">
+                      Contract tot
+                    </div>
+                    <div className="font-bold text-lg text-text-primary">
+                      {player.contractEndDate
+                        ? new Date(player.contractEndDate).toLocaleDateString('nl-NL')
+                        : '-'}
+                    </div>
                   </div>
-                  <div className="font-bold text-lg text-text-primary">
-                    {player.contractEndDate
-                      ? new Date(player.contractEndDate).toLocaleDateString('nl-NL')
-                      : '-'}
-                  </div>
-                </div>
 
-                <div>
-                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">
-                    Beste positie
+                  <div>
+                    <div className="text-text-muted uppercase tracking-wider text-xs mb-1">
+                      Beste positie
+                    </div>
+                    <div className="font-bold text-lg text-text-primary">
+                      {player.position || '-'}
+                    </div>
                   </div>
-                  <div className="font-bold text-lg text-text-primary">
-                    {player.position || '-'}
-                  </div>
-                </div>
 
-                <div>
-                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">
-                    Nevenpositie
+                  <div>
+                    <div className="text-text-muted uppercase tracking-wider text-xs mb-1">
+                      Nevenpositie
+                    </div>
+                    <div className="font-bold text-lg text-text-primary">
+                      {player.secondaryPosition || '-'}
+                    </div>
                   </div>
-                  <div className="font-bold text-lg text-text-primary">
-                    {player.secondaryPosition || '-'}
-                  </div>
-                </div>
 
-                <div>
-                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">
-                    Optiejaar
-                  </div>
-                  <div className="font-bold text-lg text-text-primary">
-                    {player.optionYear ? 'Ja' : 'Nee'}
-                  </div>
-                </div>
-
-                <div>
-                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">
-                    Top talent
-                  </div>
-                  <div className="font-bold text-lg text-text-primary">
-                    {player.isTopTalent ? '⭐ Ja' : 'Nee'}
+                  <div>
+                    <div className="text-text-muted uppercase tracking-wider text-xs mb-1">
+                      Optiejaar
+                    </div>
+                    <div className="font-bold text-lg text-text-primary">
+                      {player.optionYear ? 'Ja' : 'Nee'}
+                    </div>
                   </div>
                 </div>
               </CardContent>
