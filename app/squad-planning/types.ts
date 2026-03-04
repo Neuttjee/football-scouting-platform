@@ -3,6 +3,7 @@ export type TeamOption = {
   name: string;
   code: string | null;
   displayOrder: number;
+  isActive: boolean;
 };
 
 export type PlanningPlayer = {
