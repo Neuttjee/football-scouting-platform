@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import { Star, Plus } from "lucide-react";
+import { PlayerActionsMenu, PlayerForActions } from "@/components/PlayerActionsMenu";
 
 type InternalPlayer = {
   id: string;
@@ -47,6 +48,7 @@ type Props = {
   players: InternalPlayer[];
   agingThreshold: number;
   seasonYear: number;
+  clubUsers: { id: string; name: string }[];
 };
 
 const INTERNAL_COLUMNS: ColumnDef<InternalPlayer>[] = [
@@ -151,17 +153,32 @@ const INTERNAL_COLUMNS: ColumnDef<InternalPlayer>[] = [
   {
     id: "actions",
     header: () => <div className="text-right text-text-muted pr-2">Acties</div>,
-    cell: ({ row }) => {
-      const p = row.original;
+    cell: ({ row, table }) => {
+      const p = row.original as InternalPlayer;
+      const clubUsers = (table.options.meta as any)?.clubUsers as { id: string; name: string }[];
+  
+      const playerForActions: PlayerForActions = {
+        id: p.id,
+        name: p.name,
+        type: "INTERNAL",
+        position: p.position,
+        currentClub: null,
+        team: p.teamLabel,
+        secondaryPosition: p.secondaryPosition,
+        preferredFoot: p.preferredFoot,
+        dateOfBirth: null,
+        age: p.age,
+        step: null,
+        status: null,
+        advies: null,
+        notes: null,
+      };
+  
       return (
-        <div className="flex justify-end pr-2">
-          <Link
-            href={`/players/${p.id}/profile`}
-            className="p-1.5 bg-accent-primary/10 text-accent-primary hover:bg-accent-primary/20 rounded-md transition-colors outline-none"
-          >
-            <Plus className="h-4 w-4" />
-          </Link>
-        </div>
+        <PlayerActionsMenu
+          player={playerForActions}
+          clubUsers={clubUsers}
+        />
       );
     },
   },
@@ -176,6 +193,8 @@ function Filter({ column }: { column: any }) {
     "secondaryPosition",
     "preferredFoot",
     "age",
+    "joinedAt",
+    "contractEndDate",
   ].includes(column.id);
 
   if (isFaceted) {
@@ -259,6 +278,7 @@ export function InternalPlayersTable({
   players,
   agingThreshold,
   seasonYear,
+  clubUsers,
 }: Props) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] =
@@ -278,6 +298,9 @@ export function InternalPlayersTable({
     state: {
       sorting,
       columnFilters,
+    },
+    meta: {
+      clubUsers,
     },
   });
 

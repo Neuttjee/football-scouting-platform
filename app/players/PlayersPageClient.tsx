@@ -113,6 +113,7 @@ export function PlayersPageClient({
           teams={teams}
           agingThreshold={agingThreshold}
           defaultSeasonYear={defaultSeasonYear}
+          clubUsers={clubUsers}
         />
       )}
     </div>
