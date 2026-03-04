@@ -19,32 +19,34 @@ export default async function PlayerProfilePage({
 
   const { id } = await params;
 
-  const player = await prisma.player.findUnique({
+  const rawPlayer = await (prisma as any).player.findUnique({
     where: { id, clubId: session.user.clubId },
     include: {
       contacts: {
         orderBy: { createdAt: 'desc' },
         include: {
-          createdBy: { select: { name: true } }
-        }
+          createdBy: { select: { name: true } },
+        },
       },
       tasks: {
         where: { isCompleted: false },
         orderBy: { createdAt: 'desc' },
-        include: { assignedTo: true, createdBy: true, player: true }
+        include: { assignedTo: true, createdBy: true, player: true },
       },
       teamRef: {
         select: { id: true, name: true, code: true },
       },
-    }
+    } as any,
   });
+
+  const player = rawPlayer as any;
 
   const [clubUsers, teams] = await Promise.all([
     prisma.user.findMany({
       where: { clubId: session.user.clubId },
       select: { id: true, name: true },
     }),
-    prisma.team.findMany({
+    (prisma as any).team.findMany({
       where: { clubId: session.user.clubId, isActive: true },
       orderBy: [{ displayOrder: 'asc' }, { createdAt: 'asc' }],
       select: { id: true, name: true, code: true },
@@ -178,7 +180,7 @@ export default async function PlayerProfilePage({
                 <p className="text-sm text-text-muted">Nog geen contactmomenten geregistreerd.</p>
               ) : (
                 <div className="space-y-6">
-                  {player.contacts.map((contact) => (
+                  {player.contacts.map((contact: any) => (
                     <div key={contact.id} className="border-l-2 border-accent-primary/50 pl-5 pb-2 relative">
                       <div className="absolute w-3 h-3 bg-accent-primary rounded-full -left-[7px] top-1 shadow-[0_0_10px_rgba(var(--primary-rgb),0.5)]"></div>
                       <div className="flex justify-between items-start mb-2">
@@ -219,62 +221,112 @@ export default async function PlayerProfilePage({
           {player.type === 'INTERNAL' ? (
             <Card>
               <CardHeader>
-                <CardTitle className="text-accent-primary uppercase tracking-widest text-xs">Interne Club</CardTitle>
+                <CardTitle className="text-accent-primary uppercase tracking-widest text-xs">
+                  Interne Situatie
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div>
-                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Team</div>
-                  <div className="font-bold text-lg text-text-primary">{internalTeamLabel}</div>
-                </div>
-                <div>
-                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Bij club sinds</div>
+                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">
+                    Team
+                  </div>
                   <div className="font-bold text-lg text-text-primary">
-                    {player.joinedAt ? new Date(player.joinedAt).toLocaleDateString('nl-NL') : '-'}
+                    {internalTeamLabel}
                   </div>
                 </div>
+
                 <div>
-                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Beste positie</div>
-                  <div className="font-bold text-lg text-text-primary">{player.position || '-'}</div>
-                </div>
-                <div>
-                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Nevenpositie</div>
-                  <div className="font-bold text-lg text-text-primary">{player.secondaryPosition || '-'}</div>
-                </div>
-                <div>
-                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Contract tot</div>
+                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">
+                    Bij club sinds
+                  </div>
                   <div className="font-bold text-lg text-text-primary">
-                    {player.contractEndDate ? new Date(player.contractEndDate).toLocaleDateString('nl-NL') : '-'}
+                    {player.joinedAt
+                      ? new Date(player.joinedAt).toLocaleDateString('nl-NL')
+                      : '-'}
                   </div>
                 </div>
+
                 <div>
-                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Option year</div>
-                  <div className="font-bold text-lg text-text-primary">{player.optionYear ? 'Ja' : 'Nee'}</div>
+                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">
+                    Contract tot
+                  </div>
+                  <div className="font-bold text-lg text-text-primary">
+                    {player.contractEndDate
+                      ? new Date(player.contractEndDate).toLocaleDateString('nl-NL')
+                      : '-'}
+                  </div>
                 </div>
+
                 <div>
-                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Top talent</div>
-                  <div className="font-bold text-lg text-text-primary">{player.isTopTalent ? '⭐ Ja' : 'Nee'}</div>
+                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">
+                    Beste positie
+                  </div>
+                  <div className="font-bold text-lg text-text-primary">
+                    {player.position || '-'}
+                  </div>
+                </div>
+
+                <div>
+                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">
+                    Nevenpositie
+                  </div>
+                  <div className="font-bold text-lg text-text-primary">
+                    {player.secondaryPosition || '-'}
+                  </div>
+                </div>
+
+                <div>
+                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">
+                    Optiejaar
+                  </div>
+                  <div className="font-bold text-lg text-text-primary">
+                    {player.optionYear ? 'Ja' : 'Nee'}
+                  </div>
+                </div>
+
+                <div>
+                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">
+                    Top talent
+                  </div>
+                  <div className="font-bold text-lg text-text-primary">
+                    {player.isTopTalent ? '⭐ Ja' : 'Nee'}
+                  </div>
                 </div>
               </CardContent>
             </Card>
           ) : (
             <Card>
               <CardHeader>
-                <CardTitle className="text-accent-primary uppercase tracking-widest text-xs">Scouting Status</CardTitle>
+                <CardTitle className="text-accent-primary uppercase tracking-widest text-xs">
+                  Scouting Status
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div>
-                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Status</div>
-                  <div className="font-bold text-lg flex items-center gap-2 text-text-primary">{player.status || '-'}</div>
+                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">
+                    Status
+                  </div>
+                  <div className="font-bold text-lg flex items-center gap-2 text-text-primary">
+                    {player.status || '-'}
+                  </div>
                 </div>
 
                 <div>
-                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Processtap</div>
-                  <div className="font-bold text-lg text-text-primary">{player.step || '-'}</div>
+                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">
+                    Processtap
+                  </div>
+                  <div className="font-bold text-lg text-text-primary">
+                    {player.step || '-'}
+                  </div>
                 </div>
 
                 <div>
-                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Advies</div>
-                  <div className="font-bold text-lg text-text-primary">{player.advies || '-'}</div>
+                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">
+                    Advies
+                  </div>
+                  <div className="font-bold text-lg text-text-primary">
+                    {player.advies || '-'}
+                  </div>
                 </div>
               </CardContent>
             </Card>

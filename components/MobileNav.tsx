@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Users, CheckSquare, Settings, ShieldUser, ClipboardList } from 'lucide-react';
+import { Home, Users, CheckSquare, Settings, ClipboardList } from 'lucide-react';
 
 export function MobileNav({ role }: { role: string }) {
   const pathname = usePathname();
@@ -10,7 +10,6 @@ export function MobileNav({ role }: { role: string }) {
   const navItems = [
     { href: '/dashboard', label: 'Dash', icon: Home },
     { href: '/players', label: 'Spelers', icon: Users },
-    { href: '/internal-players', label: 'Intern', icon: ShieldUser },
     { href: '/squad-planning', label: 'Planning', icon: ClipboardList },
     { href: '/tasks', label: 'Taken', icon: CheckSquare },
   ];

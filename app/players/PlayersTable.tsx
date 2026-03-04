@@ -41,6 +41,7 @@ import { PlayerDobAgeFields } from "./PlayerDobAgeFields"
 interface Player {
   id: string
   name: string
+  type: "INTERNAL" | "EXTERNAL"
   position: string | null
   currentClub: string | null
   team: string | null
@@ -150,6 +151,10 @@ function PlayerActionsMenu({ player, clubUsers }: { player: Player, clubUsers: a
     router.refresh()
   }
 
+  const [playerType, setPlayerType] = React.useState<"EXTERNAL" | "INTERNAL">(
+    player.type === "INTERNAL" ? "INTERNAL" : "EXTERNAL"
+  );
+
   return (
     <div className="flex justify-end pr-2">
       <DropdownMenu>
@@ -176,8 +181,29 @@ function PlayerActionsMenu({ player, clubUsers }: { player: Player, clubUsers: a
           </DialogHeader>
           <form onSubmit={handleEdit} className="space-y-4 py-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Type speler */}
+              <div>
+                <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
+                  Type speler
+                </label>
+                <select
+                  name="type"
+                  value={playerType}
+                  onChange={(e) =>
+                    setPlayerType(e.target.value as "EXTERNAL" | "INTERNAL")
+                  }
+                  className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
+                >
+                  <option value="EXTERNAL">EXTERNAL</option>
+                  <option value="INTERNAL">INTERNAL</option>
+                </select>
+              </div>
+
+              {/* Naam */}
               <div className="md:col-span-2">
-                <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Naam *</label>
+                <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
+                  Naam *
+                </label>
                 <input
                   type="text"
                   name="name"
@@ -186,6 +212,8 @@ function PlayerActionsMenu({ player, clubUsers }: { player: Player, clubUsers: a
                   className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
                 />
               </div>
+
+              {/* Geboortedatum / Leeftijd */}
               <PlayerDobAgeFields
                 initialDateOfBirth={
                   player.dateOfBirth
@@ -194,105 +222,149 @@ function PlayerActionsMenu({ player, clubUsers }: { player: Player, clubUsers: a
                 }
                 initialAge={player.age}
               />
-              <div>
-                <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Huidige Club</label>
-                <input
-                  type="text"
-                  name="currentClub"
-                  defaultValue={player.currentClub || ''}
-                  className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Team</label>
-                <input
-                  type="text"
-                  name="team"
-                  defaultValue={player.team || ''}
-                  className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Positie</label>
-                <input
-                  type="text"
-                  name="position"
-                  defaultValue={player.position || ''}
-                  className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Nevenpositie</label>
-                <input
-                  type="text"
-                  name="secondaryPosition"
-                  defaultValue={player.secondaryPosition || ''}
-                  className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Voorkeursbeen</label>
-                <select
-                  name="preferredFoot"
-                  defaultValue={player.preferredFoot || ''}
-                  className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
-                >
-                  <option value=""></option>
-                  <option value="Rechts">Rechts</option>
-                  <option value="Links">Links</option>
-                  <option value="Tweebenig">Tweebenig</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Advies</label>
-                <select
-                  name="advies"
-                  defaultValue={player.advies || ''}
-                  className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
-                >
-                  <option value=""></option>
-                  {ADVIES_OPTIONS.map((a) => (
-                    <option key={a} value={a}>
-                      {a}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Processtap</label>
-                <select
-                  name="step"
-                  defaultValue={player.step || ''}
-                  className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
-                >
-                  <option value=""></option>
-                  {STEP_OPTIONS.map((s) => (
-                    <option key={s} value={s}>
-                      {s}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Status</label>
-                <select
-                  name="status"
-                  defaultValue={player.status || ''}
-                  className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
-                >
-                  <option value=""></option>
-                  {STATUS_OPTIONS.map((s) => (
-                    <option key={s} value={s}>
-                      {s}
-                    </option>
-                  ))}
-                </select>
-              </div>
+
+              {playerType === "INTERNAL" ? (
+                <>
+                  {/* Hier kun je – als je teams wilt – later een teamId‑dropdown toevoegen zodra je teams als prop hebt */}
+                  <div className="md:col-span-2">
+                    <p className="text-xs text-text-muted">
+                      Interne details (contract, team, etc.) bewerk je nu via het
+                      spelersprofiel.
+                    </p>
+                  </div>
+                </>
+              ) : (
+                <>
+                  {/* EXTERNAL – huidige club + team + scoutingvelden */}
+                  <div>
+                    <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
+                      Huidige Club
+                    </label>
+                    <input
+                      type="text"
+                      name="currentClub"
+                      defaultValue={player.currentClub || ""}
+                      className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
+                      Team
+                    </label>
+                    <input
+                      type="text"
+                      name="team"
+                      defaultValue={player.team || ""}
+                      className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
+                      Positie
+                    </label>
+                    <input
+                      type="text"
+                      name="position"
+                      defaultValue={player.position || ""}
+                      className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
+                      Nevenpositie
+                    </label>
+                    <input
+                      type="text"
+                      name="secondaryPosition"
+                      defaultValue={player.secondaryPosition || ""}
+                      className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
+                      Voorkeursbeen
+                    </label>
+                    <select
+                      name="preferredFoot"
+                      defaultValue={player.preferredFoot || ""}
+                      className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
+                    >
+                      <option value=""></option>
+                      <option value="Rechts">Rechts</option>
+                      <option value="Links">Links</option>
+                      <option value="Tweebenig">Tweebenig</option>
+                    </select>
+                  </div>
+
+                  {/* Scoutingvelden */}
+                  <div>
+                    <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
+                      Advies
+                    </label>
+                    <select
+                      name="advies"
+                      defaultValue={player.advies || ""}
+                      className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
+                    >
+                      <option value=""></option>
+                      {ADVIES_OPTIONS.map((a) => (
+                        <option key={a} value={a}>
+                          {a}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
+                      Processtap
+                    </label>
+                    <select
+                      name="step"
+                      defaultValue={player.step || ""}
+                      className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
+                    >
+                      <option value=""></option>
+                      {STEP_OPTIONS.map((s) => (
+                        <option key={s} value={s}>
+                          {s}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
+                      Status
+                    </label>
+                    <select
+                      name="status"
+                      defaultValue={player.status || ""}
+                      className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
+                    >
+                      <option value=""></option>
+                      {STATUS_OPTIONS.map((s) => (
+                        <option key={s} value={s}>
+                          {s}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </>
+              )}
             </div>
+
             <div>
-              <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">Korte Notities</label>
-              <textarea name="notes" className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none" rows={3}></textarea>
+              <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
+                Korte Notities
+              </label>
+              <textarea
+                name="notes"
+                className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
+                rows={3}
+                defaultValue={player.notes || ""}
+              ></textarea>
             </div>
+
             <div className="pt-4 flex justify-end">
               <Button type="submit" className="btn-premium text-white">
                 Opslaan

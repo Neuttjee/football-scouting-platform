@@ -113,13 +113,13 @@ export async function updateAgingThreshold(agingThreshold: number) {
     ? Math.max(16, Math.min(45, Math.round(agingThreshold)))
     : 30;
 
-  await prisma.club.update({
+  await (prisma as any).club.update({
     where: { id: session.user.clubId },
-    data: { agingThreshold: safeThreshold },
+    data: { agingThreshold: safeThreshold } as any,
   });
 
   revalidatePath('/settings');
-  revalidatePath('/internal-players');
+  revalidatePath('/players');
   revalidatePath('/squad-planning');
 }
 
@@ -130,12 +130,12 @@ export async function createTeam(name: string, code: string | null) {
   const cleanedName = name?.trim();
   if (!cleanedName) throw new Error('Teamnaam is verplicht');
 
-  const maxOrder = await prisma.team.aggregate({
+  const maxOrder = await (prisma as any).team.aggregate({
     where: { clubId: session.user.clubId },
     _max: { displayOrder: true },
   });
 
-  await prisma.team.create({
+  await (prisma as any).team.create({
     data: {
       name: cleanedName,
       code: code?.trim() ? code.trim() : null,
@@ -146,7 +146,7 @@ export async function createTeam(name: string, code: string | null) {
   });
 
   revalidatePath('/settings');
-  revalidatePath('/internal-players');
+  revalidatePath('/players');
   revalidatePath('/squad-planning');
 }
 
@@ -154,13 +154,13 @@ export async function setTeamActive(teamId: string, isActive: boolean) {
   const session = await getSession();
   if (!session || session.user.role !== 'ADMIN') throw new Error('Unauthorized');
 
-  await prisma.team.update({
+  await (prisma as any).team.update({
     where: { id: teamId, clubId: session.user.clubId },
     data: { isActive },
   });
 
   revalidatePath('/settings');
-  revalidatePath('/internal-players');
+  revalidatePath('/players');
   revalidatePath('/squad-planning');
 }
 
@@ -168,13 +168,13 @@ export async function moveTeam(teamId: string, direction: 'up' | 'down') {
   const session = await getSession();
   if (!session || session.user.role !== 'ADMIN') throw new Error('Unauthorized');
 
-  const teams = await prisma.team.findMany({
+  const teams = await (prisma as any).team.findMany({
     where: { clubId: session.user.clubId },
     orderBy: [{ displayOrder: 'asc' }, { createdAt: 'asc' }],
     select: { id: true, displayOrder: true },
   });
 
-  const currentIndex = teams.findIndex((t) => t.id === teamId);
+  const currentIndex = teams.findIndex((t: { id: string }) => t.id === teamId);
   if (currentIndex === -1) throw new Error('Team niet gevonden');
 
   const swapIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
@@ -184,17 +184,17 @@ export async function moveTeam(teamId: string, direction: 'up' | 'down') {
   const target = teams[swapIndex];
 
   await prisma.$transaction([
-    prisma.team.update({
+    (prisma as any).team.update({
       where: { id: current.id },
       data: { displayOrder: target.displayOrder },
     }),
-    prisma.team.update({
+    (prisma as any).team.update({
       where: { id: target.id },
       data: { displayOrder: current.displayOrder },
     }),
   ]);
 
   revalidatePath('/settings');
-  revalidatePath('/internal-players');
+  revalidatePath('/players');
   revalidatePath('/squad-planning');
 }
