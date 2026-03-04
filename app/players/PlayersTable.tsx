@@ -37,6 +37,7 @@ import { createContact } from "./[id]/contacts/actions"
 import { targetSteps, targetStatuses, adviesOptions } from "@/lib/statusMapping"
 import { calculateAgeFromDate } from "@/lib/age"
 import { PlayerDobAgeFields } from "./PlayerDobAgeFields"
+import { PlayerTypeToggle, PlayerTypeValue } from "@/components/PlayerTypeToggle";
 
 interface Player {
   id: string
@@ -151,7 +152,7 @@ function PlayerActionsMenu({ player, clubUsers }: { player: Player, clubUsers: a
     router.refresh()
   }
 
-  const [playerType, setPlayerType] = React.useState<"EXTERNAL" | "INTERNAL">(
+  const [playerType, setPlayerType] = React.useState<PlayerTypeValue>(
     player.type === "INTERNAL" ? "INTERNAL" : "EXTERNAL"
   );
 
@@ -182,21 +183,17 @@ function PlayerActionsMenu({ player, clubUsers }: { player: Player, clubUsers: a
           <form onSubmit={handleEdit} className="space-y-4 py-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Type speler */}
-              <div>
-                <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
+              <div className="md:col-span-2 flex flex-col gap-1">
+                <label className="block text-text-muted uppercase tracking-wider text-xs">
                   Type speler
                 </label>
-                <select
-                  name="type"
+                {/* Hidden input voor FormData */}
+                <input type="hidden" name="type" value={playerType} />
+                <PlayerTypeToggle
                   value={playerType}
-                  onChange={(e) =>
-                    setPlayerType(e.target.value as "EXTERNAL" | "INTERNAL")
-                  }
-                  className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
-                >
-                  <option value="EXTERNAL">EXTERNAL</option>
-                  <option value="INTERNAL">INTERNAL</option>
-                </select>
+                  onChange={setPlayerType}
+                  size="sm"
+                />
               </div>
 
               {/* Naam */}

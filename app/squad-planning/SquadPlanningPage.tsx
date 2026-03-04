@@ -1,11 +1,20 @@
 "use client";
 
 import * as React from "react";
+import { Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AnalyticsPanel } from "./AnalyticsPanel";
 import { Field } from "./Field";
 import { PlayerPicker } from "./PlayerPicker";
 import { FieldSlot, Formation, MidfieldVariant, PlanningPlayer, TeamOption } from "./types";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { TeamSettingsForm } from "../settings/TeamSettingsForm";
 
 function getSlots(formation: Formation, midfieldVariant: MidfieldVariant): FieldSlot[] {
   if (formation === "4-4-2") {
@@ -85,6 +94,7 @@ export default function SquadPlanningPage({
     playerId: string;
     targetSlotId: string;
   } | null>(null);
+  const [settingsOpen, setSettingsOpen] = React.useState(false);
 
   React.useEffect(() => {
     setAssignments((prev) => {
@@ -173,68 +183,90 @@ export default function SquadPlanningPage({
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center gap-3">
-        <div className="inline-flex items-center gap-2 rounded-full bg-bg-secondary/60 border border-border-dark p-1">
-          {teams.map((team) => {
-            const active = team.id === selectedTeamId;
-            return (
-              <button
-                key={team.id}
-                type="button"
-                onClick={() => setSelectedTeamId(team.id)}
-                className={cn(
-                  "px-3 py-1.5 text-xs font-medium rounded-full transition-colors",
-                  active
-                    ? "bg-accent-primary text-primary-foreground shadow-[0_0_10px_rgba(var(--primary-rgb,255,106,0),0.4)]"
-                    : "text-text-muted hover:text-text-primary hover:bg-bg-primary/60"
-                )}
-              >
-                {team.code || team.name}
-              </button>
-            );
-          })}
-        </div>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        {/* Linkerzijde: teamselectie + filters */}
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="inline-flex items-center gap-2 rounded-full bg-bg-secondary/60 border border-border-dark p-1">
+            {teams.map((team) => {
+              const active = team.id === selectedTeamId;
+              return (
+                <button
+                  key={team.id}
+                  type="button"
+                  onClick={() => setSelectedTeamId(team.id)}
+                  className={cn(
+                    "px-3 py-1.5 text-xs font-medium rounded-full transition-colors",
+                    active
+                      ? "bg-accent-primary text-primary-foreground shadow-[0_0_10px_rgba(var(--primary-rgb,255,106,0),0.4)]"
+                      : "text-text-muted hover:text-text-primary hover:bg-bg-primary/60"
+                  )}
+                >
+                  {team.code || team.name}
+                </button>
+              );
+            })}
+          </div>
 
-        <select
-          value={seasonYear}
-          onChange={(e) => setSeasonYear(parseInt(e.target.value, 10))}
-          className="border border-border-dark rounded px-2 py-1 text-xs bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
-        >
-          {seasonOptions.map((year) => (
-            <option key={year} value={year}>
-              {year}-{year + 1}
-            </option>
-          ))}
-        </select>
-
-        <select
-          value={formation}
-          onChange={(e) => setFormation(e.target.value as Formation)}
-          className="border border-border-dark rounded px-2 py-1 text-xs bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
-        >
-          <option value="4-3-3">4-3-3</option>
-          <option value="4-4-2">4-4-2</option>
-        </select>
-
-        {formation === "4-3-3" && (
           <select
-            value={midfieldVariant}
-            onChange={(e) => setMidfieldVariant(e.target.value as MidfieldVariant)}
+            value={seasonYear}
+            onChange={(e) => setSeasonYear(parseInt(e.target.value, 10))}
             className="border border-border-dark rounded px-2 py-1 text-xs bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
           >
-            <option value="POINT_BACK">POINT_BACK</option>
-            <option value="POINT_FORWARD">POINT_FORWARD</option>
+            {seasonOptions.map((year) => (
+              <option key={year} value={year}>
+                {year}-{year + 1}
+              </option>
+            ))}
           </select>
-        )}
 
-        <label className="text-xs text-text-muted flex items-center gap-2">
-          <input
-            type="checkbox"
-            checked={includeFeederTeams}
-            onChange={(e) => setIncludeFeederTeams(e.target.checked)}
-          />
-          Onderliggende teams meenemen
-        </label>
+          <select
+            value={formation}
+            onChange={(e) => setFormation(e.target.value as Formation)}
+            className="border border-border-dark rounded px-2 py-1 text-xs bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
+          >
+            <option value="4-3-3">4-3-3</option>
+            <option value="4-4-2">4-4-2</option>
+          </select>
+
+          {formation === "4-3-3" && (
+            <select
+              value={midfieldVariant}
+              onChange={(e) => setMidfieldVariant(e.target.value as MidfieldVariant)}
+              className="border border-border-dark rounded px-2 py-1 text-xs bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
+            >
+              <option value="POINT_BACK">POINT_BACK</option>
+              <option value="POINT_FORWARD">POINT_FORWARD</option>
+            </select>
+          )}
+
+          <label className="text-xs text-text-muted flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={includeFeederTeams}
+              onChange={(e) => setIncludeFeederTeams(e.target.checked)}
+            />
+            Onderliggende teams meenemen
+          </label>
+        </div>
+
+        {/* Rechterzijde: planning instellingen dialoog */}
+        <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
+          <DialogTrigger asChild>
+            <button
+              type="button"
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-border-dark text-xs text-text-secondary hover:text-text-primary hover:bg-bg-primary/60"
+            >
+              <Settings className="w-4 h-4" />
+              <span className="hidden sm:inline">Planning instellingen</span>
+            </button>
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto bg-bg-card border-accent-primary text-text-primary">
+            <DialogHeader>
+              <DialogTitle>Planning instellingen</DialogTitle>
+            </DialogHeader>
+            <TeamSettingsForm teams={teams} agingThreshold={agingThreshold} />
+          </DialogContent>
+        </Dialog>
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-[1fr_390px] gap-6">

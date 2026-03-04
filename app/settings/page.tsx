@@ -4,7 +4,6 @@ import { redirect } from 'next/navigation';
 import { UserTable } from './UserTable';
 import { BrandingForm } from './BrandingForm';
 import { InviteUserModal } from './InviteUserModal';
-import { TeamSettingsForm } from './TeamSettingsForm';
 
 export default async function SettingsPage() {
   const session = await getSession();
@@ -12,13 +11,9 @@ export default async function SettingsPage() {
     redirect('/dashboard');
   }
 
-  const [club, users, teams] = await Promise.all([
+  const [club, users] = await Promise.all([
     prisma.club.findUnique({ where: { id: session.user.clubId } }),
     prisma.user.findMany({ where: { clubId: session.user.clubId } }),
-    prisma.team.findMany({
-      where: { clubId: session.user.clubId },
-      orderBy: [{ displayOrder: 'asc' }, { createdAt: 'asc' }],
-    }),
   ]);
 
   return (
@@ -30,11 +25,6 @@ export default async function SettingsPage() {
       <section className="card-premium p-6 rounded-lg shadow">
         <h2 className="text-xl font-semibold mb-4">Club Branding</h2>
         <BrandingForm club={club} />
-      </section>
-
-      <section className="card-premium p-6 rounded-lg shadow">
-        <h2 className="text-xl font-semibold mb-4">Planning Instellingen</h2>
-        <TeamSettingsForm teams={teams} agingThreshold={club?.agingThreshold ?? 30} />
       </section>
 
       <section className="card-premium p-6 rounded-lg shadow">

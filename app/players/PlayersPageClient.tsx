@@ -2,10 +2,10 @@
 
 import * as React from "react";
 import { useSearchParams } from "next/navigation";
-import { cn } from "@/lib/utils";
 import { PlayersTable } from "./PlayersTable";
 import { NewPlayerModal } from "./NewPlayerModal";
 import InternalPlayersPage from "../internal-players/InternalPlayersPage";
+import { PlayerTypeToggle, PlayerTypeValue } from "@/components/PlayerTypeToggle";
 
 type ExternalPlayer = {
   id: string;
@@ -68,65 +68,46 @@ export function PlayersPageClient({
 }: Props) {
   const searchParams = useSearchParams();
   const viewParam = searchParams.get("view");
-  const [view, setView] = React.useState<"external" | "internal">(
-    viewParam === "internal" ? "internal" : "external"
+
+  const [view, setView] = React.useState<PlayerTypeValue>(
+    viewParam === "internal" ? "INTERNAL" : "EXTERNAL"
   );
 
-  React.useEffect(() => {
-    if (viewParam === "internal") setView("internal");
-    else if (viewParam === "external") setView("external");
-  }, [viewParam]);
-
-  const handleViewChange = (newView: "external" | "internal") => {
+  const handleViewChange = (newView: PlayerTypeValue) => {
     setView(newView);
-    const url = newView === "internal" ? "/players?view=internal" : "/players";
+    const url = newView === "INTERNAL" ? "/players?view=internal" : "/players";
     window.history.replaceState(null, "", url);
   };
 
+  React.useEffect(() => {
+    if (viewParam === "internal") setView("INTERNAL");
+    else if (viewParam === "external") setView("EXTERNAL");
+  }, [viewParam]);
+
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <h1 className="text-3xl font-bold">Spelers</h1>
+      <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] items-center gap-4">
+        {/* Links: titel */}
+        <div className="justify-self-start">
+          <h1 className="text-3xl font-bold">Spelers</h1>
+        </div>
 
-        {/* Toggle Intern / Extern */}
-        <div className="inline-flex items-center gap-2 rounded-full bg-bg-secondary/60 border border-border-dark p-1">
-          <button
-            type="button"
-            onClick={() => handleViewChange("external")}
-            className={cn(
-              "px-3 py-1.5 text-xs font-medium rounded-full transition-colors",
-              view === "external"
-                ? "bg-accent-primary text-primary-foreground shadow-[0_0_10px_rgba(var(--primary-rgb,255,106,0),0.4)]"
-                : "text-text-muted hover:text-text-primary hover:bg-bg-primary/60"
-            )}
-          >
-            Extern
-          </button>
-          <button
-            type="button"
-            onClick={() => handleViewChange("internal")}
-            className={cn(
-              "px-3 py-1.5 text-xs font-medium rounded-full transition-colors",
-              view === "internal"
-                ? "bg-accent-primary text-primary-foreground shadow-[0_0_10px_rgba(var(--primary-rgb,255,106,0),0.4)]"
-                : "text-text-muted hover:text-text-primary hover:bg-bg-primary/60"
-            )}
-          >
-            Intern
-          </button>
+        {/* Midden: Intern/Extern toggle */}
+        <div className="justify-self-center">
+          <PlayerTypeToggle value={view} onChange={handleViewChange} size="md" />
+        </div>
+
+        {/* Rechts: nieuwe speler button in beide views */}
+        <div className="justify-self-end">
+          <NewPlayerModal teams={teams} />
         </div>
       </div>
 
-      {view === "external" && (
-        <>
-          <div className="flex justify-end">
-            <NewPlayerModal teams={teams} />
-          </div>
-          <PlayersTable data={externalPlayers as any} clubUsers={clubUsers} />
-        </>
+      {view === "EXTERNAL" && (
+        <PlayersTable data={externalPlayers as any} clubUsers={clubUsers} />
       )}
 
-      {view === "internal" && (
+      {view === "INTERNAL" && (
         <InternalPlayersPage
           players={internalPlayers}
           teams={teams}
