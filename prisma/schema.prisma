@@ -65,6 +65,7 @@ model Player {
   type                  PlayerType @default(EXTERNAL)
   position              String?
   secondaryPosition     String?
+  favoritePosition      String?
   preferredFoot         String?
   team                  String?
   teamId                String?
@@ -75,6 +76,7 @@ model Player {
   contractEndDate       DateTime?
   optionYear            Boolean  @default(false)
   isTopTalent           Boolean  @default(false)
+  distanceFromClubKm    Int?
 
   // New fields
   currentClub           String?

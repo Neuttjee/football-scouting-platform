@@ -71,6 +71,11 @@ export default async function PlayerProfilePage({
       ? (player.currentClub || session.user.clubName || 'Geen club')
       : (player.currentClub || 'Geen club');
 
+  const distanceFromClubLabel =
+    player.type === 'INTERNAL' && typeof player.distanceFromClubKm === 'number'
+      ? `${player.distanceFromClubKm} km`
+      : '-';
+
   return (
     <div className="space-y-8">
       <div className="flex items-center space-x-4 mb-2">
@@ -117,6 +122,7 @@ export default async function PlayerProfilePage({
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 text-sm">
+                {/* Rij 1: club, team, niveau */}
                 <div>
                   <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Club (Huidig)</div>
                   <div className="font-medium text-text-primary">{currentClubLabel || '-'}</div>
@@ -129,17 +135,27 @@ export default async function PlayerProfilePage({
                   <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Niveau (Huidig)</div>
                   <div className="font-medium text-text-primary">{player.niveau || '-'}</div>
                 </div>
+
+                {/* Rij 2: beste, neven, favoriete positie */}
                 <div>
-                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Geboortedatum</div>
-                  <div className="font-medium text-text-primary font-mono">{player.dateOfBirth ? new Date(player.dateOfBirth).toLocaleDateString('nl-NL') : '-'}</div>
-                </div>
-                <div>
-                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Positie</div>
+                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Beste positie</div>
                   <div className="font-medium text-text-primary">{player.position || '-'}</div>
                 </div>
                 <div>
                   <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Nevenpositie</div>
                   <div className="font-medium text-text-primary">{player.secondaryPosition || '-'}</div>
+                </div>
+                <div>
+                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Favoriete positie</div>
+                  <div className="font-medium text-text-primary">{player.favoritePosition || '-'}</div>
+                </div>
+
+                {/* Rij 3: geboortedatum, voet, contactpersoon */}
+                <div>
+                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Geboortedatum</div>
+                  <div className="font-medium text-text-primary font-mono">
+                    {player.dateOfBirth ? new Date(player.dateOfBirth).toLocaleDateString('nl-NL') : '-'}
+                  </div>
                 </div>
                 <div>
                   <div className="text-text-muted uppercase tracking-wider text-xs mb-1">Voorkeursbeen</div>
@@ -247,15 +263,6 @@ export default async function PlayerProfilePage({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div>
                     <div className="text-text-muted uppercase tracking-wider text-xs mb-1">
-                      Team
-                    </div>
-                    <div className="font-bold text-lg text-text-primary">
-                      {internalTeamLabel}
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="text-text-muted uppercase tracking-wider text-xs mb-1">
                       Bij club sinds
                     </div>
                     <div className="font-bold text-lg text-text-primary">
@@ -278,28 +285,10 @@ export default async function PlayerProfilePage({
 
                   <div>
                     <div className="text-text-muted uppercase tracking-wider text-xs mb-1">
-                      Beste positie
+                      Afstand tot club
                     </div>
                     <div className="font-bold text-lg text-text-primary">
-                      {player.position || '-'}
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="text-text-muted uppercase tracking-wider text-xs mb-1">
-                      Nevenpositie
-                    </div>
-                    <div className="font-bold text-lg text-text-primary">
-                      {player.secondaryPosition || '-'}
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="text-text-muted uppercase tracking-wider text-xs mb-1">
-                      Optiejaar
-                    </div>
-                    <div className="font-bold text-lg text-text-primary">
-                      {player.optionYear ? 'Ja' : 'Nee'}
+                      {distanceFromClubLabel}
                     </div>
                   </div>
                 </div>

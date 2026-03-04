@@ -36,6 +36,7 @@ type EditablePlayer = {
   niveau: string | null
   position: string | null
   secondaryPosition: string | null
+  favoritePosition: string | null
   preferredFoot: string | null
   contactPerson: string | null
   status: string | null
@@ -227,7 +228,7 @@ export function EditPlayerModal({
   
             <div>
               <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
-                Positie
+                Beste positie
               </label>
               <input
                 type="text"
@@ -245,7 +246,19 @@ export function EditPlayerModal({
                 type="text"
                 name="secondaryPosition"
                 defaultValue={player.secondaryPosition || ""}
-                className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
+                className="w-full border border-border-dark rounded p-2 bg-background focus-border-accent-primary focus-visible:outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
+                Favoriete positie
+              </label>
+              <input
+                type="text"
+                name="favoritePosition"
+                defaultValue={player.favoritePosition || ""}
+                className="w-full border border-border-dark rounded p-2 bg-background focus-border-accent-primary focus-visible:outline-none"
               />
             </div>
   

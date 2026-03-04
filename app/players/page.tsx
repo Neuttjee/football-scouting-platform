@@ -19,6 +19,7 @@ type PlayerWithRelations = {
   } | null;
   position: string | null;
   secondaryPosition: string | null;
+  favoritePosition: string | null;
   preferredFoot: string | null;
   dateOfBirth: Date | null;
   age: number | null;
@@ -30,6 +31,7 @@ type PlayerWithRelations = {
   joinedAt: Date | null;
   contractEndDate: Date | null;
   isTopTalent: boolean;
+  distanceFromClubKm: number | null;
 };
 
 type TeamOption = {

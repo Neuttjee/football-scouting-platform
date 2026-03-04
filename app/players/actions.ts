@@ -12,6 +12,7 @@ async function savePlayerLogic(playerId: string | null, formData: FormData) {
   const name = formData.get('name') as string;
   const position = formData.get('position') as string;
   const secondaryPosition = formData.get('secondaryPosition') as string;
+  const favoritePosition = formData.get('favoritePosition') as string;
   const preferredFoot = formData.get('preferredFoot') as string;
   const team = formData.get('team') as string;
   const teamIdInput = (formData.get('teamId') as string | null) || null;
@@ -26,6 +27,12 @@ async function savePlayerLogic(playerId: string | null, formData: FormData) {
   const notes = formData.get('notes') as string || null;
   const optionYear = formData.get('optionYear') === 'on';
   const isTopTalent = formData.get('isTopTalent') === 'on';
+
+  const distanceFromClubKmRaw = formData.get('distanceFromClubKm') as string;
+  const distanceFromClubKm =
+    distanceFromClubKmRaw && distanceFromClubKmRaw.trim() !== ''
+      ? parseInt(distanceFromClubKmRaw, 10)
+      : null;
 
   let dateOfBirth: Date | null = null;
   const dobStr = formData.get('dateOfBirth') as string;
@@ -84,6 +91,7 @@ async function savePlayerLogic(playerId: string | null, formData: FormData) {
         name,
         position,
         secondaryPosition,
+        favoritePosition,
         preferredFoot,
         team: safeType === 'INTERNAL' ? resolvedTeamName : team,
         teamId: safeType === 'INTERNAL' ? resolvedTeamId : null,
@@ -94,6 +102,7 @@ async function savePlayerLogic(playerId: string | null, formData: FormData) {
         contractEndDate: safeType === 'INTERNAL' ? contractEndDate : null,
         optionYear: safeType === 'INTERNAL' ? optionYear : false,
         isTopTalent: safeType === 'INTERNAL' ? isTopTalent : false,
+        distanceFromClubKm: safeType === 'INTERNAL' ? distanceFromClubKm : null,
         step,
         status: statusInput, // direct uit formulier
         currentClub,
@@ -110,6 +119,7 @@ async function savePlayerLogic(playerId: string | null, formData: FormData) {
         name,
         position,
         secondaryPosition,
+        favoritePosition,
         preferredFoot,
         team: safeType === 'INTERNAL' ? resolvedTeamName : team,
         teamId: safeType === 'INTERNAL' ? resolvedTeamId : null,
@@ -120,6 +130,7 @@ async function savePlayerLogic(playerId: string | null, formData: FormData) {
         contractEndDate: safeType === 'INTERNAL' ? contractEndDate : null,
         optionYear: safeType === 'INTERNAL' ? optionYear : false,
         isTopTalent: safeType === 'INTERNAL' ? isTopTalent : false,
+        distanceFromClubKm: safeType === 'INTERNAL' ? distanceFromClubKm : null,
         step,
         status: statusInput, // direct uit formulier
         currentClub,

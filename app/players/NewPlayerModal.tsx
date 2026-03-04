@@ -163,7 +163,7 @@ export function NewPlayerModal({ teams }: { teams: TeamOption[] }) {
   
             <div>
               <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
-                Positie
+                Beste positie
               </label>
               <input
                 type="text"
@@ -179,6 +179,17 @@ export function NewPlayerModal({ teams }: { teams: TeamOption[] }) {
               <input
                 type="text"
                 name="secondaryPosition"
+                className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
+                Favoriete positie
+              </label>
+              <input
+                type="text"
+                name="favoritePosition"
                 className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
               />
             </div>
