@@ -47,19 +47,27 @@ export function NewPlayerModal({ teams }: { teams: TeamOption[] }) {
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Type speler */}
-            <div className="md:col-span-2 flex flex-col gap-1">
-              <label className="block text-text-muted uppercase tracking-wider text-xs">
-                Type speler
-              </label>
-              <input type="hidden" name="type" value={playerType} />
-              <PlayerTypeToggle
-                value={playerType}
-                onChange={setPlayerType}
-                size="sm"
-              />
+            {/* Type speler + Top speler */}
+            <div className="md:col-span-2 flex flex-wrap items-center justify-between gap-3">
+              <div className="flex flex-col gap-1">
+                <span className="block text-text-muted uppercase tracking-wider text-xs">
+                  Type speler
+                </span>
+                <input type="hidden" name="type" value={playerType} />
+                <PlayerTypeToggle
+                  value={playerType}
+                  onChange={setPlayerType}
+                  size="sm"
+                />
+              </div>
+              {playerType === "INTERNAL" && (
+                <label className="flex items-center gap-2 text-sm text-text-secondary">
+                  <input type="checkbox" name="isTopTalent" />
+                  Top speler
+                </label>
+              )}
             </div>
-  
+
             {/* Naam */}
             <div className="md:col-span-2">
               <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
@@ -72,9 +80,11 @@ export function NewPlayerModal({ teams }: { teams: TeamOption[] }) {
                 className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
               />
             </div>
-  
+
+            {/* Geboortedatum / leeftijd */}
             <PlayerDobAgeFields />
-  
+
+            {/* Club + Team (extern), of alleen teamselect (intern) */}
             {playerType === "INTERNAL" ? (
               <>
                 <div>
@@ -83,7 +93,7 @@ export function NewPlayerModal({ teams }: { teams: TeamOption[] }) {
                   </label>
                   <select
                     name="teamId"
-                    className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
+                    className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-border-accent-primary focus-visible:outline-none"
                   >
                     <option value=""></option>
                     {teams.map((team) => (
@@ -92,36 +102,6 @@ export function NewPlayerModal({ teams }: { teams: TeamOption[] }) {
                       </option>
                     ))}
                   </select>
-                </div>
-                <div>
-                  <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
-                    Bij club sinds
-                  </label>
-                  <input
-                    type="date"
-                    name="joinedAt"
-                    className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
-                    Contract tot
-                  </label>
-                  <input
-                    type="date"
-                    name="contractEndDate"
-                    className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
-                  />
-                </div>
-                <div className="flex items-center gap-5 pt-6 md:col-span-2">
-                  <label className="text-sm text-text-secondary flex items-center gap-2">
-                    <input type="checkbox" name="optionYear" />
-                    Option year
-                  </label>
-                  <label className="text-sm text-text-secondary flex items-center gap-2">
-                    <input type="checkbox" name="isTopTalent" />
-                    Top talent
-                  </label>
                 </div>
               </>
             ) : (
@@ -133,10 +113,10 @@ export function NewPlayerModal({ teams }: { teams: TeamOption[] }) {
                   <input
                     type="text"
                     name="currentClub"
-                    className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
+                    className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-border-accent-primary focus-visible:outline-none"
                   />
                 </div>
-  
+
                 <div>
                   <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
                     Team
@@ -144,12 +124,13 @@ export function NewPlayerModal({ teams }: { teams: TeamOption[] }) {
                   <input
                     type="text"
                     name="team"
-                    className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
+                    className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-border-accent-primary focus-visible:outline-none"
                   />
                 </div>
               </>
             )}
-  
+
+            {/* Niveau / Beste positie */}
             <div>
               <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
                 Niveau (Huidig)
@@ -157,10 +138,9 @@ export function NewPlayerModal({ teams }: { teams: TeamOption[] }) {
               <input
                 type="text"
                 name="niveau"
-                className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
+                className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-border-accent-primary focus-visible:outline-none"
               />
             </div>
-  
             <div>
               <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
                 Beste positie
@@ -168,10 +148,11 @@ export function NewPlayerModal({ teams }: { teams: TeamOption[] }) {
               <input
                 type="text"
                 name="position"
-                className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
+                className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-border-accent-primary focus-visible:outline-none"
               />
             </div>
-  
+
+            {/* Neven / Favoriete positie */}
             <div>
               <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
                 Nevenpositie
@@ -179,10 +160,9 @@ export function NewPlayerModal({ teams }: { teams: TeamOption[] }) {
               <input
                 type="text"
                 name="secondaryPosition"
-                className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
+                className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-border-accent-primary focus-visible:outline-none"
               />
             </div>
-
             <div>
               <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
                 Favoriete positie
@@ -190,17 +170,18 @@ export function NewPlayerModal({ teams }: { teams: TeamOption[] }) {
               <input
                 type="text"
                 name="favoritePosition"
-                className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
+                className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-border-accent-primary focus-visible:outline-none"
               />
             </div>
-  
+
+            {/* Voet / Contactpersoon */}
             <div>
               <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
                 Voorkeursbeen
               </label>
               <select
                 name="preferredFoot"
-                className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
+                className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-border-accent-primary focus-visible:outline-none"
               >
                 <option value=""></option>
                 <option value="Rechts">Rechts</option>
@@ -208,7 +189,6 @@ export function NewPlayerModal({ teams }: { teams: TeamOption[] }) {
                 <option value="Tweebenig">Tweebenig</option>
               </select>
             </div>
-  
             <div>
               <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
                 Contactpersoon
@@ -216,10 +196,11 @@ export function NewPlayerModal({ teams }: { teams: TeamOption[] }) {
               <input
                 type="text"
                 name="contactPerson"
-                className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
+                className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-border-accent-primary focus-visible:outline-none"
               />
             </div>
-  
+
+            {/* Externe status / stap / advies */}
             {playerType === "EXTERNAL" && (
               <>
                 <div>
@@ -228,7 +209,7 @@ export function NewPlayerModal({ teams }: { teams: TeamOption[] }) {
                   </label>
                   <select
                     name="status"
-                    className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
+                    className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-border-accent-primary focus-visible:outline-none"
                   >
                     <option value=""></option>
                     {targetStatuses.map((s) => (
@@ -238,14 +219,14 @@ export function NewPlayerModal({ teams }: { teams: TeamOption[] }) {
                     ))}
                   </select>
                 </div>
-  
+
                 <div>
                   <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
                     Processtap
                   </label>
                   <select
                     name="step"
-                    className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
+                    className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-border-accent-primary focus-visible:outline-none"
                   >
                     <option value=""></option>
                     {targetSteps.map((s) => (
@@ -255,14 +236,14 @@ export function NewPlayerModal({ teams }: { teams: TeamOption[] }) {
                     ))}
                   </select>
                 </div>
-  
+
                 <div>
                   <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
                     Advies
                   </label>
                   <select
                     name="advies"
-                    className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
+                    className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-border-accent-primary focus-visible:outline-none"
                   >
                     <option value=""></option>
                     {adviesOptions.map((a) => (
@@ -274,19 +255,56 @@ export function NewPlayerModal({ teams }: { teams: TeamOption[] }) {
                 </div>
               </>
             )}
+
+            {/* Interne situatie onderaan */}
+            {playerType === "INTERNAL" && (
+              <>
+                <div>
+                  <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
+                    Bij club sinds
+                  </label>
+                  <input
+                    type="date"
+                    name="joinedAt"
+                    className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-border-accent-primary focus-visible:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
+                    Contract tot
+                  </label>
+                  <input
+                    type="date"
+                    name="contractEndDate"
+                    className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-border-accent-primary focus-visible:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
+                    Afstand tot club (km)
+                  </label>
+                  <input
+                    type="number"
+                    name="distanceFromClubKm"
+                    min={0}
+                    className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-border-accent-primary focus-visible:outline-none"
+                  />
+                </div>
+              </>
+            )}
           </div>
-  
+
           <div>
             <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
               Korte Notities
             </label>
             <textarea
               name="notes"
-              className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
+              className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-border-accent-primary focus-visible:outline-none"
               rows={3}
             ></textarea>
           </div>
-  
+
           <div className="pt-4 flex justify-end">
             <Button type="submit" className="btn-premium text-white">
               Opslaan

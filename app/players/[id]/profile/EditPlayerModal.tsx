@@ -32,7 +32,6 @@ type EditablePlayer = {
   joinedAt: string | Date | null
   contractEndDate: string | Date | null
   distanceFromClubKm: number | null
-  optionYear: boolean
   isTopTalent: boolean
   niveau: string | null
   position: string | null
@@ -81,19 +80,31 @@ export function EditPlayerModal({
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Type speler */}
-            <div className="md:col-span-2 flex flex-col gap-1">
-              <label className="block text-text-muted uppercase tracking-wider text-xs">
-                Type speler
-              </label>
-              <input type="hidden" name="type" value={playerType} />
-              <PlayerTypeToggle
-                value={playerType}
-                onChange={setPlayerType}
-                size="sm"
-              />
+            {/* Type speler + Top speler */}
+            <div className="md:col-span-2 flex flex-wrap items-center justify-between gap-3">
+              <div className="flex flex-col gap-1">
+                <span className="block text-text-muted uppercase tracking-wider text-xs">
+                  Type speler
+                </span>
+                <input type="hidden" name="type" value={playerType} />
+                <PlayerTypeToggle
+                  value={playerType}
+                  onChange={setPlayerType}
+                  size="sm"
+                />
+              </div>
+              {playerType === "INTERNAL" && (
+                <label className="flex items-center gap-2 text-sm text-text-secondary">
+                  <input
+                    type="checkbox"
+                    name="isTopTalent"
+                    defaultChecked={!!player.isTopTalent}
+                  />
+                  Top speler
+                </label>
+              )}
             </div>
-  
+
             {/* Naam */}
             <div className="md:col-span-2">
               <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
@@ -107,7 +118,8 @@ export function EditPlayerModal({
                 className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
               />
             </div>
-  
+
+            {/* Geboortedatum / leeftijd */}
             <PlayerDobAgeFields
               initialDateOfBirth={
                 player.dateOfBirth
@@ -116,117 +128,32 @@ export function EditPlayerModal({
               }
               initialAge={player.age ?? null}
             />
-  
-            {playerType === "INTERNAL" ? (
-              <>
-                <div>
-                  <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
-                    Team
-                  </label>
-                  <select
-                    name="teamId"
-                    defaultValue={player.teamId || ""}
-                    className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
-                  >
-                    <option value=""></option>
-                    {teams.map((team) => (
-                      <option key={team.id} value={team.id}>
-                        {team.code || team.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
-                    Bij club sinds
-                  </label>
-                  <input
-                    type="date"
-                    name="joinedAt"
-                    defaultValue={
-                      player.joinedAt
-                        ? new Date(player.joinedAt).toISOString().split("T")[0]
-                        : ""
-                    }
-                    className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
-                    Contract tot
-                  </label>
-                  <input
-                    type="date"
-                    name="contractEndDate"
-                    defaultValue={
-                      player.contractEndDate
-                        ? new Date(player.contractEndDate)
-                            .toISOString()
-                            .split("T")[0]
-                        : ""
-                    }
-                    className="w-full border border-border-dark rounded p-2 bg-background focus-border-accent-primary focus-visible:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
-                    Afstand tot club (km)
-                  </label>
-                  <input
-                    type="number"
-                    name="distanceFromClubKm"
-                    min={0}
-                    defaultValue={player.distanceFromClubKm ?? ""}
-                    className="w-full border border-border-dark rounded p-2 bg-background focus-border-accent-primary focus-visible:outline-none"
-                  />
-                </div>
-                <div className="flex items-center gap-5 pt-6 md:col-span-2">
-                  <label className="text-sm text-text-secondary flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      name="optionYear"
-                      defaultChecked={!!player.optionYear}
-                    />
-                    Option year
-                  </label>
-                  <label className="text-sm text-text-secondary flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      name="isTopTalent"
-                      defaultChecked={!!player.isTopTalent}
-                    />
-                    Top talent
-                  </label>
-                </div>
-              </>
-            ) : (
-              <>
-                <div>
-                  <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
-                    Huidige Club
-                  </label>
-                  <input
-                    type="text"
-                    name="currentClub"
-                    defaultValue={player.currentClub || ""}
-                    className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
-                  />
-                </div>
-  
-                <div>
-                  <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
-                    Team
-                  </label>
-                  <input
-                    type="text"
-                    name="team"
-                    defaultValue={player.team || ""}
-                    className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
-                  />
-                </div>
-              </>
-            )}
-  
+
+            {/* Rij: Club / Team (huidig) */}
+            <div>
+              <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
+                Club (Huidig)
+              </label>
+              <input
+                type="text"
+                name="currentClub"
+                defaultValue={player.currentClub || ""}
+                className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
+                Team (Huidig)
+              </label>
+              <input
+                type="text"
+                name="team"
+                defaultValue={player.team || ""}
+                className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
+              />
+            </div>
+
+            {/* Rij: Niveau / Beste positie */}
             <div>
               <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
                 Niveau (Huidig)
@@ -238,7 +165,6 @@ export function EditPlayerModal({
                 className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
               />
             </div>
-  
             <div>
               <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
                 Beste positie
@@ -250,7 +176,8 @@ export function EditPlayerModal({
                 className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
               />
             </div>
-  
+
+            {/* Rij: Nevenpositie / Favoriete positie */}
             <div>
               <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
                 Nevenpositie
@@ -259,10 +186,9 @@ export function EditPlayerModal({
                 type="text"
                 name="secondaryPosition"
                 defaultValue={player.secondaryPosition || ""}
-                className="w-full border border-border-dark rounded p-2 bg-background focus-border-accent-primary focus-visible:outline-none"
+                className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
               />
             </div>
-
             <div>
               <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
                 Favoriete positie
@@ -271,10 +197,11 @@ export function EditPlayerModal({
                 type="text"
                 name="favoritePosition"
                 defaultValue={player.favoritePosition || ""}
-                className="w-full border border-border-dark rounded p-2 bg-background focus-border-accent-primary focus-visible:outline-none"
+                className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
               />
             </div>
-  
+
+            {/* Rij: Voorkeursbeen / Contactpersoon */}
             <div>
               <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
                 Voorkeursbeen
@@ -290,7 +217,6 @@ export function EditPlayerModal({
                 <option value="Tweebenig">Tweebenig</option>
               </select>
             </div>
-  
             <div>
               <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
                 Contactpersoon
@@ -302,7 +228,8 @@ export function EditPlayerModal({
                 className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
               />
             </div>
-  
+
+            {/* Externe scoutingvelden: status / stap / advies */}
             {playerType === "EXTERNAL" && (
               <>
                 <div>
@@ -322,7 +249,6 @@ export function EditPlayerModal({
                     ))}
                   </select>
                 </div>
-  
                 <div>
                   <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
                     Processtap
@@ -340,7 +266,6 @@ export function EditPlayerModal({
                     ))}
                   </select>
                 </div>
-  
                 <div>
                   <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
                     Advies
@@ -360,8 +285,58 @@ export function EditPlayerModal({
                 </div>
               </>
             )}
+
+            {/* Interne situatie onderaan: bij club sinds / contract tot / km */}
+            {playerType === "INTERNAL" && (
+              <>
+                <div>
+                  <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
+                    Bij club sinds
+                  </label>
+                  <input
+                    type="date"
+                    name="joinedAt"
+                    defaultValue={
+                      player.joinedAt
+                        ? new Date(player.joinedAt).toISOString().split("T")[0]
+                        : ""
+                    }
+                    className="w-full border border-border-dark rounded p-2 bg-background focus-border-accent-primary focus-visible:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
+                    Contract tot
+                  </label>
+                  <input
+                    type="date"
+                    name="contractEndDate"
+                    defaultValue={
+                      player.contractEndDate
+                        ? new Date(player.contractEndDate as any)
+                            .toISOString()
+                            .split("T")[0]
+                        : ""
+                    }
+                    className="w-full border border-border-dark rounded p-2 bg-background focus-border-accent-primary focus-visible:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
+                    Afstand tot club (km)
+                  </label>
+                  <input
+                    type="number"
+                    name="distanceFromClubKm"
+                    min={0}
+                    defaultValue={player.distanceFromClubKm ?? ""}
+                    className="w-full border border-border-dark rounded p-2 bg-background focus-border-accent-primary focus-visible:outline-none"
+                  />
+                </div>
+              </>
+            )}
           </div>
-  
+
           <div>
             <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
               Korte Notities
@@ -369,11 +344,11 @@ export function EditPlayerModal({
             <textarea
               name="notes"
               defaultValue={player.notes || ""}
-              className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
+              className="w-full border border-border-dark rounded p-2 bg-background focus-border-accent-primary focus-visible:outline-none"
               rows={3}
             ></textarea>
           </div>
-  
+
           <div className="pt-4 flex justify-end">
             <Button type="submit" className="btn-premium text-white">
               Opslaan
@@ -382,5 +357,5 @@ export function EditPlayerModal({
         </form>
       </DialogContent>
     </Dialog>
-  );
+  )
 }
