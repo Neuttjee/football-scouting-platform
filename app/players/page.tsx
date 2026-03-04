@@ -48,6 +48,7 @@ type InternalPlayerForPage = {
   originTeamLabel: string | null;
   position: string | null;
   secondaryPosition: string | null;
+  favoritePosition: string | null;
   preferredFoot: string | null;
   age: number | null;
   joinedAt: Date | null;
@@ -118,6 +119,7 @@ export default async function PlayersPage() {
       originTeamLabel: p.teamRef?.code || p.teamRef?.name || p.team || null,
       position: p.position,
       secondaryPosition: p.secondaryPosition,
+      favoritePosition: p.favoritePosition,
       preferredFoot: p.preferredFoot,
       age: p.dateOfBirth ? calculateAgeFromDate(p.dateOfBirth) : p.age ?? null,
       joinedAt: p.joinedAt,

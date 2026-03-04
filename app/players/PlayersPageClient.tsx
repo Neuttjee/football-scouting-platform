@@ -31,6 +31,7 @@ type InternalPlayer = {
   originTeamLabel: string | null;
   position: string | null;
   secondaryPosition: string | null;
+  favoritePosition: string | null;
   preferredFoot: string | null;
   age: number | null;
   joinedAt: Date | null;
