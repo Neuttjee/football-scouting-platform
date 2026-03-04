@@ -31,6 +31,7 @@ type EditablePlayer = {
   teamId: string | null
   joinedAt: string | Date | null
   contractEndDate: string | Date | null
+  distanceFromClubKm: number | null
   optionYear: boolean
   isTopTalent: boolean
   niveau: string | null
@@ -164,6 +165,18 @@ export function EditPlayerModal({
                             .split("T")[0]
                         : ""
                     }
+                    className="w-full border border-border-dark rounded p-2 bg-background focus-border-accent-primary focus-visible:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
+                    Afstand tot club (km)
+                  </label>
+                  <input
+                    type="number"
+                    name="distanceFromClubKm"
+                    min={0}
+                    defaultValue={player.distanceFromClubKm ?? ""}
                     className="w-full border border-border-dark rounded p-2 bg-background focus-border-accent-primary focus-visible:outline-none"
                   />
                 </div>

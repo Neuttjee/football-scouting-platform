@@ -88,8 +88,9 @@ export default async function PlayersPage() {
 
   const players = playersResult as unknown as PlayerWithRelations[];
   const teams = teamsResult as TeamOption[];
-  const club = clubResult as { agingThreshold?: number | null } | null;
+  const club = clubResult as { agingThreshold?: number | null; name?: string | null } | null;
   const agingThreshold = club?.agingThreshold ?? 30;
+  const clubName = club?.name ?? session.user.clubName ?? null;
 
   const externalPlayers = players
     .filter((p) => p.type === "EXTERNAL")
@@ -135,6 +136,7 @@ export default async function PlayersPage() {
       clubUsers={clubUsers}
       agingThreshold={agingThreshold}
       defaultSeasonYear={new Date().getFullYear()}
+      clubName={clubName}
     />
   );
 }

@@ -57,6 +57,7 @@ type Props = {
   clubUsers: ClubUser[];
   agingThreshold: number;
   defaultSeasonYear: number;
+  clubName: string | null;
 };
 
 export function PlayersPageClient({
@@ -66,6 +67,7 @@ export function PlayersPageClient({
   clubUsers,
   agingThreshold,
   defaultSeasonYear,
+  clubName,
 }: Props) {
   const searchParams = useSearchParams();
   const viewParam = searchParams.get("view");
@@ -105,7 +107,7 @@ export function PlayersPageClient({
       </div>
 
       {view === "EXTERNAL" && (
-        <PlayersTable data={externalPlayers as any} clubUsers={clubUsers} />
+        <PlayersTable data={externalPlayers as any} clubUsers={clubUsers} clubName={clubName} />
       )}
 
       {view === "INTERNAL" && (
@@ -115,6 +117,7 @@ export function PlayersPageClient({
           agingThreshold={agingThreshold}
           defaultSeasonYear={defaultSeasonYear}
           clubUsers={clubUsers}
+          clubName={clubName}
         />
       )}
     </div>

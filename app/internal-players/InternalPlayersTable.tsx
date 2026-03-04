@@ -50,6 +50,7 @@ type Props = {
   agingThreshold: number;
   seasonYear: number;
   clubUsers: { id: string; name: string }[];
+  clubName: string | null;
 };
 
 const INTERNAL_COLUMNS: ColumnDef<InternalPlayer>[] = [
@@ -290,6 +291,7 @@ export function InternalPlayersTable({
   agingThreshold,
   seasonYear,
   clubUsers,
+  clubName,
 }: Props) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] =
@@ -312,6 +314,7 @@ export function InternalPlayersTable({
     },
     meta: {
       clubUsers,
+      clubName,
     },
   });
 

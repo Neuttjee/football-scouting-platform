@@ -32,6 +32,7 @@ type Props = {
   agingThreshold: number;
   defaultSeasonYear: number;
   clubUsers: { id: string; name: string }[];
+  clubName: string | null;
 };
 
 export default function InternalPlayersPage({
@@ -40,6 +41,7 @@ export default function InternalPlayersPage({
   agingThreshold,
   defaultSeasonYear,
   clubUsers,
+  clubName,
 }: Props) {
   return (
     <div className="space-y-6">
@@ -48,6 +50,7 @@ export default function InternalPlayersPage({
         agingThreshold={agingThreshold}
         seasonYear={defaultSeasonYear}
         clubUsers={clubUsers}
+        clubName={clubName}
       />
     </div>
   );

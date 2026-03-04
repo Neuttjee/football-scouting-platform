@@ -96,7 +96,7 @@ function InlineInput({
   )
 }
 
-export function getColumns(clubUsers: any[]): ColumnDef<Player>[] {
+export function getColumns(clubUsers: any[], clubName: string | null): ColumnDef<Player>[] {
   return [
     {
       accessorKey: "name",
@@ -243,7 +243,13 @@ export function getColumns(clubUsers: any[]): ColumnDef<Player>[] {
     {
       id: "actions",
       header: () => <div className="text-right text-text-muted pr-2">Acties</div>,
-      cell: ({ row }) => <PlayerActionsMenu player={row.original} clubUsers={clubUsers} />,
+      cell: ({ row }) => (
+        <PlayerActionsMenu
+          player={row.original}
+          clubUsers={clubUsers}
+          clubName={clubName}
+        />
+      ),
     },
   ]
 }
@@ -318,11 +324,11 @@ function Filter({
   )
 }
 
-export function PlayersTable({ data, clubUsers = [] }: { data: Player[], clubUsers?: any[] }) {
+export function PlayersTable({ data, clubUsers = [], clubName = null }: { data: Player[], clubUsers?: any[], clubName?: string | null }) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
 
-  const columns = React.useMemo(() => getColumns(clubUsers), [clubUsers]);
+  const columns = React.useMemo(() => getColumns(clubUsers, clubName), [clubUsers, clubName]);
 
   const table = useReactTable({
     data,

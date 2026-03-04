@@ -41,9 +41,13 @@ const ADVIES_OPTIONS = adviesOptions;
 export function PlayerActionsMenu({
   player,
   clubUsers,
+  // clubName is currently unused here but passed from callers for future layout improvements
+  // to keep types aligned across the app.
+  clubName,
 }: {
   player: PlayerForActions;
   clubUsers: { id: string; name: string }[];
+  clubName?: string | null;
 }) {
   const router = useRouter();
   const [openEdit, setOpenEdit] = React.useState(false);
