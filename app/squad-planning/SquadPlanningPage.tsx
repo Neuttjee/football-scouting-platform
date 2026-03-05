@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Settings } from "lucide-react";
+import { Settings, BarChart3 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AnalyticsPanel } from "./AnalyticsPanel";
 import { Field } from "./Field";
@@ -28,8 +28,8 @@ function getSlots(formation: Formation, midfieldVariant: MidfieldVariant): Field
       { id: "CMR", label: "CM rechts", x: 58, y: 55, line: "MID" },
       { id: "CML", label: "CM links", x: 42, y: 55, line: "MID" },
       { id: "LM", label: "Linksmidden", x: 22, y: 55, line: "MID" },
-      { id: "ST1", label: "Spits 1", x: 42, y: 30, line: "FWD" },
-      { id: "ST2", label: "Spits 2", x: 58, y: 30, line: "FWD" },
+      { id: "ST1", label: "Spits 1", x: 42, y: 20, line: "FWD" },
+      { id: "ST2", label: "Spits 2", x: 58, y: 20, line: "FWD" },
     ];
   }
 
@@ -53,20 +53,22 @@ function getSlots(formation: Formation, midfieldVariant: MidfieldVariant): Field
     { id: "LCB", label: "Linker CV", x: 40, y: 76, line: "DEF" },
     { id: "LB", label: "Linksback", x: 22, y: 76, line: "DEF" },
     ...midfield,
-    { id: "RW", label: "Rechtsbuiten", x: 78, y: 28, line: "FWD" },
-    { id: "ST", label: "Spits", x: 50, y: 24, line: "FWD" },
-    { id: "LW", label: "Linksbuiten", x: 22, y: 28, line: "FWD" },
+    { id: "RW", label: "Rechtsbuiten", x: 78, y: 18, line: "FWD" },
+    { id: "ST", label: "Spits", x: 50, y: 14, line: "FWD" },
+    { id: "LW", label: "Linksbuiten", x: 22, y: 18, line: "FWD" },
   ];
 }
+
+const MAX_PLAYERS_PER_SLOT = 2;
 
 function addToSlot(assignments: Record<string, string[]>, slotId: string, playerId: string) {
   const current = assignments[slotId] || [];
   if (current.includes(playerId)) return assignments;
   const next = [...current];
-  if (next.length < 3) {
+  if (next.length < MAX_PLAYERS_PER_SLOT) {
     next.push(playerId);
   } else {
-    next[2] = playerId;
+    next[MAX_PLAYERS_PER_SLOT - 1] = playerId;
   }
   return { ...assignments, [slotId]: next };
 }
@@ -95,6 +97,7 @@ export default function SquadPlanningPage({
     targetSlotId: string;
   } | null>(null);
   const [settingsOpen, setSettingsOpen] = React.useState(false);
+  const [analyticsOpen, setAnalyticsOpen] = React.useState(false);
 
   React.useEffect(() => {
     setAssignments((prev) => {
@@ -249,24 +252,49 @@ export default function SquadPlanningPage({
           </label>
         </div>
 
-        {/* Rechterzijde: planning instellingen dialoog */}
-        <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
-          <DialogTrigger asChild>
-            <button
-              type="button"
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-border-dark text-xs text-text-secondary hover:text-text-primary hover:bg-bg-primary/60"
-            >
-              <Settings className="w-4 h-4" />
-              <span className="hidden sm:inline">Planning instellingen</span>
-            </button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto bg-bg-card border-accent-primary text-text-primary">
-            <DialogHeader>
-              <DialogTitle>Planning instellingen</DialogTitle>
-            </DialogHeader>
-            <TeamSettingsForm teams={teams} agingThreshold={agingThreshold} />
-          </DialogContent>
-        </Dialog>
+        {/* Rechterzijde: analyse + planning instellingen */}
+        <div className="flex items-center gap-2">
+          <Dialog open={analyticsOpen} onOpenChange={setAnalyticsOpen}>
+            <DialogTrigger asChild>
+              <button
+                type="button"
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-border-dark text-xs text-text-secondary hover:text-text-primary hover:bg-bg-primary/60"
+              >
+                <BarChart3 className="w-4 h-4" />
+                <span className="hidden sm:inline">Analyse</span>
+              </button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto bg-bg-card border-accent-primary text-text-primary">
+              <DialogHeader>
+                <DialogTitle>Selectie-analyse</DialogTitle>
+              </DialogHeader>
+              <AnalyticsPanel
+                slots={slots}
+                assignments={assignments}
+                playersById={playersById}
+                seasonYear={seasonYear}
+                agingThreshold={agingThreshold}
+              />
+            </DialogContent>
+          </Dialog>
+          <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
+            <DialogTrigger asChild>
+              <button
+                type="button"
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-border-dark text-xs text-text-secondary hover:text-text-primary hover:bg-bg-primary/60"
+              >
+                <Settings className="w-4 h-4" />
+                <span className="hidden sm:inline">Planning instellingen</span>
+              </button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto bg-bg-card border-accent-primary text-text-primary">
+              <DialogHeader>
+                <DialogTitle>Planning instellingen</DialogTitle>
+              </DialogHeader>
+              <TeamSettingsForm teams={teams} agingThreshold={agingThreshold} />
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-[1fr_390px] gap-6">
@@ -288,14 +316,6 @@ export default function SquadPlanningPage({
           onTypeChange={setSelectedType}
         />
       </div>
-
-      <AnalyticsPanel
-        slots={slots}
-        assignments={assignments}
-        playersById={playersById}
-        seasonYear={seasonYear}
-        agingThreshold={agingThreshold}
-      />
 
       {pendingDrop && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
