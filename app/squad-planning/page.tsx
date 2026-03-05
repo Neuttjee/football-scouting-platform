@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getSession } from "@/lib/auth";
+import { getSession, getEffectiveClubId } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { calculateAgeFromDate } from "@/lib/age";
 import SquadPlanningPage from "./SquadPlanningPage";
@@ -8,13 +8,16 @@ export default async function SquadPlanningServerPage() {
   const session = await getSession();
   if (!session) redirect("/login");
 
+  const clubId = getEffectiveClubId(session);
+  if (!clubId) redirect("/superadmin");
+
   const [club, teams, players] = await Promise.all([
     (prisma as any).club.findUnique({
-      where: { id: session.user.clubId },
+      where: { id: clubId },
       select: { agingThreshold: true },
     }),
     (prisma as any).team.findMany({
-      where: { clubId: session.user.clubId },
+      where: { clubId },
       orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }],
       select: {
         id: true,
@@ -26,7 +29,7 @@ export default async function SquadPlanningServerPage() {
       },
     }),
     prisma.player.findMany({
-      where: { clubId: session.user.clubId },
+      where: { clubId },
       include: {
         teamRef: {
           select: { id: true, name: true, code: true, displayOrder: true },

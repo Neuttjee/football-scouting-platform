@@ -1,5 +1,6 @@
-import { getSession } from '@/lib/auth';
+import { getSession, getEffectiveClubId } from '@/lib/auth';
 import prisma from '@/lib/prisma';
+import { redirect } from 'next/navigation';
 import { NewContactModal } from './NewContactModal';
 import { ContactsTable } from './ContactsTable';
 
@@ -7,8 +8,14 @@ export default async function ContactsPage() {
   const session = await getSession();
   if (!session) return null;
 
+  const clubId = getEffectiveClubId(session);
+  if (!clubId) {
+    if (session.user.role === 'SUPERADMIN') redirect('/superadmin');
+    return null;
+  }
+
   const contacts = await prisma.contactMoment.findMany({
-    where: { clubId: session.user.clubId },
+    where: { clubId },
     orderBy: { createdAt: 'desc' },
     include: {
       player: { select: { id: true, name: true } },

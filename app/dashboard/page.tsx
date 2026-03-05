@@ -1,17 +1,24 @@
-import { getSession } from '@/lib/auth';
+import { getSession, getEffectiveClubId } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 
 export default async function DashboardPage() {
   const session = await getSession();
   if (!session) return null;
 
+  const clubId = getEffectiveClubId(session);
+  if (!clubId) {
+    if (session.user.role === 'SUPERADMIN') redirect('/superadmin');
+    return null;
+  }
+
   const [playerCount, taskCount, myTasks] = await Promise.all([
-    prisma.player.count({ where: { clubId: session.user.clubId } }),
-    prisma.task.count({ where: { clubId: session.user.clubId, isCompleted: false } }),
-    prisma.task.findMany({ 
-      where: { 
-        clubId: session.user.clubId, 
+    prisma.player.count({ where: { clubId } }),
+    prisma.task.count({ where: { clubId, isCompleted: false } }),
+    prisma.task.findMany({
+      where: {
+        clubId,
         assignedToId: session.user.id,
         isCompleted: false
       },

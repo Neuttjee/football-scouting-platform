@@ -2,6 +2,7 @@ import { getSession } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import { redirect } from 'next/navigation';
 import { SuperadminClubsTable } from './SuperadminClubsTable';
+import { NewClubModal } from './NewClubModal';
 
 export default async function SuperadminPage() {
   const session = await getSession();
@@ -10,6 +11,7 @@ export default async function SuperadminPage() {
   }
 
   const clubs = await prisma.club.findMany({
+    where: { name: { not: 'Platform' } },
     orderBy: { name: 'asc' },
     include: {
       _count: { select: { users: true, players: true } },
@@ -35,13 +37,16 @@ export default async function SuperadminPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Superadmin – Clubs</h1>
-        <p className="text-muted-foreground mt-1">
-          Overzicht van alle clubs. Switch naar een club om huisstijl in te stellen via Instellingen.
-        </p>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold">Superadmin – Clubs</h1>
+          <p className="text-muted-foreground mt-1">
+            Voeg clubs toe en selecteer een club om spelers, taken en instellingen te bekijken.
+          </p>
+        </div>
+        <NewClubModal />
       </div>
-      <SuperadminClubsTable rows={rows} />
+      <SuperadminClubsTable rows={rows} activeClubId={session.activeClubId} />
     </div>
   );
 }

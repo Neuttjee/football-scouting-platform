@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
-import { getSession } from '@/lib/auth';
+import { getSession, getEffectiveClubId } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import { Sidebar } from '@/components/Sidebar';
 import { MobileNav } from '@/components/MobileNav';
@@ -23,11 +23,12 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const session = await getSession();
+  const effectiveClubId = getEffectiveClubId(session);
   let club = null;
 
-  if (session && session.user && session.user.clubId) {
+  if (session && effectiveClubId) {
     club = await prisma.club.findUnique({
-      where: { id: session.user.clubId },
+      where: { id: effectiveClubId },
     });
   }
 

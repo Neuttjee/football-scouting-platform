@@ -1,4 +1,4 @@
-import { getSession } from "@/lib/auth";
+import { getSession, getEffectiveClubId } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { calculateAgeFromDate } from "@/lib/age";
 import { redirect } from "next/navigation";
@@ -61,6 +61,12 @@ export default async function PlayersPage() {
   const session = await getSession();
   if (!session) return null;
 
+  const clubId = getEffectiveClubId(session);
+  if (!clubId) {
+    if (session.user.role === 'SUPERADMIN') redirect('/superadmin');
+    return null;
+  }
+
   const playerInclude = {
     teamRef: {
       select: { id: true, name: true, code: true, isActive: true, displayOrder: true },
@@ -69,21 +75,21 @@ export default async function PlayersPage() {
 
   const [playersResult, clubUsers, teamsResult, clubResult] = await Promise.all([
     prisma.player.findMany({
-      where: { clubId: session.user.clubId },
+      where: { clubId },
       orderBy: { name: "asc" },
       include: playerInclude as any,
     }),
     prisma.user.findMany({
-      where: { clubId: session.user.clubId },
+      where: { clubId },
       select: { id: true, name: true },
     }),
     (prisma as any).team.findMany({
-      where: { clubId: session.user.clubId, isActive: true },
+      where: { clubId, isActive: true },
       orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }],
       select: { id: true, name: true, code: true, niveau: true },
     }),
     prisma.club.findUnique({
-      where: { id: session.user.clubId },
+      where: { id: clubId },
     }),
   ]);
 

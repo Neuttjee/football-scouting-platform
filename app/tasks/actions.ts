@@ -1,12 +1,14 @@
 'use server';
 
-import { getSession } from '@/lib/auth';
+import { getSession, getEffectiveClubId } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 
 export async function createTask(formData: FormData) {
   const session = await getSession();
   if (!session) throw new Error('Unauthorized');
+  const clubId = getEffectiveClubId(session);
+  if (!clubId) throw new Error('Geen club geselecteerd');
 
   const title = formData.get('title') as string;
   const description = formData.get('description') as string | null;
@@ -28,7 +30,7 @@ export async function createTask(formData: FormData) {
       assignedToExternalName: assignedToExternalName || null,
       playerId: playerId || null,
       dueDate,
-      clubId: session.user.clubId,
+      clubId,
       createdById: session.user.id
     }
   });
@@ -40,9 +42,11 @@ export async function createTask(formData: FormData) {
 export async function toggleTask(taskId: string, isCompleted: boolean) {
   const session = await getSession();
   if (!session) throw new Error('Unauthorized');
+  const clubId = getEffectiveClubId(session);
+  if (!clubId) throw new Error('Geen club geselecteerd');
 
   await prisma.task.update({
-    where: { id: taskId, clubId: session.user.clubId },
+    where: { id: taskId, clubId },
     data: { isCompleted }
   });
 

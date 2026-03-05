@@ -1,6 +1,6 @@
 'use server';
 
-import { getSession } from '@/lib/auth';
+import { getSession, getEffectiveClubId } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
@@ -8,6 +8,8 @@ import { redirect } from 'next/navigation';
 async function savePlayerLogic(playerId: string | null, formData: FormData) {
   const session = await getSession();
   if (!session) throw new Error('Unauthorized');
+  const clubId = getEffectiveClubId(session);
+  if (!clubId) throw new Error('Geen club geselecteerd');
 
   const name = formData.get('name') as string;
   const position = formData.get('position') as string;
@@ -52,7 +54,7 @@ async function savePlayerLogic(playerId: string | null, formData: FormData) {
   let resolvedNiveau: string | null = niveau;
   if (teamIdInput) {
     const selectedTeam = await prisma.team.findFirst({
-      where: { id: teamIdInput, clubId: session.user.clubId },
+      where: { id: teamIdInput, clubId },
       select: { id: true, name: true, code: true, niveau: true },
     });
     if (selectedTeam) {
@@ -86,9 +88,8 @@ async function savePlayerLogic(playerId: string | null, formData: FormData) {
   // - status komt direct uit het formulier (statusInput)
 
   if (playerId) {
-    // Update
     await prisma.player.update({
-      where: { id: playerId, clubId: session.user.clubId },
+      where: { id: playerId, clubId },
       data: {
         name,
         position,
@@ -140,7 +141,7 @@ async function savePlayerLogic(playerId: string | null, formData: FormData) {
         niveau: resolvedNiveau,
         contactPerson,
         notes,
-        clubId: session.user.clubId,
+        clubId,
         createdById: session.user.id,
       },
     });
@@ -171,9 +172,11 @@ export async function updatePlayerField(
 ) {
   const session = await getSession();
   if (!session) throw new Error("Unauthorized");
+  const clubId = getEffectiveClubId(session);
+  if (!clubId) throw new Error('Geen club geselecteerd');
 
   await prisma.player.update({
-    where: { id: playerId, clubId: session.user.clubId },
+    where: { id: playerId, clubId },
     data: {
       [field]: value,
     },
@@ -185,12 +188,14 @@ export async function updatePlayerField(
 export async function searchPlayers(query: string) {
   const session = await getSession();
   if (!session) return [];
-  
+  const clubId = getEffectiveClubId(session);
+  if (!clubId) return [];
+
   if (!query || query.trim() === '') return [];
 
   const players = await prisma.player.findMany({
     where: {
-      clubId: session.user.clubId,
+      clubId,
       name: { contains: query, mode: 'insensitive' }
     },
     select: {

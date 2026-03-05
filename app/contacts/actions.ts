@@ -1,12 +1,14 @@
 'use server';
 
-import { getSession } from '@/lib/auth';
+import { getSession, getEffectiveClubId } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 
 export async function createContactFromContactsPage(formData: FormData) {
   const session = await getSession();
   if (!session) throw new Error('Unauthorized');
+  const clubId = getEffectiveClubId(session);
+  if (!clubId) throw new Error('Geen club geselecteerd');
 
   const playerId = formData.get('playerId') as string;
   if (!playerId) throw new Error('Speler is verplicht');
@@ -29,7 +31,7 @@ export async function createContactFromContactsPage(formData: FormData) {
       reason,
       notes,
       playerId,
-      clubId: session.user.clubId,
+      clubId,
       createdById: session.user.id,
     },
   });

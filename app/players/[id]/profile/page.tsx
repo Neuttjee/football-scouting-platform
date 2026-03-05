@@ -1,4 +1,4 @@
-import { getSession } from '@/lib/auth';
+import { getSession, getEffectiveClubId } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
@@ -18,10 +18,13 @@ export default async function PlayerProfilePage({
   const session = await getSession();
   if (!session) redirect('/login');
 
+  const clubId = getEffectiveClubId(session);
+  if (!clubId) redirect('/superadmin');
+
   const { id } = await params;
 
   const rawPlayer = await (prisma as any).player.findUnique({
-    where: { id, clubId: session.user.clubId },
+    where: { id, clubId },
     include: {
       contacts: {
         orderBy: { createdAt: 'desc' },
@@ -44,11 +47,11 @@ export default async function PlayerProfilePage({
 
   const [clubUsers, teams] = await Promise.all([
     prisma.user.findMany({
-      where: { clubId: session.user.clubId },
+      where: { clubId },
       select: { id: true, name: true },
     }),
     (prisma as any).team.findMany({
-      where: { clubId: session.user.clubId, isActive: true },
+      where: { clubId, isActive: true },
       orderBy: [{ displayOrder: 'asc' }, { createdAt: 'asc' }],
       select: { id: true, name: true, code: true },
     }),

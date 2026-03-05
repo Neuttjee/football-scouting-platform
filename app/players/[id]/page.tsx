@@ -2,15 +2,18 @@ import { updatePlayer } from '../actions';
 import { targetSteps, targetStatuses } from '@/lib/statusMapping';
 import Link from 'next/link';
 import prisma from '@/lib/prisma';
-import { getSession } from '@/lib/auth';
+import { getSession, getEffectiveClubId } from '@/lib/auth';
 import { notFound } from 'next/navigation';
 
 export default async function EditPlayerPage({ params }: { params: { id: string } }) {
   const session = await getSession();
   if (!session) return null;
 
+  const clubId = getEffectiveClubId(session);
+  if (!clubId) return null;
+
   const player = await prisma.player.findUnique({
-    where: { id: params.id, clubId: session.user.clubId }
+    where: { id: params.id, clubId }
   });
 
   if (!player) return notFound();

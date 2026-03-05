@@ -1,7 +1,7 @@
 'use server';
 
 import prisma from '@/lib/prisma';
-import { getSession } from '@/lib/auth';
+import { getSession, getEffectiveClubId } from '@/lib/auth';
 import { revalidatePath } from 'next/cache';
 import { sanitizePrimaryColor } from '@/lib/branding';
 import { sendInviteEmail } from '@/lib/email';
@@ -9,7 +9,9 @@ import crypto from 'crypto';
 
 export async function updateClubBranding(formData: FormData) {
   const session = await getSession();
-  if (!session || session.user.role !== 'ADMIN') throw new Error('Unauthorized');
+  if (!session || (session.user.role !== 'ADMIN' && session.user.role !== 'SUPERADMIN')) throw new Error('Unauthorized');
+  const clubId = getEffectiveClubId(session);
+  if (!clubId) throw new Error('Geen club geselecteerd');
 
   const primaryColor = sanitizePrimaryColor(formData.get('primaryColor') as string);
   const logo = formData.get('logo') as string;
@@ -20,7 +22,7 @@ export async function updateClubBranding(formData: FormData) {
   }
 
   await prisma.club.update({
-    where: { id: session.user.clubId },
+    where: { id: clubId },
     data,
   });
 
@@ -30,12 +32,14 @@ export async function updateClubBranding(formData: FormData) {
 
 export async function toggleUserStatus(userId: string, isActive: boolean) {
   const session = await getSession();
-  if (!session || session.user.role !== 'ADMIN') throw new Error('Unauthorized');
+  if (!session || (session.user.role !== 'ADMIN' && session.user.role !== 'SUPERADMIN')) throw new Error('Unauthorized');
+  const clubId = getEffectiveClubId(session);
+  if (!clubId) throw new Error('Geen club geselecteerd');
 
   if (userId === session.user.id) throw new Error('Cannot deactivate yourself');
 
   await prisma.user.update({
-    where: { id: userId, clubId: session.user.clubId },
+    where: { id: userId, clubId },
     data: { isActive },
   });
 
@@ -44,15 +48,16 @@ export async function toggleUserStatus(userId: string, isActive: boolean) {
 
 export async function updateUserRole(userId: string, role: string) {
   const session = await getSession();
-  if (!session || session.user.role !== 'ADMIN') throw new Error('Unauthorized');
+  if (!session || (session.user.role !== 'ADMIN' && session.user.role !== 'SUPERADMIN')) throw new Error('Unauthorized');
+  const clubId = getEffectiveClubId(session);
+  if (!clubId) throw new Error('Geen club geselecteerd');
 
-  // Voorkom dat je jezelf zonder admin‑rechten zet
-  if (userId === session.user.id && role !== 'ADMIN') {
+  if (userId === session.user.id && role !== 'ADMIN' && role !== 'SUPERADMIN') {
     throw new Error('Je kunt je eigen admin-rechten niet verwijderen');
   }
 
   await prisma.user.update({
-    where: { id: userId, clubId: session.user.clubId },
+    where: { id: userId, clubId },
     data: { role },
   });
 
@@ -92,14 +97,16 @@ export async function resendInvite(userId: string) {
 
 export async function deleteUser(userId: string) {
   const session = await getSession();
-  if (!session || session.user.role !== 'ADMIN') throw new Error('Unauthorized');
+  if (!session || (session.user.role !== 'ADMIN' && session.user.role !== 'SUPERADMIN')) throw new Error('Unauthorized');
+  const clubId = getEffectiveClubId(session);
+  if (!clubId) throw new Error('Geen club geselecteerd');
 
   if (userId === session.user.id) {
     throw new Error('Je kunt jezelf niet verwijderen');
   }
 
   await prisma.user.delete({
-    where: { id: userId, clubId: session.user.clubId },
+    where: { id: userId, clubId },
   });
 
   revalidatePath('/settings');
@@ -107,14 +114,16 @@ export async function deleteUser(userId: string) {
 
 export async function updateAgingThreshold(agingThreshold: number) {
   const session = await getSession();
-  if (!session || session.user.role !== 'ADMIN') throw new Error('Unauthorized');
+  if (!session || (session.user.role !== 'ADMIN' && session.user.role !== 'SUPERADMIN')) throw new Error('Unauthorized');
+  const clubId = getEffectiveClubId(session);
+  if (!clubId) throw new Error('Geen club geselecteerd');
 
   const safeThreshold = Number.isFinite(agingThreshold)
     ? Math.max(16, Math.min(45, Math.round(agingThreshold)))
     : 30;
 
   await (prisma as any).club.update({
-    where: { id: session.user.clubId },
+    where: { id: clubId },
     data: { agingThreshold: safeThreshold } as any,
   });
 
@@ -125,14 +134,16 @@ export async function updateAgingThreshold(agingThreshold: number) {
 
 export async function createTeam(name: string, code: string | null, niveau: string | null) {
   const session = await getSession();
-  if (!session || session.user.role !== 'ADMIN') throw new Error('Unauthorized');
+  if (!session || (session.user.role !== 'ADMIN' && session.user.role !== 'SUPERADMIN')) throw new Error('Unauthorized');
+  const clubId = getEffectiveClubId(session);
+  if (!clubId) throw new Error('Geen club geselecteerd');
 
   const cleanedName = name?.trim();
   if (!cleanedName) throw new Error('Teamnaam is verplicht');
   const cleanedNiveau = niveau?.trim() || null;
 
   const maxOrder = await (prisma as any).team.aggregate({
-    where: { clubId: session.user.clubId },
+    where: { clubId },
     _max: { displayOrder: true },
   });
 
@@ -141,7 +152,7 @@ export async function createTeam(name: string, code: string | null, niveau: stri
       name: cleanedName,
       code: code?.trim() ? code.trim() : null,
       niveau: cleanedNiveau,
-      clubId: session.user.clubId,
+      clubId,
       displayOrder: (maxOrder._max.displayOrder ?? -1) + 1,
       isActive: true,
     },
@@ -154,12 +165,14 @@ export async function createTeam(name: string, code: string | null, niveau: stri
 
 export async function updateTeamNiveau(teamId: string, niveau: string | null) {
   const session = await getSession();
-  if (!session || session.user.role !== 'ADMIN') throw new Error('Unauthorized');
+  if (!session || (session.user.role !== 'ADMIN' && session.user.role !== 'SUPERADMIN')) throw new Error('Unauthorized');
+  const clubId = getEffectiveClubId(session);
+  if (!clubId) throw new Error('Geen club geselecteerd');
 
   const cleaned = niveau?.trim() || null;
 
   await (prisma as any).team.update({
-    where: { id: teamId, clubId: session.user.clubId },
+    where: { id: teamId, clubId },
     data: { niveau: cleaned },
   });
 
@@ -170,10 +183,12 @@ export async function updateTeamNiveau(teamId: string, niveau: string | null) {
 
 export async function setTeamActive(teamId: string, isActive: boolean) {
   const session = await getSession();
-  if (!session || session.user.role !== 'ADMIN') throw new Error('Unauthorized');
+  if (!session || (session.user.role !== 'ADMIN' && session.user.role !== 'SUPERADMIN')) throw new Error('Unauthorized');
+  const clubId = getEffectiveClubId(session);
+  if (!clubId) throw new Error('Geen club geselecteerd');
 
   await (prisma as any).team.update({
-    where: { id: teamId, clubId: session.user.clubId },
+    where: { id: teamId, clubId },
     data: { isActive },
   });
 
@@ -184,10 +199,12 @@ export async function setTeamActive(teamId: string, isActive: boolean) {
 
 export async function moveTeam(teamId: string, direction: 'up' | 'down') {
   const session = await getSession();
-  if (!session || session.user.role !== 'ADMIN') throw new Error('Unauthorized');
+  if (!session || (session.user.role !== 'ADMIN' && session.user.role !== 'SUPERADMIN')) throw new Error('Unauthorized');
+  const clubId = getEffectiveClubId(session);
+  if (!clubId) throw new Error('Geen club geselecteerd');
 
   const teams = await (prisma as any).team.findMany({
-    where: { clubId: session.user.clubId },
+    where: { clubId },
     orderBy: [{ displayOrder: 'asc' }, { createdAt: 'asc' }],
     select: { id: true, displayOrder: true },
   });

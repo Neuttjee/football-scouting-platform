@@ -1,4 +1,4 @@
-import { getSession } from '@/lib/auth';
+import { getSession, getEffectiveClubId } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -8,8 +8,11 @@ export default async function PlayerContactsPage({ params }: { params: { id: str
   const session = await getSession();
   if (!session) return null;
 
+  const clubId = getEffectiveClubId(session);
+  if (!clubId) return null;
+
   const player = await prisma.player.findUnique({
-    where: { id: params.id, clubId: session.user.clubId },
+    where: { id: params.id, clubId },
     include: {
       contacts: {
         orderBy: { createdAt: 'desc' },

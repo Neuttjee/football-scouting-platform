@@ -1,4 +1,4 @@
-import { getSession } from '@/lib/auth';
+import { getSession, getEffectiveClubId } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import { redirect } from 'next/navigation';
 import { UserTable } from './UserTable';
@@ -11,9 +11,12 @@ export default async function SettingsPage() {
     redirect('/dashboard');
   }
 
+  const clubId = getEffectiveClubId(session);
+  if (!clubId) redirect('/superadmin');
+
   const [club, users] = await Promise.all([
-    prisma.club.findUnique({ where: { id: session.user.clubId } }),
-    prisma.user.findMany({ where: { clubId: session.user.clubId } }),
+    prisma.club.findUnique({ where: { id: clubId } }),
+    prisma.user.findMany({ where: { clubId } }),
   ]);
 
   return (

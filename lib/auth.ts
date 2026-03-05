@@ -24,10 +24,35 @@ export async function decrypt(input: string): Promise<any> {
   }
 }
 
+const SUPERADMIN_ACTIVE_CLUB_COOKIE = 'superadmin_active_club_id';
+
 export async function getSession() {
-  const session = (await cookies()).get('session')?.value;
+  const cookieStore = await cookies();
+  const session = cookieStore.get('session')?.value;
   if (!session) return null;
-  return await decrypt(session);
+  const payload = await decrypt(session);
+  if (!payload) return null;
+  if (payload.user?.role === 'SUPERADMIN') {
+    const activeClubId = cookieStore.get(SUPERADMIN_ACTIVE_CLUB_COOKIE)?.value ?? undefined;
+    return { ...payload, activeClubId };
+  }
+  return payload;
+}
+
+/** Club ID to use for data (players, tasks, etc.). For SUPERADMIN: only the selected club (null until they pick one). */
+export function getEffectiveClubId(session: { user: { role: string; clubId: string }; activeClubId?: string } | null): string | null {
+  if (!session?.user?.clubId) return null;
+  if (session.user.role === 'SUPERADMIN') return session.activeClubId ?? null;
+  return session.user.clubId;
+}
+
+export async function setActiveClubId(clubId: string | null) {
+  const cookieStore = await cookies();
+  if (clubId) {
+    cookieStore.set(SUPERADMIN_ACTIVE_CLUB_COOKIE, clubId, { path: '/', maxAge: 60 * 60 * 24 * 7 }); // 7 days
+  } else {
+    cookieStore.delete(SUPERADMIN_ACTIVE_CLUB_COOKIE);
+  }
 }
 
 export async function setSession(user: any) {

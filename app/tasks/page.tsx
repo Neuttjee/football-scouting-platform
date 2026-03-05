@@ -1,5 +1,6 @@
-import { getSession } from '@/lib/auth';
+import { getSession, getEffectiveClubId } from '@/lib/auth';
 import prisma from '@/lib/prisma';
+import { redirect } from 'next/navigation';
 import { TaskList } from './TaskList';
 import { NewTaskModal } from './NewTaskModal';
 
@@ -7,12 +8,18 @@ export default async function TasksPage() {
   const session = await getSession();
   if (!session) return null;
 
+  const clubId = getEffectiveClubId(session);
+  if (!clubId) {
+    if (session.user.role === 'SUPERADMIN') redirect('/superadmin');
+    return null;
+  }
+
   const clubUsers = await prisma.user.findMany({
-    where: { clubId: session.user.clubId, isActive: true }
+    where: { clubId, isActive: true }
   });
 
   const tasks = await prisma.task.findMany({
-    where: { clubId: session.user.clubId },
+    where: { clubId },
     orderBy: [
       { isCompleted: 'asc' },
       { createdAt: 'desc' }

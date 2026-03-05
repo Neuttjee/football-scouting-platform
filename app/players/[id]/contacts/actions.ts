@@ -1,12 +1,14 @@
 'use server';
 
-import { getSession } from '@/lib/auth';
+import { getSession, getEffectiveClubId } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 
 export async function createContact(playerId: string, formData: FormData) {
   const session = await getSession();
   if (!session) throw new Error('Unauthorized');
+  const clubId = getEffectiveClubId(session);
+  if (!clubId) throw new Error('Geen club geselecteerd');
 
   const type = formData.get('type') as string;
   const channel = formData.get('channel') as string;
@@ -26,7 +28,7 @@ export async function createContact(playerId: string, formData: FormData) {
       reason,
       notes,
       playerId,
-      clubId: session.user.clubId,
+      clubId,
       createdById: session.user.id
     }
   });

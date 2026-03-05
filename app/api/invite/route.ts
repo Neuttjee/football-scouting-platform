@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { getSession } from '@/lib/auth';
+import { getSession, getEffectiveClubId } from '@/lib/auth';
 import { sendInviteEmail } from '@/lib/email';
 import crypto from 'crypto';
 import bcrypt from 'bcrypt';
@@ -8,27 +8,30 @@ import bcrypt from 'bcrypt';
 export async function POST(req: Request) {
   try {
     const session = await getSession();
-    if (!session || session.user?.role !== 'ADMIN') {
+    if (!session || (session.user?.role !== 'ADMIN' && session.user?.role !== 'SUPERADMIN')) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+    }
+    const clubId = getEffectiveClubId(session);
+    if (!clubId) {
+      return NextResponse.json({ error: 'Geen club geselecteerd' }, { status: 400 });
     }
 
     const { email, name, role } = await req.json();
     
-    // Check if user already exists
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) {
       return NextResponse.json({ error: 'User already exists' }, { status: 400 });
     }
 
     const inviteToken = crypto.randomBytes(32).toString('hex');
-    const inviteTokenExpires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+    const inviteTokenExpires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
     const user = await prisma.user.create({
       data: {
         email,
         name,
         role,
-        clubId: session.user.clubId,
+        clubId,
         inviteToken,
         inviteTokenExpires,
       },
