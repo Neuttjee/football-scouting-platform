@@ -53,6 +53,7 @@ export function PlayerForm({
   clubName,
   onSubmit,
 }: PlayerFormProps) {
+  const [step, setStep] = React.useState<1 | 2>(1);
   const [playerType, setPlayerType] = React.useState<PlayerTypeValue>(
     initialValues.type === "INTERNAL" ? "INTERNAL" : "EXTERNAL"
   );
@@ -73,7 +74,21 @@ export function PlayerForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 py-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* Kleine stap-indicator bovenaan */}
+      <div className="flex items-center justify-between text-[11px] text-text-muted mb-1">
+        <span>
+          {step === 1
+            ? "Stap 1 van 2 – Basisgegevens"
+            : `Stap 2 van 2 – ${isInternal ? "Interne info" : "Scouting info"}`}
+        </span>
+      </div>
+
+      {/* Stap 1: basisgegevens */}
+      <div
+        className={`grid grid-cols-1 md:grid-cols-2 gap-4 ${
+          step === 1 ? "" : "hidden"
+        }`}
+      >
         {/* Type speler + Top speler */}
         <div className="md:col-span-2 flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-col gap-1">
@@ -221,7 +236,14 @@ export function PlayerForm({
             className="w-full border border-border-dark rounded p-2 bg-background focus-border-accent-primary focus-visible:outline-none"
           />
         </div>
+      </div>
 
+      {/* Stap 2: type-specifiek + notities */}
+      <div
+        className={`grid grid-cols-1 md:grid-cols-2 gap-4 ${
+          step === 2 ? "" : "hidden"
+        }`}
+      >
         {/* Extern: Status / Processtap / Advies */}
         {!isInternal && (
           <>
@@ -326,25 +348,50 @@ export function PlayerForm({
             </div>
           </>
         )}
+
+        {/* Notities (volledige breedte op stap 2) */}
+        <div className="md:col-span-2">
+          <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
+            Korte Notities
+          </label>
+          <textarea
+            name="notes"
+            defaultValue={initialValues.notes || ""}
+            className="w-full border border-border-dark rounded p-2 bg-background focus-border-accent-primary focus-visible:outline-none"
+            rows={3}
+          ></textarea>
+        </div>
       </div>
 
-      {/* Notities + Opslaan */}
-      <div>
-        <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
-          Korte Notities
-        </label>
-        <textarea
-          name="notes"
-          defaultValue={initialValues.notes || ""}
-          className="w-full border border-border-dark rounded p-2 bg-background focus-border-accent-primary focus-visible:outline-none"
-          rows={3}
-        ></textarea>
-      </div>
-
-      <div className="pt-4 flex justify-end">
-        <Button type="submit" className="btn-premium text-white">
-          {mode === "edit" ? "Opslaan" : "Toevoegen"}
-        </Button>
+      {/* Footer: navigatie tussen stappen + submit */}
+      <div className="pt-4 flex items-center justify-between">
+        {step === 1 ? (
+          <>
+            <span className="text-[11px] text-text-muted">
+              Velden met * zijn verplicht
+            </span>
+            <Button
+              type="button"
+              className="btn-premium text-white"
+              onClick={() => setStep(2)}
+            >
+              Volgende
+            </Button>
+          </>
+        ) : (
+          <>
+            <button
+              type="button"
+              className="text-xs text-text-muted hover:text-text-primary underline-offset-4 hover:underline"
+              onClick={() => setStep(1)}
+            >
+              Vorige
+            </button>
+            <Button type="submit" className="btn-premium text-white">
+              {mode === "edit" ? "Opslaan" : "Toevoegen"}
+            </Button>
+          </>
+        )}
       </div>
     </form>
   );

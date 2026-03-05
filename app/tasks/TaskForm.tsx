@@ -5,7 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 type ClubUser = { id: string; name: string };
-type PlayerOption = { id: string; name: string };
+type PlayerOption = {
+  id: string;
+  name: string;
+  currentClub?: string | null;
+  position?: string | null;
+  age?: number | null;
+};
 
 type Props = {
   clubUsers: ClubUser[];
@@ -131,7 +137,7 @@ export function TaskForm({
               </button>
             </PopoverTrigger>
             <PopoverContent
-              className="w-[var(--radix-popover-trigger-width)] p-2 bg-bg-card border-border-dark"
+              className="w-[var(--radix-popover-trigger-width)] p-2 bg-bg-card border-accent-primary shadow-[0_0_15px_rgba(var(--primary-rgb),0.3)]"
               align="start"
             >
               <div className="space-y-2">
@@ -168,19 +174,34 @@ export function TaskForm({
                     </div>
                   )}
 
-                  {playerResults.map((p) => (
-                    <button
-                      key={p.id}
-                      type="button"
-                      className="w-full text-left text-sm p-2 rounded hover:bg-bg-hover text-text-primary"
-                      onClick={() => {
-                        setSelectedPlayer(p);
-                        setPlayerOpen(false);
-                      }}
-                    >
-                      {p.name}
-                    </button>
-                  ))}
+                  {playerResults.map((p) => {
+                    const metaParts = [
+                      p.currentClub || undefined,
+                      p.position || undefined,
+                      typeof p.age === "number" ? `${p.age} jaar` : undefined,
+                    ].filter(Boolean) as string[];
+
+                    return (
+                      <button
+                        key={p.id}
+                        type="button"
+                        className="w-full text-left text-sm p-2 rounded hover:bg-bg-hover text-text-primary"
+                        onClick={() => {
+                          setSelectedPlayer(p);
+                          setPlayerOpen(false);
+                        }}
+                      >
+                        <div className="flex flex-col items-start gap-0.5">
+                          <span className="font-medium">{p.name}</span>
+                          {metaParts.length > 0 && (
+                            <span className="text-[11px] text-text-muted">
+                              {metaParts.join(" • ")}
+                            </span>
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             </PopoverContent>
