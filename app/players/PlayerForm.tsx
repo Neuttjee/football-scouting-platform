@@ -72,10 +72,69 @@ export function PlayerForm({
       ? (clubName || initialValues.currentClub || "")
       : (initialValues.currentClub || "");
 
+  // Helpers voor seizoens-dropdowns (intern)
+  const today = new Date();
+  const currentYear = today.getFullYear();
+  const currentMonth = today.getMonth(); // 0 = jan
+  const currentSeasonStartYear = currentMonth >= 6 ? currentYear : currentYear - 1; // seizoen start in juli
+
+  const seasonLabel = (startYear: number) =>
+    `Seizoen ${startYear}/${startYear + 1}`;
+
+  const joinedAtOptions = React.useMemo(() => {
+    const options: { value: string; label: string }[] = [];
+    for (let year = 2014; year <= currentSeasonStartYear; year++) {
+      // opslaan als 1 juli van het startjaar
+      const value = `${year}-07-01`;
+      options.push({ value, label: seasonLabel(year) });
+    }
+    return options.reverse(); // nieuwste eerst
+  }, [currentSeasonStartYear]);
+
+  const contractEndOptions = React.useMemo(() => {
+    const options: { value: string; label: string }[] = [];
+    const maxStartYear = currentSeasonStartYear + 4; // ~ huidige + 4 = 5 seizoenen zichtbaar
+    for (let year = currentSeasonStartYear; year <= maxStartYear; year++) {
+      // opslaan als 30 juni van het eindjaar
+      const endYear = year + 1;
+      const value = `${endYear}-06-30`;
+      options.push({ value, label: seasonLabel(year) });
+    }
+    return options;
+  }, [currentSeasonStartYear]);
+
+  const deriveJoinedAtDefault = () => {
+    if (!initialValues.joinedAt) return "";
+    const d = new Date(initialValues.joinedAt);
+    if (Number.isNaN(d.getTime())) return "";
+    const year = d.getFullYear();
+    const month = d.getMonth();
+    const startYear = month >= 6 ? year : year - 1;
+    const canonical = `${startYear}-07-01`;
+    const exists = joinedAtOptions.some((o) => o.value === canonical);
+    return exists ? canonical : "";
+  };
+
+  const deriveContractEndDefault = () => {
+    if (!initialValues.contractEndDate) return "";
+    const d = new Date(initialValues.contractEndDate);
+    if (Number.isNaN(d.getTime())) return "";
+    const year = d.getFullYear();
+    const month = d.getMonth();
+    const startYear = month >= 6 ? year : year - 1;
+    const endYear = startYear + 1;
+    const canonical = `${endYear}-06-30`;
+    const exists = contractEndOptions.some((o) => o.value === canonical);
+    return exists ? canonical : "";
+  };
+
+  const joinedAtDefault = deriveJoinedAtDefault();
+  const contractEndDefault = deriveContractEndDefault();
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 py-4">
+    <form onSubmit={handleSubmit} className="space-y-4 pt-2 pb-4">
       {/* Kleine stap-indicator bovenaan */}
-      <div className="flex items-center justify-between text-[11px] text-text-muted mb-1">
+      <div className="flex items-center justify-between text-[11px] text-text-muted mb-3">
         <span>
           {step === 1
             ? "Stap 1 van 2 – Basisgegevens"
@@ -308,31 +367,35 @@ export function PlayerForm({
               <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
                 Bij club sinds
               </label>
-              <input
-                type="date"
+              <select
                 name="joinedAt"
-                defaultValue={
-                  initialValues.joinedAt
-                    ? new Date(initialValues.joinedAt).toISOString().split("T")[0]
-                    : ""
-                }
+                defaultValue={joinedAtDefault}
                 className="w-full border border-border-dark rounded p-2 bg-background focus-border-accent-primary focus-visible:outline-none"
-              />
+              >
+                <option value="">Selecteer seizoen...</option>
+                {joinedAtOptions.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
               <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
                 Contract tot
               </label>
-              <input
-                type="date"
+              <select
                 name="contractEndDate"
-                defaultValue={
-                  initialValues.contractEndDate
-                    ? new Date(initialValues.contractEndDate).toISOString().split("T")[0]
-                    : ""
-                }
+                defaultValue={contractEndDefault}
                 className="w-full border border-border-dark rounded p-2 bg-background focus-border-accent-primary focus-visible:outline-none"
-              />
+              >
+                <option value="">Selecteer seizoen...</option>
+                {contractEndOptions.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
               <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
@@ -382,7 +445,7 @@ export function PlayerForm({
           <>
             <button
               type="button"
-              className="text-xs text-text-muted hover:text-text-primary underline-offset-4 hover:underline"
+              className="px-3 py-1.5 rounded border border-accent-primary text-accent-primary text-xs md:text-sm bg-transparent hover:bg-accent-primary/10 transition-colors"
               onClick={() => setStep(1)}
             >
               Vorige
