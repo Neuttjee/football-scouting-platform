@@ -27,7 +27,7 @@ export function NewTaskModal({ clubUsers }: { clubUsers: any[] }) {
           Taak toevoegen
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-xl bg-bg-card border-border-dark text-text-primary">
+      <DialogContent className="max-w-xl bg-bg-card border-accent-primary text-text-primary shadow-[0_0_15px_rgba(var(--primary-rgb),0.3)]">
         <DialogHeader>
           <DialogTitle className="text-text-primary">Nieuwe taak</DialogTitle>
         </DialogHeader>

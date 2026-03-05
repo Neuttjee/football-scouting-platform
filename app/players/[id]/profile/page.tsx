@@ -206,7 +206,7 @@ export default async function PlayerProfilePage({
                 <CardTitle className="text-accent-primary uppercase tracking-widest text-xs">
                   Contacten Tijdlijn ({player.contacts.length})
                 </CardTitle>
-                <NewContactModal playerId={player.id} />
+                <NewContactModal playerId={player.id} playerName={player.name} />
               </div>
             </CardHeader>
             <CardContent>

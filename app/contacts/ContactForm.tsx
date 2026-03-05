@@ -4,37 +4,31 @@ import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
-type ClubUser = { id: string; name: string };
 type PlayerOption = { id: string; name: string };
 
 type Props = {
-  clubUsers: ClubUser[];
   initialPlayer?: PlayerOption | null;
   lockPlayer?: boolean;
   onSubmit: (fd: FormData) => Promise<void> | void;
   submitLabel?: string;
 };
 
-export function TaskForm({
-  clubUsers,
+export function ContactForm({
   initialPlayer = null,
   lockPlayer = false,
   onSubmit,
   submitLabel = "Opslaan",
 }: Props) {
+  const [selectedPlayer, setSelectedPlayer] = React.useState<PlayerOption | null>(
+    initialPlayer
+  );
   const [playerQuery, setPlayerQuery] = React.useState("");
   const [playerOpen, setPlayerOpen] = React.useState(false);
   const [playerLoading, setPlayerLoading] = React.useState(false);
   const [playerResults, setPlayerResults] = React.useState<PlayerOption[]>([]);
-  const [selectedPlayer, setSelectedPlayer] = React.useState<PlayerOption | null>(
-    initialPlayer
-  );
 
-  const [assignedToId, setAssignedToId] = React.useState("");
-
-  const sortedClubUsers = React.useMemo(() => {
-    return [...clubUsers].sort((a, b) => a.name.localeCompare(b.name, "nl-NL"));
-  }, [clubUsers]);
+  const [outcome, setOutcome] = React.useState("");
+  const requiresReason = outcome === "Afgehaakt" || outcome === "Niet haalbaar";
 
   React.useEffect(() => {
     if (!playerOpen) return;
@@ -70,47 +64,23 @@ export function TaskForm({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!selectedPlayer?.id && !lockPlayer) {
+      alert("Selecteer een speler.");
+      return;
+    }
     const fd = new FormData(e.currentTarget);
     if (selectedPlayer?.id) fd.set("playerId", selectedPlayer.id);
     else fd.set("playerId", "");
     await onSubmit(fd);
   };
 
-  const externalLocked = assignedToId.trim() !== "";
-
   return (
     <form onSubmit={handleSubmit} className="space-y-4 py-4">
       <div className="space-y-4">
-        {/* Taak omschrijving */}
+        {/* Speler (optioneel gelockt) */}
         <div>
           <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
-            Taak omschrijving *
-          </label>
-          <input
-            type="text"
-            name="title"
-            required
-            placeholder="Bijv. Video bekijken van speler X"
-            className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-visible:ring-1 focus-visible:ring-accent-primary focus-visible:outline-none"
-          />
-        </div>
-
-        {/* Deadline */}
-        <div>
-          <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
-            Deadline
-          </label>
-          <input
-            type="date"
-            name="dueDate"
-            className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-visible:ring-1 focus-visible:ring-accent-primary focus-visible:outline-none"
-          />
-        </div>
-
-        {/* Koppel aan speler (zoekveld) */}
-        <div>
-          <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
-            Koppel aan speler
+            Speler *
           </label>
 
           <input type="hidden" name="playerId" value={selectedPlayer?.id || ""} />
@@ -123,7 +93,7 @@ export function TaskForm({
                 disabled={lockPlayer}
               >
                 <span className="truncate">
-                  {selectedPlayer ? selectedPlayer.name : "Geen speler gekoppeld"}
+                  {selectedPlayer ? selectedPlayer.name : "Selecteer speler..."}
                 </span>
                 {!lockPlayer && (
                   <span className="text-[10px] text-accent-primary">▼</span>
@@ -144,29 +114,18 @@ export function TaskForm({
                   autoFocus
                 />
 
-                <div className="max-h-56 overflow-y-auto">
-                  <button
-                    type="button"
-                    className="w-full text-left text-sm p-2 rounded hover:bg-bg-hover text-text-secondary"
-                    onClick={() => {
-                      setSelectedPlayer(null);
-                      setPlayerOpen(false);
-                      setPlayerQuery("");
-                      setPlayerResults([]);
-                    }}
-                  >
-                    Geen speler gekoppeld
-                  </button>
-
+                <div className="max-h-56 overflow-y-auto mt-1">
                   {playerLoading && (
                     <div className="text-xs text-text-muted p-2">Zoeken…</div>
                   )}
 
-                  {!playerLoading && playerQuery.trim() !== "" && playerResults.length === 0 && (
-                    <div className="text-xs text-text-muted p-2">
-                      Geen spelers gevonden.
-                    </div>
-                  )}
+                  {!playerLoading &&
+                    playerQuery.trim() !== "" &&
+                    playerResults.length === 0 && (
+                      <div className="text-xs text-text-muted p-2">
+                        Geen spelers gevonden.
+                      </div>
+                    )}
 
                   {playerResults.map((p) => (
                     <button
@@ -187,37 +146,110 @@ export function TaskForm({
           </Popover>
         </div>
 
-        {/* Toewijzen aan (Gebruiker) */}
+        {/* Type */}
         <div>
           <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
-            Koppel aan gebruiker
+            Type *
           </label>
           <select
-            name="assignedToId"
-            value={assignedToId}
-            onChange={(e) => setAssignedToId(e.target.value)}
-            className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-visible:ring-1 focus-visible:ring-accent-primary focus-visible:outline-none"
+            name="type"
+            required
+            className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
           >
-            <option value="">Niet toegewezen</option>
-            {sortedClubUsers.map((u) => (
-              <option key={u.id} value={u.id}>
-                {u.name}
+            <option value="">Selecteer...</option>
+            {[
+              "Intro benadering",
+              "Follow up",
+              "Gesprek",
+              "Meetraining",
+              "Aanbod",
+              "Overig",
+            ].map((t) => (
+              <option key={t} value={t}>
+                {t}
               </option>
             ))}
           </select>
         </div>
 
-        {/* Toewijzen aan extern */}
+        {/* Kanaal */}
         <div>
           <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
-            Toewijzen aan extern
+            Kanaal *
           </label>
-          <input
-            type="text"
-            name="assignedToExternalName"
-            placeholder="Naam externe persoon"
-            disabled={externalLocked}
-            className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-visible:ring-1 focus-visible:ring-accent-primary focus-visible:outline-none disabled:opacity-60"
+          <select
+            name="channel"
+            required
+            className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
+          >
+            <option value="">Selecteer...</option>
+            {[
+              "Whatsapp",
+              "Telefoon",
+              "Op de club",
+              "Training",
+              "Via derde",
+              "E-mail",
+              "Overig",
+            ].map((t) => (
+              <option key={t} value={t}>
+                {t}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Uitkomst */}
+        <div>
+          <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
+            Uitkomst
+          </label>
+          <select
+            name="outcome"
+            value={outcome}
+            onChange={(e) => setOutcome(e.target.value)}
+            className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
+          >
+            <option value="">Geen of onbekend</option>
+            {[
+              "Positief",
+              "Neutraal",
+              "Twijfel",
+              "Negatief",
+              "Afgehaakt",
+              "Niet haalbaar",
+            ].map((t) => (
+              <option key={t} value={t}>
+                {t}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Reden (conditioneel) */}
+        {requiresReason && (
+          <div>
+            <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
+              Reden (verplicht bij Afgehaakt / Niet haalbaar) *
+            </label>
+            <input
+              type="text"
+              name="reason"
+              required={requiresReason}
+              className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
+            />
+          </div>
+        )}
+
+        {/* Notities */}
+        <div>
+          <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
+            Notities
+          </label>
+          <textarea
+            name="notes"
+            rows={3}
+            className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
           />
         </div>
       </div>

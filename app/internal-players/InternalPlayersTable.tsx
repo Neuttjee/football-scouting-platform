@@ -85,7 +85,9 @@ const INTERNAL_COLUMNS: ColumnDef<InternalPlayer>[] = [
     header: "Team",
     filterFn: "arrIncludesSome",
     cell: ({ row }) => (
-      <span className="text-text-secondary">{row.getValue("teamLabel") || "-"}</span>
+      <span className="text-text-secondary">
+        {row.getValue("teamLabel") || "-"}
+      </span>
     ),
   },
   {
@@ -93,7 +95,9 @@ const INTERNAL_COLUMNS: ColumnDef<InternalPlayer>[] = [
     header: "Beste positie",
     filterFn: "arrIncludesSome",
     cell: ({ row }) => (
-      <span className="text-accent-primary font-medium">{row.getValue("position") || "-"}</span>
+      <span className="text-accent-primary font-medium">
+        {row.getValue("position") || "-"}
+      </span>
     ),
   },
   {
@@ -217,10 +221,12 @@ function Filter({ column }: { column: any }) {
     "teamLabel",
     "position",
     "secondaryPosition",
+    "favoritePosition",
     "preferredFoot",
     "age",
     "joinedAt",
     "contractEndDate",
+    "distanceFromClubKm",
   ].includes(column.id);
 
   if (isFaceted) {

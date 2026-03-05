@@ -21,6 +21,7 @@ import { createTask } from "@/app/tasks/actions";
 import { createContact } from "@/app/players/[id]/contacts/actions";
 import { PlayerForm } from "@/app/players/PlayerForm";
 import { TaskForm } from "@/app/tasks/TaskForm";
+import { ContactForm } from "@/app/contacts/ContactForm";
 
 export interface PlayerForActions {
   id: string;
@@ -52,9 +53,6 @@ export function PlayerActionsMenu({
   const [openEdit, setOpenEdit] = React.useState(false);
   const [openTask, setOpenTask] = React.useState(false);
   const [openContact, setOpenContact] = React.useState(false);
-  const [outcome, setOutcome] = React.useState("");
-  const requiresReason =
-    outcome === "Afgehaakt" || outcome === "Niet haalbaar";
 
     const handleEditSubmit = async (fd: FormData) => {
       await updatePlayer(player.id, fd);
@@ -68,14 +66,6 @@ export function PlayerActionsMenu({
     formData.append("playerId", player.id);
     await createTask(formData);
     setOpenTask(false);
-    router.refresh();
-  };
-
-  const handleContact = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    await createContact(player.id, formData);
-    setOpenContact(false);
     router.refresh();
   };
 
@@ -167,6 +157,26 @@ export function PlayerActionsMenu({
               fd.set("playerId", player.id);
               await createTask(fd);
               setOpenTask(false);
+              router.refresh();
+            }}
+            submitLabel="Opslaan"
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* Nieuw contactmoment vanuit tabel, met speler gelocked */}
+      <Dialog open={openContact} onOpenChange={setOpenContact}>
+        <DialogContent className="max-w-md bg-bg-card border-accent-primary text-text-primary shadow-[0_0_15px_rgba(var(--primary-rgb),0.3)]">
+          <DialogHeader>
+            <DialogTitle>Nieuw contactmoment</DialogTitle>
+          </DialogHeader>
+          <ContactForm
+            initialPlayer={{ id: player.id, name: player.name }}
+            lockPlayer={true}
+            onSubmit={async (fd) => {
+              fd.set("playerId", player.id);
+              await createContact(player.id, fd);
+              setOpenContact(false);
               router.refresh();
             }}
             submitLabel="Opslaan"
