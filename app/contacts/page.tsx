@@ -2,6 +2,7 @@ import { getSession } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 import Link from 'next/link';
 import { NewContactModal } from './NewContactModal';
+import { DataTable } from '@/components/DataTable';
 
 export default async function ContactsPage() {
   const session = await getSession();
@@ -23,47 +24,40 @@ export default async function ContactsPage() {
         <NewContactModal />
       </div>
 
-      <div className="bg-card p-6 rounded-lg shadow-sm border">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left">
-            <thead className="bg-muted/50 text-muted-foreground border-b">
-              <tr>
-                <th className="p-3 font-medium">Datum</th>
-                <th className="p-3 font-medium">Speler</th>
-                <th className="p-3 font-medium">Type</th>
-                <th className="p-3 font-medium">Kanaal</th>
-                <th className="p-3 font-medium">Uitkomst</th>
-                <th className="p-3 font-medium">Aangemaakt door</th>
-              </tr>
-            </thead>
-            <tbody>
-              {contacts.length === 0 && (
-                <tr>
-                  <td colSpan={6} className="p-4 text-center text-muted-foreground italic">
-                    Geen contactmomenten gevonden.
-                  </td>
-                </tr>
-              )}
-              {contacts.map(c => (
-                <tr key={c.id} className="border-b last:border-0 hover:bg-muted/30 transition-colors">
-                  <td className="p-3 text-muted-foreground">
-                    {new Date(c.createdAt).toLocaleDateString('nl-NL')}
-                  </td>
-                  <td className="p-3">
-                    <Link href={`/players/${c.player.id}/profile`} className="text-accent-primary hover:text-accent-glow font-medium transition-colors">
-                      {c.player.name}
-                    </Link>
-                  </td>
-                  <td className="p-3 text-foreground">{c.type}</td>
-                  <td className="p-3 text-muted-foreground">{c.channel}</td>
-                  <td className="p-3 text-muted-foreground">{c.outcome || '-'}</td>
-                  <td className="p-3 text-muted-foreground">{c.createdBy?.name || 'Onbekend'}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <DataTable.Root>
+        <DataTable.Header>
+          <DataTable.HeaderRow>
+            <DataTable.HeaderCell>Datum</DataTable.HeaderCell>
+            <DataTable.HeaderCell>Speler</DataTable.HeaderCell>
+            <DataTable.HeaderCell>Type</DataTable.HeaderCell>
+            <DataTable.HeaderCell>Kanaal</DataTable.HeaderCell>
+            <DataTable.HeaderCell>Uitkomst</DataTable.HeaderCell>
+            <DataTable.HeaderCell>Aangemaakt door</DataTable.HeaderCell>
+          </DataTable.HeaderRow>
+        </DataTable.Header>
+        <DataTable.Body>
+          {contacts.length === 0 ? (
+            <DataTable.Empty colSpan={6}>Geen contactmomenten gevonden.</DataTable.Empty>
+          ) : (
+            contacts.map((c) => (
+              <DataTable.Row key={c.id}>
+                <DataTable.Cell className="text-muted-foreground">
+                  {new Date(c.createdAt).toLocaleDateString('nl-NL')}
+                </DataTable.Cell>
+                <DataTable.Cell>
+                  <Link href={`/players/${c.player.id}/profile`} className="text-accent-primary hover:text-accent-glow font-medium transition-colors">
+                    {c.player.name}
+                  </Link>
+                </DataTable.Cell>
+                <DataTable.Cell>{c.type}</DataTable.Cell>
+                <DataTable.Cell className="text-muted-foreground">{c.channel}</DataTable.Cell>
+                <DataTable.Cell className="text-muted-foreground">{c.outcome || '-'}</DataTable.Cell>
+                <DataTable.Cell className="text-muted-foreground">{c.createdBy?.name || 'Onbekend'}</DataTable.Cell>
+              </DataTable.Row>
+            ))
+          )}
+        </DataTable.Body>
+      </DataTable.Root>
     </div>
   );
 }

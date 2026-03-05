@@ -27,6 +27,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { DataTable } from "@/components/DataTable"
 import { updatePlayerField } from "./actions"
 import { targetSteps, targetStatuses, adviesOptions } from "@/lib/statusMapping"
 import { calculateAgeFromDate } from "@/lib/age"
@@ -347,68 +348,66 @@ export function PlayersTable({ data, clubUsers = [], clubName = null }: { data: 
   })
 
   return (
-    <div className="rounded-xl card-premium overflow-hidden shadow-lg">
-      <div className="overflow-x-auto pb-4">
-        <Table className="min-w-max">
-          <TableHeader className="bg-bg-secondary">
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className="border-border-dark hover:bg-transparent">
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id} className="align-top py-2 px-2 text-text-secondary">
-                      <div className="flex flex-col gap-3">
-                        <div 
-                          className={header.column.getCanSort() ? "cursor-pointer select-none font-semibold hover:text-text-primary flex items-center transition-colors uppercase tracking-wider text-xs" : "font-semibold uppercase tracking-wider text-xs"}
-                          onClick={header.column.getToggleSortingHandler()}
-                        >
-                          {header.isPlaceholder
-                            ? null
-                            : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext()
-                              )}
-                          {{
-                            asc: <span className="ml-1 text-accent-primary text-[10px]">▲</span>,
-                            desc: <span className="ml-1 text-accent-primary text-[10px]">▼</span>,
-                          }[header.column.getIsSorted() as string] ?? null}
-                        </div>
-                        {header.column.getCanFilter() && header.column.id !== 'actions' ? (
-                          <div>
-                            <Filter column={header.column} />
-                          </div>
-                        ) : <div className="h-8"></div>}
+    <DataTable.Wrapper>
+      <Table className="min-w-max">
+        <TableHeader className="bg-bg-secondary">
+          {table.getHeaderGroups().map((headerGroup) => (
+            <TableRow key={headerGroup.id} className="border-border-dark hover:bg-transparent">
+              {headerGroup.headers.map((header) => {
+                return (
+                  <TableHead key={header.id} className="align-top py-2 px-2 text-text-secondary">
+                    <div className="flex flex-col gap-3">
+                      <div 
+                        className={header.column.getCanSort() ? "cursor-pointer select-none font-semibold hover:text-text-primary flex items-center transition-colors uppercase tracking-wider text-xs" : "font-semibold uppercase tracking-wider text-xs"}
+                        onClick={header.column.getToggleSortingHandler()}
+                      >
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                        {{
+                          asc: <span className="ml-1 text-accent-primary text-[10px]">▲</span>,
+                          desc: <span className="ml-1 text-accent-primary text-[10px]">▼</span>,
+                        }[header.column.getIsSorted() as string] ?? null}
                       </div>
-                    </TableHead>
-                  )
-                })}
+                      {header.column.getCanFilter() && header.column.id !== 'actions' ? (
+                        <div>
+                          <Filter column={header.column} />
+                        </div>
+                      ) : <div className="h-8"></div>}
+                    </div>
+                  </TableHead>
+                )
+              })}
+            </TableRow>
+          ))}
+        </TableHeader>
+        <TableBody>
+          {table.getRowModel().rows?.length ? (
+            table.getRowModel().rows.map((row) => (
+              <TableRow
+                key={row.id}
+                data-state={row.getIsSelected() && "selected"}
+                className="hover:bg-bg-hover border-border-dark transition-colors"
+              >
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id} className="py-2 px-2 text-sm">
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
               </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                  className="hover:bg-bg-hover border-border-dark transition-colors"
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="py-2 px-2 text-sm">
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center text-text-muted">
-                  Geen spelers gevonden.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
-    </div>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={columns.length} className="h-24 text-center text-text-muted">
+                Geen spelers gevonden.
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+    </DataTable.Wrapper>
   )
 }

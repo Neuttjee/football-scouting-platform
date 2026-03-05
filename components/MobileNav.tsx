@@ -2,19 +2,20 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Users, CheckSquare, Settings, ClipboardList } from 'lucide-react';
+import { Home, Users, CheckSquare, Settings, ClipboardList, Shield } from 'lucide-react';
 
 export function MobileNav({ role }: { role: string }) {
   const pathname = usePathname();
 
   const navItems = [
+    ...(role === 'SUPERADMIN' ? [{ href: '/superadmin', label: 'Admin', icon: Shield }] : []),
     { href: '/dashboard', label: 'Dash', icon: Home },
     { href: '/players', label: 'Spelers', icon: Users },
     { href: '/squad-planning', label: 'Planning', icon: ClipboardList },
     { href: '/tasks', label: 'Taken', icon: CheckSquare },
   ];
 
-  if (role === 'ADMIN') {
+  if (role === 'ADMIN' || role === 'SUPERADMIN') {
     navItems.push({ href: '/settings', label: 'Instellingen', icon: Settings });
   }
 

@@ -6,14 +6,7 @@ import { updateUserRole, resendInvite, deleteUser } from './actions';
 import { useTransition } from 'react';
 import { Plus } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
+import { DataTable } from "@/components/DataTable"
 
 type User = {
   id: string;
@@ -68,54 +61,26 @@ export function UserTable({ users, currentUserId }: { users: User[], currentUser
 
   return (
     <>
-      <div className="rounded-xl card-premium overflow-hidden shadow-lg">
-      <div className="overflow-x-auto pb-4">
-        <Table className="min-w-max">
-          <TableHeader className="bg-bg-secondary">
-            <TableRow className="border-border-dark hover:bg-transparent">
-              <TableHead className="align-top py-2 px-2 text-text-secondary">
-                <div className="font-semibold uppercase tracking-wider text-xs">
-                  Naam
-                </div>
-              </TableHead>
-              <TableHead className="align-top py-2 px-2 text-text-secondary">
-                <div className="font-semibold uppercase tracking-wider text-xs">
-                  Email
-                </div>
-              </TableHead>
-              <TableHead className="align-top py-2 px-2 text-text-secondary">
-                <div className="font-semibold uppercase tracking-wider text-xs">
-                  Rol
-                </div>
-              </TableHead>
-              <TableHead className="align-top py-2 px-2 text-text-secondary">
-                <div className="font-semibold uppercase tracking-wider text-xs">
-                  Status
-                </div>
-              </TableHead>
-              <TableHead className="align-top py-2 px-2 text-text-secondary">
-                <div className="font-semibold uppercase tracking-wider text-xs text-right">
-                  Acties
-                </div>
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {users.map((u) => (
-              <TableRow
-                key={u.id}
-                className="hover:bg-bg-hover border-border-dark transition-colors"
-              >
-                <TableCell className="py-2 px-2 text-sm">
-                  {u.name}
-                </TableCell>
-                <TableCell className="py-2 px-2 text-sm">
-                  {u.email}
-                </TableCell>
-                <TableCell className="py-2 px-2 text-sm">
-                  {u.role}
-                </TableCell>
-                <TableCell className="py-2 px-2 text-sm">
+      <DataTable.Root>
+        <DataTable.Header>
+          <DataTable.HeaderRow>
+            <DataTable.HeaderCell>Naam</DataTable.HeaderCell>
+            <DataTable.HeaderCell>Email</DataTable.HeaderCell>
+            <DataTable.HeaderCell>Rol</DataTable.HeaderCell>
+            <DataTable.HeaderCell>Status</DataTable.HeaderCell>
+            <DataTable.HeaderCell className="text-right">Acties</DataTable.HeaderCell>
+          </DataTable.HeaderRow>
+        </DataTable.Header>
+        <DataTable.Body>
+          {users.length === 0 ? (
+            <DataTable.Empty colSpan={5}>Geen gebruikers gevonden.</DataTable.Empty>
+          ) : (
+            users.map((u) => (
+              <DataTable.Row key={u.id}>
+                <DataTable.Cell>{u.name}</DataTable.Cell>
+                <DataTable.Cell>{u.email}</DataTable.Cell>
+                <DataTable.Cell>{u.role}</DataTable.Cell>
+                <DataTable.Cell>
                   {(!u.passwordHash && u.inviteToken) ? (
                     <span className="px-2 py-1 rounded text-xs bg-yellow-100 text-yellow-800">
                       Uitgenodigd
@@ -131,8 +96,8 @@ export function UserTable({ users, currentUserId }: { users: User[], currentUser
                       {u.isActive ? "Actief" : "Inactief"}
                     </span>
                   )}
-                </TableCell>
-                <TableCell className="py-2 px-2 text-sm text-right">
+                </DataTable.Cell>
+                <DataTable.Cell className="text-right">
                   {u.id !== currentUserId && (
                     <div className="flex justify-end pr-2">
                       <DropdownMenu>
@@ -168,13 +133,12 @@ export function UserTable({ users, currentUserId }: { users: User[], currentUser
                       </DropdownMenu>
                     </div>
                   )}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-          </Table>
-      </div>
-    </div>
+                </DataTable.Cell>
+              </DataTable.Row>
+            ))
+          )}
+        </DataTable.Body>
+      </DataTable.Root>
 
     {/* Rol wijzigen modal */}
     {roleModalOpen && (

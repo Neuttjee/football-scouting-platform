@@ -10,6 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import { DataTable } from "@/components/DataTable"
 
 type Task = {
   id: string;
@@ -36,74 +37,67 @@ export function TaskList({ tasks }: { tasks: Task[] }) {
 
   return (
     <>
-      <div className="rounded-md border bg-card overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left">
-            <thead className="bg-muted/50 text-muted-foreground border-b">
-              <tr>
-                <th className="p-3 font-medium w-10"></th>
-                <th className="p-3 font-medium">Taak</th>
-                <th className="p-3 font-medium">Speler</th>
-                <th className="p-3 font-medium">Toegewezen aan</th>
-                <th className="p-3 font-medium">Deadline</th>
-                <th className="p-3 font-medium">Aangemaakt door</th>
-                <th className="p-3 font-medium">Datum</th>
-              </tr>
-            </thead>
-            <tbody>
-              {tasks.length === 0 && (
-                <tr>
-                  <td colSpan={7} className="p-4 text-center text-muted-foreground italic">
-                    Geen taken gevonden.
-                  </td>
-                </tr>
-              )}
-              {tasks.map(t => {
-                const assignedName = t.assignedTo?.name || t.assignedToExternalName || '-';
-                return (
-                  <tr 
-                    key={t.id} 
-                    className="border-b last:border-0 hover:bg-muted/30 transition-colors cursor-pointer"
-                    onClick={() => setSelectedTask(t)}
-                  >
-                    <td className="p-3" onClick={(e) => e.stopPropagation()}>
-                      <input 
-                        type="checkbox" 
-                        checked={t.isCompleted} 
-                        onChange={(e) => handleToggle(t.id, e.target.checked)}
-                        disabled={isPending}
-                        className="h-4 w-4 rounded border-border-dark text-accent-primary focus:ring-accent-primary disabled:opacity-50 cursor-pointer"
-                      />
-                    </td>
-                    <td className={`p-3 font-medium ${t.isCompleted ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
-                      {t.title}
-                    </td>
-                    <td className="p-3">
-                      {t.player ? (
-                        <Link 
-                          href={`/players/${t.player.id}/profile`} 
-                          className="text-accent-primary hover:text-accent-glow underline-offset-2 hover:underline"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          {t.player.name}
-                        </Link>
-                      ) : '-'}
-                    </td>
-                    <td className="p-3 text-muted-foreground">{assignedName}</td>
-                    <td className="p-3 text-muted-foreground">
-                      {t.dueDate ? new Date(t.dueDate).toLocaleDateString('nl-NL') : '-'}
-                    </td>
-                    <td className="p-3 text-muted-foreground">{t.createdBy?.name || 'Onbekend'}</td>
-                    <td className="p-3 text-muted-foreground">
-                      {new Date(t.createdAt).toLocaleDateString('nl-NL')}
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <DataTable.Root>
+        <DataTable.Header>
+          <DataTable.HeaderRow>
+            <DataTable.HeaderCell className="w-10">{'\u00A0'}</DataTable.HeaderCell>
+            <DataTable.HeaderCell>Taak</DataTable.HeaderCell>
+            <DataTable.HeaderCell>Speler</DataTable.HeaderCell>
+            <DataTable.HeaderCell>Toegewezen aan</DataTable.HeaderCell>
+            <DataTable.HeaderCell>Deadline</DataTable.HeaderCell>
+            <DataTable.HeaderCell>Aangemaakt door</DataTable.HeaderCell>
+            <DataTable.HeaderCell>Datum</DataTable.HeaderCell>
+          </DataTable.HeaderRow>
+        </DataTable.Header>
+        <DataTable.Body>
+          {tasks.length === 0 ? (
+            <DataTable.Empty colSpan={7}>Geen taken gevonden.</DataTable.Empty>
+          ) : (
+            tasks.map((t) => {
+              const assignedName = t.assignedTo?.name || t.assignedToExternalName || '-';
+              return (
+                <DataTable.Row
+                  key={t.id}
+                  className="cursor-pointer"
+                  onClick={() => setSelectedTask(t)}
+                >
+                  <DataTable.Cell onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+                    <input
+                      type="checkbox"
+                      checked={t.isCompleted}
+                      onChange={(e) => handleToggle(t.id, e.target.checked)}
+                      disabled={isPending}
+                      className="h-4 w-4 rounded border-border-dark text-accent-primary focus:ring-accent-primary disabled:opacity-50 cursor-pointer"
+                    />
+                  </DataTable.Cell>
+                  <DataTable.Cell className={t.isCompleted ? 'line-through text-muted-foreground' : 'font-medium'}>
+                    {t.title}
+                  </DataTable.Cell>
+                  <DataTable.Cell>
+                    {t.player ? (
+                      <Link
+                        href={`/players/${t.player.id}/profile`}
+                        className="text-accent-primary hover:text-accent-glow underline-offset-2 hover:underline"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {t.player.name}
+                      </Link>
+                    ) : '-'}
+                    </DataTable.Cell>
+                  <DataTable.Cell className="text-muted-foreground">{assignedName}</DataTable.Cell>
+                  <DataTable.Cell className="text-muted-foreground">
+                    {t.dueDate ? new Date(t.dueDate).toLocaleDateString('nl-NL') : '-'}
+                  </DataTable.Cell>
+                  <DataTable.Cell className="text-muted-foreground">{t.createdBy?.name || 'Onbekend'}</DataTable.Cell>
+                  <DataTable.Cell className="text-muted-foreground">
+                    {new Date(t.createdAt).toLocaleDateString('nl-NL')}
+                  </DataTable.Cell>
+                </DataTable.Row>
+              );
+            })
+          )}
+        </DataTable.Body>
+      </DataTable.Root>
 
       <Dialog open={!!selectedTask} onOpenChange={(open) => !open && setSelectedTask(null)}>
         <DialogContent>

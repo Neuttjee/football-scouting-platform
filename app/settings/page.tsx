@@ -7,7 +7,7 @@ import { InviteUserModal } from './InviteUserModal';
 
 export default async function SettingsPage() {
   const session = await getSession();
-  if (!session || session.user.role !== 'ADMIN') {
+  if (!session || (session.user.role !== 'ADMIN' && session.user.role !== 'SUPERADMIN')) {
     redirect('/dashboard');
   }
 

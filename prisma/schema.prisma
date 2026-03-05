@@ -34,7 +34,7 @@ model User {
   email                String    @unique
   passwordHash         String?
   name                 String
-  role                 String    // "ADMIN", "TC_LID", "SCOUT", "LEZER"
+  role                 String    // "SUPERADMIN", "ADMIN", "TC_LID", "SCOUT", "LEZER"
   isActive             Boolean   @default(true)
 
   inviteToken          String?   @unique
@@ -54,6 +54,9 @@ model User {
   contactsCreated      ContactMoment[] @relation("ContactCreatedBy")
   tasksCreated         Task[]          @relation("TaskCreatedBy")
   tasksAssigned        Task[]          @relation("TaskAssignedTo")
+
+  loginCount           Int       @default(0)
+  lastLoginAt          DateTime?
 
   createdAt            DateTime  @default(now())
   updatedAt            DateTime  @updatedAt

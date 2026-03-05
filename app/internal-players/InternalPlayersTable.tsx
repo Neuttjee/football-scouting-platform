@@ -26,6 +26,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { DataTable } from "@/components/DataTable";
 import { cn } from "@/lib/utils";
 import { Star, Plus } from "lucide-react";
 import { PlayerActionsMenu, PlayerForActions } from "@/components/PlayerActionsMenu";
@@ -339,10 +340,9 @@ export function InternalPlayersTable({
   });
 
   return (
-    <div className="rounded-xl card-premium overflow-hidden shadow-lg">
-      <div className="overflow-x-auto pb-4">
-        <Table className="min-w-max">
-          <TableHeader className="bg-bg-secondary">
+    <DataTable.Wrapper>
+      <Table className="min-w-max">
+        <TableHeader className="bg-bg-secondary">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow
                 key={headerGroup.id}
@@ -424,7 +424,6 @@ export function InternalPlayersTable({
             )}
           </TableBody>
         </Table>
-      </div>
-    </div>
+    </DataTable.Wrapper>
   );
 }

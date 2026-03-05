@@ -26,6 +26,14 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'Ongeldige logingegevens' }, { status: 401 });
       }
 
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          loginCount: { increment: 1 },
+          lastLoginAt: new Date(),
+        },
+      });
+
       await setSession({
         id: user.id,
         email: user.email,

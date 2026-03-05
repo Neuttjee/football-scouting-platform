@@ -14,6 +14,7 @@ export function Sidebar({ role, clubName, clubLogo }: SidebarProps) {
   const pathname = usePathname();
 
   const navItems = [
+    ...(role === 'SUPERADMIN' ? [{ href: '/superadmin', label: 'Superadmin' }] : []),
     { href: '/dashboard', label: 'Dashboard' },
     { href: '/players', label: 'Spelers' },
     { href: '/squad-planning', label: 'Selectie planning' },
@@ -21,7 +22,7 @@ export function Sidebar({ role, clubName, clubLogo }: SidebarProps) {
     { href: '/contacts', label: 'Contacten' },
   ];
 
-  if (role === 'ADMIN') {
+  if (role === 'ADMIN' || role === 'SUPERADMIN') {
     navItems.push({ href: '/settings', label: 'Instellingen' });
   }
 
