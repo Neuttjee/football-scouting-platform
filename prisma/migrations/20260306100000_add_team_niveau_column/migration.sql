@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Team" ADD COLUMN IF NOT EXISTS "niveau" TEXT;
