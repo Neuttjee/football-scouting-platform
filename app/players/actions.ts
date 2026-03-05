@@ -49,14 +49,16 @@ async function savePlayerLogic(playerId: string | null, formData: FormData) {
 
   let resolvedTeamId: string | null = null;
   let resolvedTeamName: string | null = team || null;
+  let resolvedNiveau: string | null = niveau;
   if (teamIdInput) {
     const selectedTeam = await prisma.team.findFirst({
       where: { id: teamIdInput, clubId: session.user.clubId },
-      select: { id: true, name: true, code: true },
+      select: { id: true, name: true, code: true, niveau: true },
     });
     if (selectedTeam) {
       resolvedTeamId = selectedTeam.id;
       resolvedTeamName = selectedTeam.code || selectedTeam.name;
+      resolvedNiveau = selectedTeam.niveau || niveau;
     }
   }
 
@@ -107,7 +109,7 @@ async function savePlayerLogic(playerId: string | null, formData: FormData) {
         status: statusInput, // direct uit formulier
         currentClub,
         advies,
-        niveau,
+        niveau: resolvedNiveau,
         contactPerson,
         notes,
       },
@@ -135,7 +137,7 @@ async function savePlayerLogic(playerId: string | null, formData: FormData) {
         status: statusInput, // direct uit formulier
         currentClub,
         advies,
-        niveau,
+        niveau: resolvedNiveau,
         contactPerson,
         notes,
         clubId: session.user.clubId,
@@ -160,7 +162,6 @@ export async function updatePlayer(playerId: string, formData: FormData) {
 export async function updatePlayerProfile(playerId: string, formData: FormData) {
   await savePlayerLogic(playerId, formData);
   revalidatePath(`/players/${playerId}/profile`);
-  redirect(`/players/${playerId}/profile`);
 }
 
 export async function updatePlayerField(

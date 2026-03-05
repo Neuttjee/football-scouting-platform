@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -51,6 +52,7 @@ export function EditPlayerModal({
   teams: TeamOption[]
 }) {
   const [open, setOpen] = React.useState(false)
+  const router = useRouter()
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -93,6 +95,7 @@ export function EditPlayerModal({
           // clubName kun je doorgeven vanuit de page als je die beschikbaar maakt
           onSubmit={async (fd) => {
             await updatePlayerProfile(player.id, fd);
+            router.refresh();
             setOpen(false);
           }}
         />

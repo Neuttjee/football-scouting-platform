@@ -44,6 +44,7 @@ type TeamOption = {
   id: string;
   name: string;
   code: string | null;
+  niveau?: string | null;
 };
 
 type ClubUser = {
@@ -103,7 +104,7 @@ export function PlayersPageClient({
 
         {/* Rechts: nieuwe speler button in beide views */}
         <div className="justify-self-end">
-          <NewPlayerModal teams={teams} />
+          <NewPlayerModal teams={teams} clubName={clubName} />
         </div>
       </div>
 

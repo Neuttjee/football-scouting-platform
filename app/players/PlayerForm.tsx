@@ -10,6 +10,7 @@ type TeamOption = {
   id: string;
   name: string;
   code: string | null;
+  niveau?: string | null;
 };
 
 // Dit is EditablePlayer, maar alle velden optioneel omdat we ook "new" doen.
@@ -57,9 +58,14 @@ export function PlayerForm({
   const [playerType, setPlayerType] = React.useState<PlayerTypeValue>(
     initialValues.type === "INTERNAL" ? "INTERNAL" : "EXTERNAL"
   );
+  const [currentClubValue, setCurrentClubValue] = React.useState(
+    initialValues.currentClub || ""
+  );
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    // Alleen vanaf stap 2 echt opslaan, om per ongeluk submitten op stap 1 te voorkomen
+    if (step !== 2) return;
     const fd = new FormData(e.currentTarget);
     // zorg dat type altijd goed meegaat
     fd.set("type", playerType);
@@ -71,6 +77,16 @@ export function PlayerForm({
     isInternal
       ? (clubName || initialValues.currentClub || "")
       : (initialValues.currentClub || "");
+
+  React.useEffect(() => {
+    if (isInternal) {
+      setCurrentClubValue(clubName || initialValues.currentClub || "");
+    }
+  }, [isInternal, clubName, initialValues.currentClub]);
+
+  const [selectedTeamId, setSelectedTeamId] = React.useState<string | null>(
+    (initialValues.teamId as string | null) ?? null
+  );
 
   // Helpers voor seizoens-dropdowns (intern)
   const today = new Date();
@@ -204,20 +220,41 @@ export function PlayerForm({
           <input
             type="text"
             name="currentClub"
-            defaultValue={currentClubLabel}
-            className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
+            value={currentClubValue}
+            onChange={(e) => setCurrentClubValue(e.target.value)}
+            readOnly={isInternal}
+            className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none read-only:opacity-80 read-only:cursor-not-allowed"
           />
         </div>
         <div>
           <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
-            Team (Huidig)
+            Team (Huidig){isInternal && " *"}
           </label>
-          <input
-            type="text"
-            name="team"
-            defaultValue={initialValues.team || ""}
-            className="w-full border border-border-dark rounded p-2 bg-background focus-border-accent-primary focus-visible:outline-none"
-          />
+          {isInternal ? (
+            <select
+              name="teamId"
+              value={selectedTeamId ?? ""}
+              onChange={(e) =>
+                setSelectedTeamId(e.target.value ? e.target.value : null)
+              }
+              required
+              className="w-full border border-border-dark rounded p-2 bg-background text-text-primary focus-border-accent-primary focus-visible:outline-none"
+            >
+              <option value="">Selecteer team...</option>
+              {teams.map((team) => (
+                <option key={team.id} value={team.id}>
+                  {team.code || team.name}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <input
+              type="text"
+              name="team"
+              defaultValue={initialValues.team || ""}
+              className="w-full border border-border-dark rounded p-2 bg-background focus-border-accent-primary focus-visible:outline-none"
+            />
+          )}
         </div>
 
         {/* Rij 2: Niveau / Beste positie */}
@@ -225,12 +262,26 @@ export function PlayerForm({
           <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
             Niveau (Huidig)
           </label>
-          <input
-            type="text"
-            name="niveau"
-            defaultValue={initialValues.niveau || ""}
-            className="w-full border border-border-dark rounded p-2 bg-background focus-border-accent-primary focus-visible:outline-none"
-          />
+          {isInternal ? (
+            <input
+              type="text"
+              name="niveau"
+              value={
+                teams.find((t) => t.id === selectedTeamId)?.niveau ||
+                initialValues.niveau ||
+                ""
+              }
+              readOnly
+              className="w-full border border-border-dark rounded p-2 bg-background focus-border-accent-primary focus-visible:outline-none read-only:opacity-80 read-only:cursor-not-allowed"
+            />
+          ) : (
+            <input
+              type="text"
+              name="niveau"
+              defaultValue={initialValues.niveau || ""}
+              className="w-full border border-border-dark rounded p-2 bg-background focus-border-accent-primary focus-visible:outline-none"
+            />
+          )}
         </div>
         <div>
           <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
@@ -303,6 +354,16 @@ export function PlayerForm({
           step === 2 ? "" : "hidden"
         }`}
       >
+        {/* Context: spelernaam bovenaan stap 2 */}
+        <div className="md:col-span-2">
+          <div className="text-text-muted uppercase tracking-wider text-[11px] mb-0.5">
+            Speler
+          </div>
+          <div className="font-medium text-sm text-text-primary">
+            {initialValues.name || "-"}
+          </div>
+        </div>
+
         {/* Extern: Status / Processtap / Advies */}
         {!isInternal && (
           <>
@@ -435,7 +496,7 @@ export function PlayerForm({
             </span>
             <Button
               type="button"
-              className="btn-premium text-white"
+              className="px-3 py-1.5 rounded border border-accent-primary text-accent-primary text-xs md:text-sm bg-transparent hover:bg-accent-primary/10 transition-colors"
               onClick={() => setStep(2)}
             >
               Volgende

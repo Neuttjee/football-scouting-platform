@@ -80,7 +80,7 @@ export default async function PlayersPage() {
     (prisma as any).team.findMany({
       where: { clubId: session.user.clubId, isActive: true },
       orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }],
-      select: { id: true, name: true, code: true },
+      select: { id: true, name: true, code: true, niveau: true },
     }),
     prisma.club.findUnique({
       where: { id: session.user.clubId },

@@ -123,12 +123,13 @@ export async function updateAgingThreshold(agingThreshold: number) {
   revalidatePath('/squad-planning');
 }
 
-export async function createTeam(name: string, code: string | null) {
+export async function createTeam(name: string, code: string | null, niveau: string | null) {
   const session = await getSession();
   if (!session || session.user.role !== 'ADMIN') throw new Error('Unauthorized');
 
   const cleanedName = name?.trim();
   if (!cleanedName) throw new Error('Teamnaam is verplicht');
+  const cleanedNiveau = niveau?.trim() || null;
 
   const maxOrder = await (prisma as any).team.aggregate({
     where: { clubId: session.user.clubId },
@@ -139,10 +140,27 @@ export async function createTeam(name: string, code: string | null) {
     data: {
       name: cleanedName,
       code: code?.trim() ? code.trim() : null,
+      niveau: cleanedNiveau,
       clubId: session.user.clubId,
       displayOrder: (maxOrder._max.displayOrder ?? -1) + 1,
       isActive: true,
     },
+  });
+
+  revalidatePath('/settings');
+  revalidatePath('/players');
+  revalidatePath('/squad-planning');
+}
+
+export async function updateTeamNiveau(teamId: string, niveau: string | null) {
+  const session = await getSession();
+  if (!session || session.user.role !== 'ADMIN') throw new Error('Unauthorized');
+
+  const cleaned = niveau?.trim() || null;
+
+  await (prisma as any).team.update({
+    where: { id: teamId, clubId: session.user.clubId },
+    data: { niveau: cleaned },
   });
 
   revalidatePath('/settings');

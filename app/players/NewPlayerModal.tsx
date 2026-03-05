@@ -18,7 +18,7 @@ type TeamOption = {
   code: string | null
 }
 
-export function NewPlayerModal({ teams }: { teams: TeamOption[] }) {
+export function NewPlayerModal({ teams, clubName }: { teams: TeamOption[]; clubName: string | null }) {
   const [open, setOpen] = React.useState(false)
 
   const handleSubmit = async (fd: FormData) => {
@@ -47,7 +47,7 @@ export function NewPlayerModal({ teams }: { teams: TeamOption[] }) {
             name: "",
             dateOfBirth: null,
             age: null,
-            currentClub: null,
+            currentClub: clubName,
             team: null,
             teamId: null,
             joinedAt: null,
@@ -66,6 +66,7 @@ export function NewPlayerModal({ teams }: { teams: TeamOption[] }) {
             notes: null,
           }}
           teams={teams}
+          clubName={clubName}
           onSubmit={handleSubmit}
         />
       </DialogContent>

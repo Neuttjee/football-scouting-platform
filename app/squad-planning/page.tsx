@@ -20,6 +20,7 @@ export default async function SquadPlanningServerPage() {
         id: true,
         name: true,
         code: true,
+        niveau: true,
         displayOrder: true,
         isActive: true,
       },

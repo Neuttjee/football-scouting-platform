@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { createTeam, moveTeam, setTeamActive, updateAgingThreshold } from "./actions";
+import { createTeam, moveTeam, setTeamActive, updateAgingThreshold, updateTeamNiveau } from "./actions";
 import { Button } from "@/components/ui/button";
 
 type Team = {
@@ -10,6 +10,7 @@ type Team = {
   code: string | null;
   isActive: boolean;
   displayOrder: number;
+  niveau?: string | null;
 };
 
 export function TeamSettingsForm({
@@ -22,15 +23,17 @@ export function TeamSettingsForm({
   const [pending, startTransition] = React.useTransition();
   const [name, setName] = React.useState("");
   const [code, setCode] = React.useState("");
+  const [niveau, setNiveau] = React.useState("");
   const [threshold, setThreshold] = React.useState(String(agingThreshold || 30));
 
   const onCreateTeam = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!name.trim()) return;
     startTransition(async () => {
-      await createTeam(name, code || null);
+      await createTeam(name, code || null, niveau || null);
       setName("");
       setCode("");
+      setNiveau("");
     });
   };
 
@@ -72,7 +75,7 @@ export function TeamSettingsForm({
           Teams
         </h3>
 
-        <form onSubmit={onCreateTeam} className="grid grid-cols-1 md:grid-cols-4 gap-3">
+        <form onSubmit={onCreateTeam} className="grid grid-cols-1 md:grid-cols-5 gap-3">
           <input
             type="text"
             placeholder="Teamnaam (bijv. Onder 23)"
@@ -85,6 +88,13 @@ export function TeamSettingsForm({
             placeholder="Code (bijv. O23)"
             value={code}
             onChange={(e) => setCode(e.target.value)}
+            className="border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
+          />
+          <input
+            type="text"
+            placeholder="Niveau (bijv. Hoofdklasse)"
+            value={niveau}
+            onChange={(e) => setNiveau(e.target.value)}
             className="border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
           />
           <Button type="submit" className="btn-premium text-white" disabled={pending}>
@@ -101,13 +111,25 @@ export function TeamSettingsForm({
                 key={team.id}
                 className="border border-border-dark rounded-lg px-3 py-2 flex items-center justify-between bg-bg-secondary/40"
               >
-                <div>
+                <div className="flex flex-col gap-1">
                   <p className="text-sm text-text-primary font-medium">
                     {team.code ? `${team.code} - ${team.name}` : team.name}
                   </p>
-                  <p className="text-xs text-text-muted">
-                    {team.isActive ? "Actief" : "Inactief"}
-                  </p>
+                  <div className="flex flex-wrap items-center gap-2 text-xs text-text-muted">
+                    <span>{team.isActive ? "Actief" : "Inactief"}</span>
+                    <span className="w-1 h-1 rounded-full bg-border-dark" />
+                    <span>Niveau:</span>
+                    <input
+                      type="text"
+                      defaultValue={team.niveau || ""}
+                      className="border border-border-dark rounded px-2 py-1 bg-bg-primary text-text-primary text-xs focus:border-accent-primary focus-visible:outline-none"
+                      onBlur={(e) =>
+                        startTransition(async () => {
+                          await updateTeamNiveau(team.id, e.target.value || null);
+                        })
+                      }
+                    />
+                  </div>
                 </div>
 
                 <div className="flex items-center gap-2">
