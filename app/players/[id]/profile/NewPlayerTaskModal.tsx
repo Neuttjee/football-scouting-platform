@@ -9,8 +9,9 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { createTask } from "@/app/tasks/actions";
 import { Plus } from "lucide-react";
+import { TaskForm } from "@/app/tasks/TaskForm";
+import { createTask } from "@/app/tasks/actions";
 
 export function NewPlayerTaskModal({
     playerId,
@@ -22,22 +23,11 @@ export function NewPlayerTaskModal({
     clubUsers: { id: string; name: string }[];
   }) {
     const [open, setOpen] = React.useState(false);
-    const [assigneeType, setAssigneeType] = React.useState<"none" | "user" | "external">("none");
-    const [selectedUserId, setSelectedUserId] = React.useState<string>("");
-    const [externalName, setExternalName] = React.useState<string>("");
-  
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-      const formData = new FormData(e.currentTarget);
-      formData.append("playerId", playerId);
-  
-      if (assigneeType === "user" && selectedUserId) {
-        formData.append("assignedToId", selectedUserId);
-      } else if (assigneeType === "external" && externalName.trim()) {
-        formData.append("assignedToExternalName", externalName.trim());
-      }
-  
-      await createTask(formData);
+
+    const handleSubmit = async (fd: FormData) => {
+      // speler is hier altijd bekend en gelockt
+      fd.set("playerId", playerId);
+      await createTask(fd);
       setOpen(false);
     };
 
@@ -56,91 +46,13 @@ export function NewPlayerTaskModal({
         <DialogHeader>
           <DialogTitle>Nieuwe taak voor {playerName}</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4 py-4">
-        <div className="space-y-4">
-            <div>
-              <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
-                Taak omschrijving *
-              </label>
-              <input
-                type="text"
-                name="title"
-                required
-                className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
-                Deadline
-              </label>
-              <input
-                type="date"
-                name="dueDate"
-                className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
-              />
-            </div>
-
-            <div className="md:col-span-2 space-y-2">
-              <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
-                Toewijzen aan
-              </label>
-              <select
-                className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
-                value={
-                  assigneeType === "user"
-                    ? selectedUserId || ""
-                    : assigneeType === "external"
-                    ? "external"
-                    : "none"
-                }
-                onChange={(e) => {
-                  const val = e.target.value;
-                  if (val === "none") {
-                    setAssigneeType("none");
-                    setSelectedUserId("");
-                    setExternalName("");
-                  } else if (val === "external") {
-                    setAssigneeType("external");
-                    setSelectedUserId("");
-                  } else {
-                    setAssigneeType("user");
-                    setSelectedUserId(val);
-                    setExternalName("");
-                  }
-                }}
-              >
-                <option value="none">Niet toegewezen</option>
-                {clubUsers.map((u) => (
-                  <option key={u.id} value={u.id}>
-                    {u.name}
-                  </option>
-                ))}
-                <option value="external">Ander (naam typen)</option>
-              </select>
-
-              {assigneeType === "external" && (
-                <div className="space-y-2">
-                  <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
-                    Toewijzen (Extern)
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Naam externe persoon"
-                    className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
-                    value={externalName}
-                    onChange={(e) => setExternalName(e.target.value)}
-                  />
-                </div>
-              )}
-            </div>
-          </div>
-          <div className="pt-4 flex justify-end">
-            <Button type="submit" className="btn-premium text-white">
-              Opslaan
-            </Button>
-          </div>
-        </form>
+        <TaskForm
+          clubUsers={clubUsers}
+          initialPlayer={{ id: playerId, name: playerName }}
+          lockPlayer={true}
+          onSubmit={handleSubmit}
+          submitLabel="Opslaan"
+        />
       </DialogContent>
     </Dialog>
   );

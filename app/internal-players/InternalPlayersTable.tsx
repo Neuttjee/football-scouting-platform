@@ -43,6 +43,7 @@ type InternalPlayer = {
   joinedAt: Date | null;
   contractEndDate: Date | null;
   isTopTalent: boolean;
+  distanceFromClubKm: number | null;
 };
 
 type Props = {
@@ -158,6 +159,19 @@ const INTERNAL_COLUMNS: ColumnDef<InternalPlayer>[] = [
       return (
         <span className="text-text-secondary">
           {value ? new Date(value).toLocaleDateString("nl-NL") : "-"}
+        </span>
+      );
+    },
+  },
+  {
+    accessorKey: "distanceFromClubKm",
+    header: "Afstand tot club (km)",
+    filterFn: "arrIncludesSome",
+    cell: ({ row }) => {
+      const value = row.original.distanceFromClubKm;
+      return (
+        <span className="text-text-secondary">
+          {typeof value === "number" ? `${value.toFixed(1)} km` : "-"}
         </span>
       );
     },

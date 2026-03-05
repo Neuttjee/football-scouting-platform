@@ -18,6 +18,7 @@ type InternalPlayer = {
   joinedAt: Date | null;
   contractEndDate: Date | null;
   isTopTalent: boolean;
+  distanceFromClubKm: number | null;
 };
 
 type TeamOption = {

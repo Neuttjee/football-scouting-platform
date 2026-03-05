@@ -54,6 +54,7 @@ type InternalPlayerForPage = {
   joinedAt: Date | null;
   contractEndDate: Date | null;
   isTopTalent: boolean;
+  distanceFromClubKm: number | null;
 };
 
 export default async function PlayersPage() {
@@ -126,6 +127,7 @@ export default async function PlayersPage() {
       joinedAt: p.joinedAt,
       contractEndDate: p.contractEndDate,
       isTopTalent: p.isTopTalent,
+      distanceFromClubKm: p.distanceFromClubKm,
     }));
 
   return (

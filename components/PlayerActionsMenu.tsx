@@ -20,6 +20,7 @@ import { updatePlayer } from "@/app/players/actions";
 import { createTask } from "@/app/tasks/actions";
 import { createContact } from "@/app/players/[id]/contacts/actions";
 import { PlayerForm } from "@/app/players/PlayerForm";
+import { TaskForm } from "@/app/tasks/TaskForm";
 
 export interface PlayerForActions {
   id: string;
@@ -148,6 +149,27 @@ export function PlayerActionsMenu({
             teams={[]}
             clubName={clubName}
             onSubmit={handleEditSubmit}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* Nieuwe taak vanuit tabel, met speler gelocked */}
+      <Dialog open={openTask} onOpenChange={setOpenTask}>
+        <DialogContent className="max-w-xl bg-bg-card border-accent-primary text-text-primary shadow-[0_0_15px_rgba(var(--primary-rgb),0.3)]">
+          <DialogHeader>
+            <DialogTitle>Nieuwe taak voor {player.name}</DialogTitle>
+          </DialogHeader>
+          <TaskForm
+            clubUsers={clubUsers}
+            initialPlayer={{ id: player.id, name: player.name }}
+            lockPlayer={true}
+            onSubmit={async (fd) => {
+              fd.set("playerId", player.id);
+              await createTask(fd);
+              setOpenTask(false);
+              router.refresh();
+            }}
+            submitLabel="Opslaan"
           />
         </DialogContent>
       </Dialog>
