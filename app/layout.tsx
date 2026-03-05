@@ -7,7 +7,7 @@ import { Sidebar } from '@/components/Sidebar';
 import { MobileNav } from '@/components/MobileNav';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { Topbar } from '@/components/Topbar';
-import { hexToRgb, sanitizePrimaryColor } from '@/lib/branding';
+import { hexToRgb, sanitizePrimaryColor, DEFAULT_PRIMARY_COLOR } from '@/lib/branding';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 const jetbrainsMono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono' });
@@ -31,7 +31,10 @@ export default async function RootLayout({
     });
   }
 
-  const primaryColor = sanitizePrimaryColor(club?.primaryColor);
+  const primaryColor =
+    session?.user?.role === 'SUPERADMIN'
+      ? DEFAULT_PRIMARY_COLOR
+      : sanitizePrimaryColor(club?.primaryColor);
 
   // Whitelabel styling variables
   const customStyles = {
