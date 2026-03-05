@@ -11,12 +11,6 @@ export default async function TasksPage() {
     where: { clubId: session.user.clubId, isActive: true }
   });
 
-  const players = await prisma.player.findMany({
-    where: { clubId: session.user.clubId },
-    orderBy: { name: 'asc' },
-    select: { id: true, name: true }
-  });
-
   const tasks = await prisma.task.findMany({
     where: { clubId: session.user.clubId },
     orderBy: [
@@ -30,7 +24,7 @@ export default async function TasksPage() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Taken</h1>
-        <NewTaskModal clubUsers={clubUsers} players={players} />
+        <NewTaskModal clubUsers={clubUsers} />
       </div>
 
       <div className="bg-transparent">
