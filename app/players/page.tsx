@@ -16,6 +16,7 @@ type PlayerWithRelations = {
     code: string | null;
     isActive: boolean;
     displayOrder: number;
+    niveau?: string | null;
   } | null;
   position: string | null;
   secondaryPosition: string | null;
@@ -27,6 +28,7 @@ type PlayerWithRelations = {
   status: string | null;
   currentClub: string | null;
   advies: string | null;
+  niveau: string | null;
   notes: string | null;
   joinedAt: Date | null;
   contractEndDate: Date | null;
@@ -69,7 +71,7 @@ export default async function PlayersPage() {
 
   const playerInclude = {
     teamRef: {
-      select: { id: true, name: true, code: true, isActive: true, displayOrder: true },
+      select: { id: true, name: true, code: true, isActive: true, displayOrder: true, niveau: true },
     },
   } as const;
 
@@ -109,6 +111,7 @@ export default async function PlayersPage() {
       status: p.status,
       currentClub: p.currentClub,
       team: p.team,
+      niveau: p.niveau,
       secondaryPosition: p.secondaryPosition,
       preferredFoot: p.preferredFoot,
       dateOfBirth: p.dateOfBirth,

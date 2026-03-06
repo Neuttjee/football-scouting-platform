@@ -33,7 +33,9 @@ import { targetSteps, targetStatuses, adviesOptions } from "@/lib/statusMapping"
 import { calculateAgeFromDate } from "@/lib/age"
 import { PlayerActionsMenu, PlayerForActions } from "@/components/PlayerActionsMenu";
 
-interface Player extends PlayerForActions {}
+interface Player extends PlayerForActions {
+  niveau: string | null;
+}
 
 const STATUS_OPTIONS = targetStatuses;
 const STEP_OPTIONS = targetSteps;
@@ -154,9 +156,25 @@ export function getColumns(clubUsers: any[], clubName: string | null): ColumnDef
     },
     {
       accessorKey: "team",
-      header: "Team",
+      header: "Team (huidig)",
       filterFn: "arrIncludesSome",
       cell: ({ row }) => <span className="text-text-secondary">{row.getValue("team") || "-"}</span>,
+    },
+    {
+      accessorKey: "niveau",
+      header: "Niveau (huidig)",
+      filterFn: "arrIncludesSome",
+      cell: ({ row }) => {
+        const player = row.original;
+        return (
+          <InlineInput
+            value={player.niveau}
+            onChange={async (val) => {
+              await updatePlayerField(player.id, 'niveau', val)
+            }}
+          />
+        );
+      },
     },
     {
       accessorKey: "position",

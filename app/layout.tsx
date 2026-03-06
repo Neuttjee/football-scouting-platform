@@ -49,9 +49,9 @@ export default async function RootLayout({
   }
 
   const primaryColor =
-    session?.user?.role === 'SUPERADMIN'
-      ? DEFAULT_PRIMARY_COLOR
-      : sanitizePrimaryColor(club?.primaryColor);
+    club?.primaryColor
+      ? sanitizePrimaryColor(club.primaryColor)
+      : DEFAULT_PRIMARY_COLOR;
 
   // Whitelabel styling variables
   const customStyles = {

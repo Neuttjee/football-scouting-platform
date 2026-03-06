@@ -15,6 +15,7 @@ type ExternalPlayer = {
   status: string | null;
   currentClub: string | null;
   team: string | null;
+  niveau: string | null;
   secondaryPosition: string | null;
   preferredFoot: string | null;
   dateOfBirth: Date | null;
