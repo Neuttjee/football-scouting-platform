@@ -98,9 +98,14 @@ export function EditPlayerModal({
           teams={teams}
           // clubName kun je doorgeven vanuit de page als je die beschikbaar maakt
           onSubmit={async (fd) => {
-            await updatePlayerProfile(player.id, fd);
-            router.refresh();
             setOpen(false);
+            try {
+              await updatePlayerProfile(player.id, fd);
+              router.refresh();
+            } catch (e) {
+              const digest = e && typeof e === "object" && "digest" in e ? String((e as { digest?: string }).digest) : ""
+              if (digest.startsWith("NEXT_REDIRECT")) throw e
+            }
           }}
         />
       </DialogContent>

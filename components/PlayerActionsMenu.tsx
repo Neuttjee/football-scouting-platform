@@ -57,9 +57,15 @@ export function PlayerActionsMenu({
   const [openDelete, setOpenDelete] = React.useState(false);
 
     const handleEditSubmit = async (fd: FormData) => {
-      await updatePlayer(player.id, fd);
       setOpenEdit(false);
-      router.refresh();
+      try {
+        await updatePlayer(player.id, fd);
+        router.refresh();
+      } catch (e) {
+        // negeer NEXT_REDIRECT
+        const digest = e && typeof e === "object" && "digest" in e ? String((e as { digest?: string }).digest) : ""
+        if (digest.startsWith("NEXT_REDIRECT")) throw e
+      }
     };
 
   const handleDelete = async () => {

@@ -64,8 +64,14 @@ export function PlayerForm({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    
     // Alleen vanaf stap 2 echt opslaan, om per ongeluk submitten op stap 1 te voorkomen
     if (step !== 2) return;
+
+    // Voorkom dat de form meerdere keren triggert bij een enkele klik op de submit knop.
+    const submitter = (e.nativeEvent as SubmitEvent).submitter as HTMLButtonElement | null;
+    if (submitter && submitter.type !== 'submit') return;
+
     const fd = new FormData(e.currentTarget);
     // zorg dat type altijd goed meegaat
     fd.set("type", playerType);
@@ -87,20 +93,6 @@ export function PlayerForm({
   const [selectedTeamId, setSelectedTeamId] = React.useState<string | null>(
     (initialValues.teamId as string | null) ?? null
   );
-  const step2Ref = React.useRef<HTMLDivElement>(null);
-
-  // Houd focus in de dialog bij overgang naar stap 2 (voorkomt dat Radix de modal sluit)
-  React.useEffect(() => {
-    if (step === 2 && step2Ref.current) {
-      // setTimeout om te zorgen dat de DOM is geüpdatet en we geen rare focus-blur issues krijgen
-      setTimeout(() => {
-        const first = step2Ref.current?.querySelector<HTMLElement>(
-          'button, input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        );
-        first?.focus({ preventScroll: true });
-      }, 50);
-    }
-  }, [step]);
 
   // Helpers voor seizoens-dropdowns (intern)
   const today = new Date();
@@ -364,7 +356,6 @@ export function PlayerForm({
 
       {/* Stap 2: type-specifiek + notities */}
       <div
-        ref={step2Ref}
         className={`grid grid-cols-1 md:grid-cols-2 gap-4 ${
           step === 2 ? "" : "hidden"
         }`}
@@ -512,7 +503,7 @@ export function PlayerForm({
             <Button
               type="button"
               className="px-3 py-1.5 rounded border border-accent-primary text-accent-primary text-xs md:text-sm bg-transparent hover:bg-accent-primary/10 transition-colors"
-              onClick={() => setStep(2)}
+              onClick={(e) => { e.preventDefault(); setStep(2); }}
             >
               Volgende
             </Button>
@@ -522,7 +513,7 @@ export function PlayerForm({
             <button
               type="button"
               className="px-3 py-1.5 rounded border border-accent-primary text-accent-primary text-xs md:text-sm bg-transparent hover:bg-accent-primary/10 transition-colors"
-              onClick={() => setStep(1)}
+              onClick={(e) => { e.preventDefault(); setStep(1); }}
             >
               Vorige
             </button>

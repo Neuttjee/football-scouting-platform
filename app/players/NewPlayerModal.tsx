@@ -24,13 +24,15 @@ export function NewPlayerModal({ teams, clubName }: { teams: TeamOption[]; clubN
 
   const handleSubmit = async (fd: FormData) => {
     setError(null)
+    setOpen(false) // Sluit de modal direct, zodat dubbelklikken onmogelijk is en redirect foutloos werkt
     try {
       await createPlayer(fd)
-      setOpen(false)
     } catch (e) {
       // Next.js redirect() gooit een error; die doorlaten zodat de redirect werkt
       const digest = e && typeof e === "object" && "digest" in e ? String((e as { digest?: string }).digest) : ""
       if (digest.startsWith("NEXT_REDIRECT")) throw e
+      
+      setOpen(true) // Heropen bij echte fout
       const message = e instanceof Error ? e.message : "Er is iets misgegaan. Probeer het opnieuw."
       setError(message)
     }
@@ -39,6 +41,10 @@ export function NewPlayerModal({ teams, clubName }: { teams: TeamOption[]; clubN
   const handleOpenChange = (next: boolean) => {
     if (!next) setError(null)
     setOpen(next)
+  }
+
+  const handleFormSubmit = async (fd: FormData) => {
+    await handleSubmit(fd);
   }
 
   return (
@@ -88,7 +94,7 @@ export function NewPlayerModal({ teams, clubName }: { teams: TeamOption[]; clubN
           }}
           teams={teams}
           clubName={clubName}
-          onSubmit={handleSubmit}
+          onSubmit={handleFormSubmit}
         />
       </DialogContent>
     </Dialog>
