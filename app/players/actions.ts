@@ -165,6 +165,19 @@ export async function updatePlayerProfile(playerId: string, formData: FormData) 
   revalidatePath(`/players/${playerId}/profile`);
 }
 
+export async function deletePlayer(playerId: string) {
+  const session = await getSession();
+  if (!session) throw new Error("Unauthorized");
+  const clubId = getEffectiveClubId(session);
+  if (!clubId) throw new Error('Geen club geselecteerd');
+
+  await prisma.player.delete({
+    where: { id: playerId, clubId },
+  });
+
+  revalidatePath("/players");
+}
+
 export async function updatePlayerField(
   playerId: string,
   field: string,

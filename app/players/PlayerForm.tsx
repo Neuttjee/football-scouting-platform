@@ -92,10 +92,13 @@ export function PlayerForm({
   // Houd focus in de dialog bij overgang naar stap 2 (voorkomt dat Radix de modal sluit)
   React.useEffect(() => {
     if (step === 2 && step2Ref.current) {
-      const first = step2Ref.current.querySelector<HTMLElement>(
-        'button, input, select, textarea, [tabindex]:not([tabindex="-1"])'
-      );
-      first?.focus({ preventScroll: true });
+      // setTimeout om te zorgen dat de DOM is geüpdatet en we geen rare focus-blur issues krijgen
+      setTimeout(() => {
+        const first = step2Ref.current?.querySelector<HTMLElement>(
+          'button, input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        first?.focus({ preventScroll: true });
+      }, 50);
     }
   }, [step]);
 
@@ -234,7 +237,7 @@ export function PlayerForm({
             value={currentClubValue}
             onChange={(e) => setCurrentClubValue(e.target.value)}
             readOnly={isInternal}
-            className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none read-only:opacity-80 read-only:cursor-not-allowed"
+            className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none read-only:opacity-60 read-only:text-text-muted read-only:bg-bg-secondary read-only:cursor-not-allowed"
           />
         </div>
         <div>
@@ -283,7 +286,7 @@ export function PlayerForm({
                 ""
               }
               readOnly
-              className="w-full border border-border-dark rounded p-2 bg-background focus-border-accent-primary focus-visible:outline-none read-only:opacity-80 read-only:cursor-not-allowed"
+              className="w-full border border-border-dark rounded p-2 bg-background focus-border-accent-primary focus-visible:outline-none read-only:opacity-60 read-only:text-text-muted read-only:bg-bg-secondary read-only:cursor-not-allowed"
             />
           ) : (
             <input

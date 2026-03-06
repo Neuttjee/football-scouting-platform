@@ -68,7 +68,7 @@ export function NewPlayerModal({ teams, clubName }: { teams: TeamOption[]; clubN
             name: "",
             dateOfBirth: null,
             age: null,
-            currentClub: clubName,
+            currentClub: null,
             team: null,
             teamId: null,
             joinedAt: null,

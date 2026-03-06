@@ -16,7 +16,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { updatePlayer } from "@/app/players/actions";
+import { updatePlayer, deletePlayer } from "@/app/players/actions";
 import { createTask } from "@/app/tasks/actions";
 import { createContact } from "@/app/players/[id]/contacts/actions";
 import { PlayerForm } from "@/app/players/PlayerForm";
@@ -54,12 +54,19 @@ export function PlayerActionsMenu({
   const [openEdit, setOpenEdit] = React.useState(false);
   const [openTask, setOpenTask] = React.useState(false);
   const [openContact, setOpenContact] = React.useState(false);
+  const [openDelete, setOpenDelete] = React.useState(false);
 
     const handleEditSubmit = async (fd: FormData) => {
       await updatePlayer(player.id, fd);
       setOpenEdit(false);
       router.refresh();
     };
+
+  const handleDelete = async () => {
+    await deletePlayer(player.id);
+    setOpenDelete(false);
+    router.refresh();
+  };
 
   const handleTask = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -99,6 +106,12 @@ export function PlayerActionsMenu({
           >
             Nieuw contactmoment
           </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => setOpenDelete(true)}
+            className="cursor-pointer focus:bg-red-500/20 focus:text-red-500 text-red-500 text-xs"
+          >
+            Verwijderen
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
@@ -130,7 +143,7 @@ export function PlayerActionsMenu({
               contractEndDate: null,
               distanceFromClubKm: null,
               isTopTalent: false,
-              niveau: null,
+              niveau: player.niveau,
               position: player.position,
               secondaryPosition: player.secondaryPosition,
               favoritePosition: null,
@@ -186,6 +199,36 @@ export function PlayerActionsMenu({
             }}
             submitLabel="Opslaan"
           />
+        </DialogContent>
+      </Dialog>
+
+      {/* Verwijder speler */}
+      <Dialog open={openDelete} onOpenChange={setOpenDelete}>
+        <DialogContent className="max-w-md bg-bg-card border-accent-primary text-text-primary shadow-[0_0_15px_rgba(var(--primary-rgb),0.3)]">
+          <DialogHeader>
+            <DialogTitle>Speler verwijderen</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <p className="text-sm text-text-secondary">
+              Weet je zeker dat je <strong>{player.name}</strong> wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
+            </p>
+            <div className="flex justify-end gap-2 pt-2">
+              <Button
+                variant="outline"
+                className="border-border-dark text-text-primary hover:bg-bg-hover"
+                onClick={() => setOpenDelete(false)}
+              >
+                Annuleren
+              </Button>
+              <Button
+                variant="destructive"
+                className="bg-red-600 hover:bg-red-700 text-white"
+                onClick={handleDelete}
+              >
+                Verwijderen
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
