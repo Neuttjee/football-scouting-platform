@@ -35,7 +35,7 @@ export function Field({
       {/* Maak veld zo breed als de hele kaart */}
       <div className="w-full mx-auto relative rounded-2xl overflow-hidden border border-accent-primary/50 bg-bg-secondary/40 shadow-inner">
         {/* Veldverhouding 68:105 (breedte:lengte) – langer en iets breder */}
-        <div className="relative w-full max-h-[75vh] aspect-[80/105] mx-auto">
+        <div className="relative w-[80%] max-w-[900px] max-h-[75vh] aspect-[68/105] mx-auto">
           {/* Veldlijnen: buitenlijn (iets dunner) */}
           <div className="absolute inset-0 rounded-[6px] border border-accent-primary/80" />
 
@@ -63,7 +63,7 @@ export function Field({
             return (
               <div
                 key={slot.id}
-                className="absolute -translate-x-1/2 -translate-y-1/2 w-32 md:w-40"
+                className="absolute -translate-x-1/2 -translate-y-1/2 w-36 md:w-44"
                 style={{ left: `${slot.x}%`, top: `${slot.y}%` }}
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={(e) => {
@@ -80,7 +80,7 @@ export function Field({
                         return (
                           <div
                             key={idx}
-                            className="h-5 rounded border border-dashed border-border-dark/80 bg-bg-primary/40"
+                            className="h-6 rounded border border-dashed border-border-dark/80 bg-bg-primary/40"
                           />
                         );
                       }
@@ -96,7 +96,7 @@ export function Field({
                         <div
                           key={idx}
                           className={cn(
-                            "h-5 rounded border border-border-dark px-1 flex items-center justify-between text-[10px]",
+                            "h-6 rounded border border-border-dark px-1.5 flex items-center justify-between text-[11px]",
                             expired ? "text-text-muted" : "text-text-primary",
                             "bg-bg-primary/70"
                           )}
