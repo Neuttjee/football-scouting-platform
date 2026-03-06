@@ -31,11 +31,9 @@ export function Field({
   onRemoveFromSlot: (slotId: string, playerId: string) => void;
 }) {
   return (
-    <div className="card-premium rounded-xl p-4">
-      {/* Maak veld zo breed als de hele kaart */}
-      <div className="w-full mx-auto relative rounded-2xl overflow-hidden border border-accent-primary/50 bg-bg-secondary/40 shadow-inner">
-        {/* Veldverhouding 68:105 (breedte:lengte) – langer en iets breder */}
-        <div className="relative w-[80%] max-w-[900px] max-h-[75vh] aspect-[68/105] mx-auto">
+    <div className="card-premium rounded-2xl p-0 overflow-hidden border border-accent-primary/50 bg-bg-secondary/40 shadow-inner w-[80%] max-w-[900px] mx-auto">
+      {/* Veldverhouding 68:105 (breedte:lengte) – langer en iets breder */}
+      <div className="relative w-full max-h-[75vh] aspect-[68/105]">
           {/* Veldlijnen: buitenlijn (iets dunner) */}
           <div className="absolute inset-0 rounded-[6px] border border-accent-primary/80" />
 
@@ -140,7 +138,6 @@ export function Field({
               </div>
             );
           })}
-        </div>
       </div>
     </div>
   );

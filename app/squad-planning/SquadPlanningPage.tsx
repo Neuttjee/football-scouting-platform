@@ -21,10 +21,10 @@ function getSlots(formation: Formation, midfieldVariant: MidfieldVariant): Field
   if (formation === "4-4-2") {
     return [
       { id: "GK", label: "Keeper", x: 50, y: 92, line: "GK" },
-      { id: "RB", label: "Rechtsback", x: 78, y: 76, line: "DEF" },
-      { id: "RCB", label: "Rechter CV", x: 60, y: 76, line: "DEF" },
-      { id: "LCB", label: "Linker CV", x: 40, y: 76, line: "DEF" },
-      { id: "LB", label: "Linksback", x: 22, y: 76, line: "DEF" },
+      { id: "RB", label: "Rechtsback", x: 80, y: 72, line: "DEF" },
+      { id: "RCB", label: "Rechter CV", x: 60, y: 80, line: "DEF" },
+      { id: "LCB", label: "Linker CV", x: 40, y: 80, line: "DEF" },
+      { id: "LB", label: "Linksback", x: 20, y: 72, line: "DEF" },
       { id: "RM", label: "Rechtsmidden", x: 78, y: 55, line: "MID" },
       { id: "CMR", label: "CM rechts", x: 58, y: 55, line: "MID" },
       { id: "CML", label: "CM links", x: 42, y: 55, line: "MID" },
@@ -49,10 +49,10 @@ function getSlots(formation: Formation, midfieldVariant: MidfieldVariant): Field
 
   return [
     { id: "GK", label: "Keeper", x: 50, y: 92, line: "GK" },
-    { id: "RB", label: "Rechtsback", x: 78, y: 76, line: "DEF" },
-    { id: "RCB", label: "Rechter CV", x: 60, y: 76, line: "DEF" },
-    { id: "LCB", label: "Linker CV", x: 40, y: 76, line: "DEF" },
-    { id: "LB", label: "Linksback", x: 22, y: 76, line: "DEF" },
+    { id: "RB", label: "Rechtsback", x: 80, y: 72, line: "DEF" },
+    { id: "RCB", label: "Rechter CV", x: 60, y: 80, line: "DEF" },
+    { id: "LCB", label: "Linker CV", x: 40, y: 80, line: "DEF" },
+    { id: "LB", label: "Linksback", x: 20, y: 72, line: "DEF" },
     ...midfield,
     { id: "RW", label: "Rechtsbuiten", x: 78, y: 18, line: "FWD" },
     { id: "ST", label: "Spits", x: 50, y: 14, line: "FWD" },
