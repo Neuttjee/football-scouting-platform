@@ -87,6 +87,17 @@ export function PlayerForm({
   const [selectedTeamId, setSelectedTeamId] = React.useState<string | null>(
     (initialValues.teamId as string | null) ?? null
   );
+  const step2Ref = React.useRef<HTMLDivElement>(null);
+
+  // Houd focus in de dialog bij overgang naar stap 2 (voorkomt dat Radix de modal sluit)
+  React.useEffect(() => {
+    if (step === 2 && step2Ref.current) {
+      const first = step2Ref.current.querySelector<HTMLElement>(
+        'button, input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      first?.focus({ preventScroll: true });
+    }
+  }, [step]);
 
   // Helpers voor seizoens-dropdowns (intern)
   const today = new Date();
@@ -350,6 +361,7 @@ export function PlayerForm({
 
       {/* Stap 2: type-specifiek + notities */}
       <div
+        ref={step2Ref}
         className={`grid grid-cols-1 md:grid-cols-2 gap-4 ${
           step === 2 ? "" : "hidden"
         }`}
