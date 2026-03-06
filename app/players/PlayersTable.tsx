@@ -164,17 +164,7 @@ export function getColumns(clubUsers: any[], clubName: string | null): ColumnDef
       accessorKey: "niveau",
       header: "Niveau (huidig)",
       filterFn: "arrIncludesSome",
-      cell: ({ row }) => {
-        const player = row.original;
-        return (
-          <InlineInput
-            value={player.niveau}
-            onChange={async (val) => {
-              await updatePlayerField(player.id, 'niveau', val)
-            }}
-          />
-        );
-      },
+      cell: ({ row }) => <span className="text-text-secondary">{row.getValue("niveau") || "-"}</span>,
     },
     {
       accessorKey: "position",
@@ -330,6 +320,11 @@ function Filter({
         </PopoverContent>
       </Popover>
     )
+  }
+
+  // Geen vrij tekst-zoekveld voor niveau-kolom
+  if (column.id === 'niveau') {
+    return null;
   }
 
   return (
