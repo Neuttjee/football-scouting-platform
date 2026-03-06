@@ -61,7 +61,7 @@ export function Field({
             return (
               <div
                 key={slot.id}
-                className="absolute -translate-x-1/2 -translate-y-1/2 w-40 md:w-48"
+                className="absolute -translate-x-1/2 -translate-y-1/2 w-44 md:w-56"
                 style={{ left: `${slot.x}%`, top: `${slot.y}%` }}
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={(e) => {
@@ -70,15 +70,15 @@ export function Field({
                   if (playerId) onDropPlayer(slot.id, playerId);
                 }}
               >
-                <div className="rounded-md border border-white/40 bg-bg-secondary/90 p-1.5 shadow-md backdrop-blur-sm">
-                  <div className="space-y-1">
+                <div className="rounded-md border border-white/40 bg-bg-secondary/90 p-2 shadow-md backdrop-blur-sm">
+                  <div className="space-y-1.5">
                     {Array.from({ length: 2 }, (_, idx) => {
                       const player = playerIds[idx] ? playersById[playerIds[idx]] : null;
                       if (!player) {
                         return (
                           <div
                             key={idx}
-                            className="h-7 rounded border border-dashed border-border-dark/80 bg-bg-primary/40"
+                            className="h-8 rounded border border-dashed border-border-dark/80 bg-bg-primary/40"
                           />
                         );
                       }
@@ -94,7 +94,7 @@ export function Field({
                         <div
                           key={idx}
                           className={cn(
-                            "h-7 rounded border border-border-dark px-1.5 flex items-center justify-between text-xs",
+                            "h-8 rounded border border-border-dark px-2 flex items-center justify-between text-sm",
                             expired ? "text-text-muted" : "text-text-primary",
                             "bg-bg-primary/70"
                           )}
@@ -102,22 +102,22 @@ export function Field({
                           <span className="truncate font-medium">{player.name}</span>
                           <div className="flex items-center gap-0.5 pl-1 shrink-0">
                             {fromFeederTeam && (
-                              <span className="text-[9px] px-1 rounded border border-border-dark text-text-muted">
+                              <span className="text-[10px] px-1.5 rounded border border-border-dark text-text-muted">
                                 {player.teamLabel}
                               </span>
                             )}
                             {isExternal && (
-                              <span className="text-[9px] px-1 rounded border border-border-dark text-text-muted">
+                              <span className="text-[10px] px-1.5 rounded border border-border-dark text-text-muted">
                                 EXT
                               </span>
                             )}
                             {isAging && (
-                              <span className="text-[9px] px-1 rounded border border-accent-primary/40 text-text-muted">
+                              <span className="text-[10px] px-1.5 rounded border border-accent-primary/40 text-text-muted">
                                 +
                               </span>
                             )}
                             {isDouble && (
-                              <span className="text-[9px] px-1 rounded border border-accent-primary/40 text-text-muted">
+                              <span className="text-[10px] px-1.5 rounded border border-accent-primary/40 text-text-muted">
                                 2×
                               </span>
                             )}
