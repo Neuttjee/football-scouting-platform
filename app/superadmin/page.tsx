@@ -28,6 +28,7 @@ export default async function SuperadminPage() {
     return {
       id: club.id,
       name: club.name,
+      status: (club as any).status ?? 'ACTIEF',
       userCount: club._count.users,
       playerCount: club._count.players,
       totalLogins,
@@ -39,10 +40,7 @@ export default async function SuperadminPage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold">Superadmin – Clubs</h1>
-          <p className="text-muted-foreground mt-1">
-            Voeg clubs toe en selecteer een club om spelers, taken en instellingen te bekijken.
-          </p>
+          <h1 className="text-3xl font-bold">Clubs</h1>
         </div>
         <NewClubModal />
       </div>

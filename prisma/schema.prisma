@@ -12,12 +12,20 @@ enum PlayerType {
   EXTERNAL
 }
 
+enum ClubStatus {
+  ACTIEF
+  INACTIEF
+  PROEFPERIODE
+  GESCHORST
+}
+
 model Club {
   id             String          @id @default(uuid())
   name           String
   logo           String?
   primaryColor   String?
   agingThreshold Int             @default(30)
+  status         ClubStatus      @default(ACTIEF)
 
   users          User[]
   teams          Team[]

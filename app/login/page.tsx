@@ -31,7 +31,8 @@ export default function LoginPage() {
       if (!res.ok) {
         setError(data.error || 'Ongeldige inloggegevens of account is inactief.')
       } else {
-        router.push('/dashboard')
+        const nextPath = data?.user?.role === 'SUPERADMIN' ? '/superadmin' : '/dashboard'
+        router.push(nextPath)
         router.refresh()
       }
     } catch (err) {

@@ -14,7 +14,6 @@ export function Sidebar({ role, clubName, clubLogo }: SidebarProps) {
   const pathname = usePathname();
 
   const navItems = [
-    ...(role === 'SUPERADMIN' ? [{ href: '/superadmin', label: 'Superadmin' }] : []),
     { href: '/dashboard', label: 'Dashboard' },
     { href: '/players', label: 'Spelers' },
     { href: '/squad-planning', label: 'Selectie planning' },
@@ -52,7 +51,19 @@ export function Sidebar({ role, clubName, clubLogo }: SidebarProps) {
           );
         })}
       </nav>
-      <div className="p-4">
+      <div className="p-4 space-y-2">
+        {role === 'SUPERADMIN' && (
+          <Link
+            href="/superadmin"
+            className={`relative block pl-3 p-2 rounded transition-colors ${
+              pathname.startsWith('/superadmin')
+                ? 'nav-item-active text-primary-brand font-medium rounded-md'
+                : 'text-text-secondary hover:text-primary-brand hover:bg-bg-hover rounded-md'
+            }`}
+          >
+            Superadmin
+          </Link>
+        )}
         <LogoutButton />
       </div>
     </aside>
