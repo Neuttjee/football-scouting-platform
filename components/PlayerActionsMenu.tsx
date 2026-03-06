@@ -130,7 +130,7 @@ export function PlayerActionsMenu({
               contractEndDate: null,
               distanceFromClubKm: null,
               isTopTalent: false,
-              niveau: player.niveau ?? null,
+              niveau: null,
               position: player.position,
               secondaryPosition: player.secondaryPosition,
               favoritePosition: null,
