@@ -195,6 +195,7 @@ const INTERNAL_COLUMNS: ColumnDef<InternalPlayer>[] = [
         position: p.position,
         currentClub: null,
         team: p.teamLabel,
+        niveau: null,
         secondaryPosition: p.secondaryPosition,
         preferredFoot: p.preferredFoot,
         dateOfBirth: null,
