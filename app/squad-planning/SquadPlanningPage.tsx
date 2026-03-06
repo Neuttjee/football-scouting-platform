@@ -7,6 +7,7 @@ import { AnalyticsPanel } from "./AnalyticsPanel";
 import { Field } from "./Field";
 import { PlayerPicker } from "./PlayerPicker";
 import { FieldSlot, Formation, MidfieldVariant, PlanningPlayer, TeamOption } from "./types";
+import { PlayerTypeToggle, PlayerTypeValue } from "@/components/PlayerTypeToggle";
 import {
   Dialog,
   DialogContent,
@@ -86,7 +87,7 @@ export default function SquadPlanningPage({
 }) {
   const [selectedTeamId, setSelectedTeamId] = React.useState<string | null>(teams[0]?.id ?? null);
   const [includeFeederTeams, setIncludeFeederTeams] = React.useState(true);
-  const [selectedType, setSelectedType] = React.useState<"INTERNAL" | "EXTERNAL">("INTERNAL");
+  const [selectedType, setSelectedType] = React.useState<PlayerTypeValue>("INTERNAL");
   const [seasonYear, setSeasonYear] = React.useState(defaultSeasonYear);
   const [formation, setFormation] = React.useState<Formation>("4-3-3");
   const [midfieldVariant, setMidfieldVariant] = React.useState<MidfieldVariant>("POINT_BACK");
@@ -284,12 +285,12 @@ export default function SquadPlanningPage({
                 className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-border-dark text-xs text-text-secondary hover:text-text-primary hover:bg-bg-primary/60"
               >
                 <Settings className="w-4 h-4" />
-                <span className="hidden sm:inline">Planning instellingen</span>
+                <span className="hidden sm:inline">Instellingen</span>
               </button>
             </DialogTrigger>
-            <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto bg-bg-card border-accent-primary text-text-primary">
+            <DialogContent className="w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-bg-card border-accent-primary text-text-primary">
               <DialogHeader>
-                <DialogTitle>Planning instellingen</DialogTitle>
+                <DialogTitle>Instellingen</DialogTitle>
               </DialogHeader>
               <TeamSettingsForm teams={teams} agingThreshold={agingThreshold} />
             </DialogContent>
@@ -310,11 +311,18 @@ export default function SquadPlanningPage({
           onRemoveFromSlot={removeFromSlot}
         />
 
-        <PlayerPicker
-          players={filteredPlayers}
-          selectedType={selectedType}
-          onTypeChange={setSelectedType}
-        />
+        <div className="space-y-3">
+          <PlayerTypeToggle
+            value={selectedType}
+            onChange={setSelectedType}
+            size="sm"
+          />
+          <PlayerPicker
+            players={filteredPlayers}
+            selectedType={selectedType}
+            onTypeChange={setSelectedType}
+          />
+        </div>
       </div>
 
       {pendingDrop && (

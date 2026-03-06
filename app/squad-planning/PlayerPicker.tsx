@@ -4,6 +4,7 @@ import * as React from "react";
 import { Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PlanningPlayer } from "./types";
+import type { PlayerTypeValue } from "@/components/PlayerTypeToggle";
 
 export function PlayerPicker({
   players,
@@ -11,8 +12,8 @@ export function PlayerPicker({
   onTypeChange,
 }: {
   players: PlanningPlayer[];
-  selectedType: "INTERNAL" | "EXTERNAL";
-  onTypeChange: (type: "INTERNAL" | "EXTERNAL") => void;
+  selectedType: PlayerTypeValue;
+  onTypeChange: (type: PlayerTypeValue) => void;
 }) {
   const [query, setQuery] = React.useState("");
   const [positionFilter, setPositionFilter] = React.useState("");
@@ -50,27 +51,6 @@ export function PlayerPicker({
 
   return (
     <div className="card-premium rounded-xl p-4 space-y-4">
-      <div className="inline-flex items-center gap-2 rounded-full bg-bg-secondary/60 border border-border-dark p-1">
-        {(["INTERNAL", "EXTERNAL"] as const).map((type) => {
-          const active = type === selectedType;
-          return (
-            <button
-              key={type}
-              type="button"
-              onClick={() => onTypeChange(type)}
-              className={cn(
-                "px-3 py-1.5 text-xs font-medium rounded-full transition-colors",
-                active
-                  ? "bg-accent-primary text-primary-foreground shadow-[0_0_10px_rgba(var(--primary-rgb,255,106,0),0.4)]"
-                  : "text-text-muted hover:text-text-primary hover:bg-bg-primary/60"
-              )}
-            >
-              {type === "INTERNAL" ? "Intern" : "Extern"}
-            </button>
-          );
-        })}
-      </div>
-
       <div className="space-y-2">
         <input
           value={query}

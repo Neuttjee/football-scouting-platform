@@ -30,41 +30,40 @@ export function Field({
   onDropPlayer: (slotId: string, playerId: string) => void;
   onRemoveFromSlot: (slotId: string, playerId: string) => void;
 }) {
-  const playerSlotsToShow = 2;
-
   return (
     <div className="card-premium rounded-xl p-4">
-      <div className="w-full max-w-[640px] mx-auto relative rounded-2xl overflow-hidden border-2 border-accent-primary/60 bg-bg-secondary/40 shadow-inner">
-        {/* Veldverhouding 68:105 (breedte:lengte) – langer en smaller, ruimer canvas */}
-        <div className="relative w-full aspect-[68/105]">
-          {/* Veldlijnen: buitenlijn */}
-          <div className="absolute inset-0 rounded-[6px] border-2 border-accent-primary" />
+      {/* Maak veld zo breed als de hele kaart */}
+      <div className="w-full mx-auto relative rounded-2xl overflow-hidden border border-accent-primary/50 bg-bg-secondary/40 shadow-inner">
+        {/* Veldverhouding 68:105 (breedte:lengte) – langer en iets breder */}
+        <div className="relative w-full aspect-[80/105]">
+          {/* Veldlijnen: buitenlijn (iets dunner) */}
+          <div className="absolute inset-0 rounded-[6px] border border-accent-primary/80" />
 
           {/* Middellijn */}
-          <div className="absolute left-0 right-0 top-1/2 h-0 border-t-2 border-accent-primary -translate-y-px" />
+          <div className="absolute left-0 right-0 top-1/2 h-0 border-t border-accent-primary/80 -translate-y-px" />
 
           {/* Cirkel midden */}
-          <div className="absolute left-1/2 top-1/2 w-[22%] aspect-square rounded-full border-2 border-accent-primary -translate-x-1/2 -translate-y-1/2" />
+          <div className="absolute left-1/2 top-1/2 w-[22%] aspect-square rounded-full border border-accent-primary/80 -translate-x-1/2 -translate-y-1/2" />
           <div className="absolute left-1/2 top-1/2 w-1.5 h-1.5 rounded-full bg-accent-primary -translate-x-1/2 -translate-y-1/2" />
 
-          {/* 16m (strafschopgebied) – ca. 15,7% van doellijn */}
-          <div className="absolute left-0 right-0 top-0 h-[15.7%] border-b-2 border-r-2 border-l-2 border-accent-primary rounded-t-[3px]" />
-          <div className="absolute left-0 right-0 bottom-0 h-[15.7%] border-t-2 border-r-2 border-l-2 border-accent-primary rounded-b-[3px]" />
+          {/* 16m (strafgebied) – aan beide korte zijden */}
+          <div className="absolute left-[18%] right-[18%] top-0 h-[16%] border-b border-l border-r border-accent-primary/80 rounded-b-[3px]" />
+          <div className="absolute left-[18%] right-[18%] bottom-0 h-[16%] border-t border-l border-r border-accent-primary/80 rounded-t-[3px]" />
 
-          {/* 5m (doelgebied) – ca. 5,2% */}
-          <div className="absolute left-0 right-0 top-0 h-[5.2%] border-b-2 border-r-2 border-l-2 border-accent-primary/80 rounded-t-[2px]" />
-          <div className="absolute left-0 right-0 bottom-0 h-[5.2%] border-t-2 border-r-2 border-l-2 border-accent-primary/80 rounded-b-[2px]" />
+          {/* 5m (doelgebied) */}
+          <div className="absolute left-[28%] right-[28%] top-0 h-[6%] border-b border-l border-r border-accent-primary/70 rounded-b-[2px]" />
+          <div className="absolute left-[28%] right-[28%] bottom-0 h-[6%] border-t border-l border-r border-accent-primary/70 rounded-t-[2px]" />
 
-          {/* Penaltystip – 10,5% van doellijn, gecentreerd */}
-          <div className="absolute left-1/2 top-[10.5%] w-2 h-2 rounded-full bg-accent-primary -translate-x-1/2 -translate-y-1/2" />
-          <div className="absolute left-1/2 top-[89.5%] w-2 h-2 rounded-full bg-accent-primary -translate-x-1/2 -translate-y-1/2" />
+          {/* Penaltystippen */}
+          <div className="absolute left-1/2 top-[11%] w-2 h-2 rounded-full bg-accent-primary -translate-x-1/2 -translate-y-1/2" />
+          <div className="absolute left-1/2 top-[89%] w-2 h-2 rounded-full bg-accent-primary -translate-x-1/2 -translate-y-1/2" />
 
           {slots.map((slot) => {
             const playerIds = assignments[slot.id] ?? [];
             return (
               <div
                 key={slot.id}
-                className="absolute -translate-x-1/2 -translate-y-1/2 w-32 md:w-36"
+                className="absolute -translate-x-1/2 -translate-y-1/2 w-32 md:w-40"
                 style={{ left: `${slot.x}%`, top: `${slot.y}%` }}
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={(e) => {
@@ -74,8 +73,8 @@ export function Field({
                 }}
               >
                 <div className="rounded-md border border-white/40 bg-bg-secondary/90 p-1.5 shadow-md backdrop-blur-sm">
-                  <div className="space-y-0.5">
-                    {Array.from({ length: playerSlotsToShow }, (_, idx) => {
+                  <div className="space-y-1">
+                    {Array.from({ length: 2 }, (_, idx) => {
                       const player = playerIds[idx] ? playersById[playerIds[idx]] : null;
                       if (!player) {
                         return (
