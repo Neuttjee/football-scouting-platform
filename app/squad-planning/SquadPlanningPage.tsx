@@ -19,20 +19,20 @@ import { TeamSettingsForm } from "../settings/TeamSettingsForm";
 
 const DEF_SLOTS: FieldSlot[] = [
   { id: "GK", label: "Keeper", x: 50, y: 92, line: "GK" },
-  { id: "RB", label: "Rechtsback", x: 80, y: 72, line: "DEF" },
+  { id: "RB", label: "Rechtsback", x: 80, y: 66, line: "DEF" },
   { id: "RCB", label: "Rechter CV", x: 65, y: 80, line: "DEF" },
   { id: "LCB", label: "Linker CV", x: 35, y: 80, line: "DEF" },
-  { id: "LB", label: "Linksback", x: 20, y: 72, line: "DEF" },
+  { id: "LB", label: "Linksback", x: 20, y: 66, line: "DEF" },
 ];
 
 function getSlots(formation: Formation): FieldSlot[] {
   if (formation === "4-4-2_DIAMOND") {
     return [
       ...DEF_SLOTS,
-      { id: "RM", label: "Rechtsmidden", x: 74, y: 50, line: "MID" },
-      { id: "DM", label: "Controlerende 6", x: 50, y: 60, line: "MID" },
-      { id: "LM", label: "Linksmidden", x: 26, y: 50, line: "MID" },
-      { id: "AM", label: "10", x: 50, y: 40, line: "MID" },
+      { id: "RM", label: "Rechtsmidden", x: 74, y: 46, line: "MID" },
+      { id: "DM", label: "Controlerende 6", x: 50, y: 56, line: "MID" },
+      { id: "LM", label: "Linksmidden", x: 26, y: 46, line: "MID" },
+      { id: "AM", label: "10", x: 50, y: 36, line: "MID" },
       { id: "ST1", label: "Spits 1", x: 35, y: 20, line: "FWD" },
       { id: "ST2", label: "Spits 2", x: 65, y: 20, line: "FWD" },
     ];
@@ -40,10 +40,10 @@ function getSlots(formation: Formation): FieldSlot[] {
   if (formation === "4-4-2_SQUARE") {
     return [
       ...DEF_SLOTS,
-      { id: "RM", label: "Rechtsmidden", x: 68, y: 48, line: "MID" },
-      { id: "CMR", label: "CM rechts", x: 68, y: 58, line: "MID" },
-      { id: "CML", label: "CM links", x: 32, y: 58, line: "MID" },
-      { id: "LM", label: "Linksmidden", x: 32, y: 48, line: "MID" },
+      { id: "RM", label: "Rechtsmidden", x: 68, y: 44, line: "MID" },
+      { id: "CMR", label: "CM rechts", x: 68, y: 54, line: "MID" },
+      { id: "CML", label: "CM links", x: 32, y: 54, line: "MID" },
+      { id: "LM", label: "Linksmidden", x: 32, y: 44, line: "MID" },
       { id: "ST1", label: "Spits 1", x: 35, y: 20, line: "FWD" },
       { id: "ST2", label: "Spits 2", x: 65, y: 20, line: "FWD" },
     ];
@@ -51,9 +51,9 @@ function getSlots(formation: Formation): FieldSlot[] {
   if (formation === "4-3-3_POINT_FORWARD") {
     return [
       ...DEF_SLOTS,
-      { id: "DMR", label: "6 rechts", x: 65, y: 58, line: "MID" },
-      { id: "DML", label: "6 links", x: 35, y: 58, line: "MID" },
-      { id: "AM", label: "10", x: 50, y: 44, line: "MID" },
+      { id: "DMR", label: "6 rechts", x: 65, y: 54, line: "MID" },
+      { id: "DML", label: "6 links", x: 35, y: 54, line: "MID" },
+      { id: "AM", label: "10", x: 50, y: 40, line: "MID" },
       { id: "RW", label: "Rechtsbuiten", x: 78, y: 18, line: "FWD" },
       { id: "ST", label: "Spits", x: 50, y: 14, line: "FWD" },
       { id: "LW", label: "Linksbuiten", x: 22, y: 18, line: "FWD" },
@@ -62,9 +62,9 @@ function getSlots(formation: Formation): FieldSlot[] {
   // 4-3-3_POINT_BACK
   return [
     ...DEF_SLOTS,
-    { id: "DM", label: "Controlerende 6", x: 50, y: 60, line: "MID" },
-    { id: "AMR", label: "8/10 rechts", x: 65, y: 47, line: "MID" },
-    { id: "AML", label: "8/10 links", x: 35, y: 47, line: "MID" },
+    { id: "DM", label: "Controlerende 6", x: 50, y: 56, line: "MID" },
+    { id: "AMR", label: "8/10 rechts", x: 65, y: 43, line: "MID" },
+    { id: "AML", label: "8/10 links", x: 35, y: 43, line: "MID" },
     { id: "RW", label: "Rechtsbuiten", x: 78, y: 18, line: "FWD" },
     { id: "ST", label: "Spits", x: 50, y: 14, line: "FWD" },
     { id: "LW", label: "Linksbuiten", x: 22, y: 18, line: "FWD" },
