@@ -25,6 +25,7 @@ type TeamOption = {
   id: string;
   name: string;
   code: string | null;
+  niveau?: string | null;
 };
 
 type Props = {
@@ -48,6 +49,7 @@ export default function InternalPlayersPage({
     <div className="space-y-6">
       <InternalPlayersTable
         players={players}
+        teams={teams}
         agingThreshold={agingThreshold}
         seasonYear={defaultSeasonYear}
         clubUsers={clubUsers}

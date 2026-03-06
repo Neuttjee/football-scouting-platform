@@ -39,16 +39,25 @@ export interface PlayerForActions {
   status: string | null;
   advies: string | null;
   notes: string | null;
+  // Extra (optionele) velden voor interne spelers
+  teamId?: string | null;
+  joinedAt?: Date | null;
+  contractEndDate?: Date | null;
+  distanceFromClubKm?: number | null;
+  isTopTalent?: boolean;
+  favoritePosition?: string | null;
 }
 
 export function PlayerActionsMenu({
   player,
   clubUsers,
   clubName,
+  teams,
 }: {
   player: PlayerForActions;
   clubUsers: { id: string; name: string }[];
   clubName?: string | null;
+  teams?: { id: string; name: string; code: string | null; niveau?: string | null }[];
 }) {
   const router = useRouter();
   const [openEdit, setOpenEdit] = React.useState(false);
@@ -144,15 +153,15 @@ export function PlayerActionsMenu({
               age: player.age,
               currentClub: player.currentClub,
               team: player.team,
-              teamId: null,
-              joinedAt: null,
-              contractEndDate: null,
-              distanceFromClubKm: null,
-              isTopTalent: false,
+              teamId: player.teamId ?? null,
+              joinedAt: player.joinedAt ?? null,
+              contractEndDate: player.contractEndDate ?? null,
+              distanceFromClubKm: player.distanceFromClubKm ?? null,
+              isTopTalent: !!player.isTopTalent,
               niveau: player.niveau,
               position: player.position,
               secondaryPosition: player.secondaryPosition,
-              favoritePosition: null,
+              favoritePosition: player.favoritePosition ?? null,
               preferredFoot: player.preferredFoot,
               contactPerson: null,
               status: player.status,
@@ -160,7 +169,7 @@ export function PlayerActionsMenu({
               advies: player.advies,
               notes: player.notes,
             }}
-            teams={[]}
+            teams={teams ?? []}
             clubName={clubName}
             onSubmit={handleEditSubmit}
           />

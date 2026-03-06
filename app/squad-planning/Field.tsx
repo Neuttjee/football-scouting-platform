@@ -35,7 +35,7 @@ export function Field({
       {/* Maak veld zo breed als de hele kaart */}
       <div className="w-full mx-auto relative rounded-2xl overflow-hidden border border-accent-primary/50 bg-bg-secondary/40 shadow-inner">
         {/* Veldverhouding 68:105 (breedte:lengte) – langer en iets breder */}
-        <div className="relative w-full aspect-[80/105]">
+        <div className="relative w-full max-h-[75vh] aspect-[80/105] mx-auto">
           {/* Veldlijnen: buitenlijn (iets dunner) */}
           <div className="absolute inset-0 rounded-[6px] border border-accent-primary/80" />
 

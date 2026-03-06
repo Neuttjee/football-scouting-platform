@@ -34,6 +34,7 @@ import { PlayerActionsMenu, PlayerForActions } from "@/components/PlayerActionsM
 type InternalPlayer = {
   id: string;
   name: string;
+  teamId: string | null;
   teamLabel: string | null;
   originTeamLabel: string | null;
   position: string | null;
@@ -47,8 +48,16 @@ type InternalPlayer = {
   distanceFromClubKm: number | null;
 };
 
+type TeamOption = {
+  id: string;
+  name: string;
+  code: string | null;
+  niveau?: string | null;
+};
+
 type Props = {
   players: InternalPlayer[];
+  teams: TeamOption[];
   agingThreshold: number;
   seasonYear: number;
   clubUsers: { id: string; name: string }[];
@@ -187,15 +196,19 @@ const INTERNAL_COLUMNS: ColumnDef<InternalPlayer>[] = [
     cell: ({ row, table }) => {
       const p = row.original as InternalPlayer;
       const clubUsers = (table.options.meta as any)?.clubUsers as { id: string; name: string }[];
+      const clubName = (table.options.meta as any)?.clubName as string | null;
+      const teams = (table.options.meta as any)?.teams as TeamOption[] | undefined;
+
+      const teamMeta = teams?.find((t) => t.id === p.teamId);
   
       const playerForActions: PlayerForActions = {
         id: p.id,
         name: p.name,
         type: "INTERNAL",
         position: p.position,
-        currentClub: null,
+        currentClub: clubName ?? null,
         team: p.teamLabel,
-        niveau: null,
+        niveau: teamMeta?.niveau ?? null,
         secondaryPosition: p.secondaryPosition,
         preferredFoot: p.preferredFoot,
         dateOfBirth: null,
@@ -204,12 +217,20 @@ const INTERNAL_COLUMNS: ColumnDef<InternalPlayer>[] = [
         status: null,
         advies: null,
         notes: null,
+        teamId: p.teamId,
+        joinedAt: p.joinedAt,
+        contractEndDate: p.contractEndDate,
+        distanceFromClubKm: p.distanceFromClubKm,
+        isTopTalent: p.isTopTalent,
+        favoritePosition: p.favoritePosition,
       };
   
       return (
         <PlayerActionsMenu
           player={playerForActions}
           clubUsers={clubUsers}
+          clubName={clubName}
+          teams={teams}
         />
       );
     },
@@ -310,6 +331,7 @@ function Filter({ column }: { column: any }) {
 
 export function InternalPlayersTable({
   players,
+  teams,
   agingThreshold,
   seasonYear,
   clubUsers,
@@ -337,6 +359,7 @@ export function InternalPlayersTable({
     meta: {
       clubUsers,
       clubName,
+      teams,
     },
   });
 
