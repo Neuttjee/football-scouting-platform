@@ -271,7 +271,18 @@ function Filter({
 }) {
   const columnFilterValue = column.getFilterValue()
 
-  const isFaceted = ['currentClub', 'team', 'position', 'secondaryPosition', 'preferredFoot', 'status', 'step', 'advies', 'age'].includes(column.id)
+  const isFaceted = [
+    'currentClub',
+    'team',
+    'niveau',           // ← deze toevoegen
+    'position',
+    'secondaryPosition',
+    'preferredFoot',
+    'status',
+    'step',
+    'advies',
+    'age',
+  ].includes(column.id)
 
   if (isFaceted) {
     const facetedValues = column.getFacetedUniqueValues()
@@ -320,11 +331,6 @@ function Filter({
         </PopoverContent>
       </Popover>
     )
-  }
-
-  // Geen vrij tekst-zoekveld voor niveau-kolom
-  if (column.id === 'niveau') {
-    return null;
   }
 
   return (

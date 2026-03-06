@@ -30,6 +30,7 @@ export interface PlayerForActions {
   position: string | null;
   currentClub: string | null;
   team: string | null;
+  niveau: string | null;
   secondaryPosition: string | null;
   preferredFoot: string | null;
   dateOfBirth: Date | null;
@@ -129,7 +130,7 @@ export function PlayerActionsMenu({
               contractEndDate: null,
               distanceFromClubKm: null,
               isTopTalent: false,
-              niveau: null,
+              niveau: player.niveau ?? null,
               position: player.position,
               secondaryPosition: player.secondaryPosition,
               favoritePosition: null,
