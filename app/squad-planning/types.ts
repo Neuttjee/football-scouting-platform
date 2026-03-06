@@ -21,8 +21,11 @@ export type PlanningPlayer = {
   isTopTalent: boolean;
 };
 
-export type Formation = "4-3-3" | "4-4-2";
-export type MidfieldVariant = "POINT_BACK" | "POINT_FORWARD";
+export type Formation =
+  | "4-3-3_POINT_BACK"
+  | "4-3-3_POINT_FORWARD"
+  | "4-4-2_DIAMOND"
+  | "4-4-2_SQUARE";
 
 export type SlotLine = "GK" | "DEF" | "MID" | "FWD";
 

@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { AnalyticsPanel } from "./AnalyticsPanel";
 import { Field } from "./Field";
 import { PlayerPicker } from "./PlayerPicker";
-import { FieldSlot, Formation, MidfieldVariant, PlanningPlayer, TeamOption } from "./types";
+import { FieldSlot, Formation, PlanningPlayer, TeamOption } from "./types";
 import { PlayerTypeToggle, PlayerTypeValue } from "@/components/PlayerTypeToggle";
 import {
   Dialog,
@@ -17,43 +17,54 @@ import {
 } from "@/components/ui/dialog";
 import { TeamSettingsForm } from "../settings/TeamSettingsForm";
 
-function getSlots(formation: Formation, midfieldVariant: MidfieldVariant): FieldSlot[] {
-  if (formation === "4-4-2") {
+const DEF_SLOTS: FieldSlot[] = [
+  { id: "GK", label: "Keeper", x: 50, y: 92, line: "GK" },
+  { id: "RB", label: "Rechtsback", x: 82, y: 72, line: "DEF" },
+  { id: "RCB", label: "Rechter CV", x: 63, y: 80, line: "DEF" },
+  { id: "LCB", label: "Linker CV", x: 37, y: 80, line: "DEF" },
+  { id: "LB", label: "Linksback", x: 18, y: 72, line: "DEF" },
+];
+
+function getSlots(formation: Formation): FieldSlot[] {
+  if (formation === "4-4-2_DIAMOND") {
     return [
-      { id: "GK", label: "Keeper", x: 50, y: 92, line: "GK" },
-      { id: "RB", label: "Rechtsback", x: 80, y: 72, line: "DEF" },
-      { id: "RCB", label: "Rechter CV", x: 60, y: 80, line: "DEF" },
-      { id: "LCB", label: "Linker CV", x: 40, y: 80, line: "DEF" },
-      { id: "LB", label: "Linksback", x: 20, y: 72, line: "DEF" },
+      ...DEF_SLOTS,
+      { id: "RM", label: "Rechtsmidden", x: 72, y: 52, line: "MID" },
+      { id: "DM", label: "Controlerende 6", x: 50, y: 58, line: "MID" },
+      { id: "LM", label: "Linksmidden", x: 28, y: 52, line: "MID" },
+      { id: "AM", label: "10", x: 50, y: 42, line: "MID" },
+      { id: "ST1", label: "Spits 1", x: 37, y: 20, line: "FWD" },
+      { id: "ST2", label: "Spits 2", x: 63, y: 20, line: "FWD" },
+    ];
+  }
+  if (formation === "4-4-2_SQUARE") {
+    return [
+      ...DEF_SLOTS,
       { id: "RM", label: "Rechtsmidden", x: 78, y: 55, line: "MID" },
       { id: "CMR", label: "CM rechts", x: 58, y: 55, line: "MID" },
       { id: "CML", label: "CM links", x: 42, y: 55, line: "MID" },
       { id: "LM", label: "Linksmidden", x: 22, y: 55, line: "MID" },
-      { id: "ST1", label: "Spits 1", x: 42, y: 20, line: "FWD" },
-      { id: "ST2", label: "Spits 2", x: 58, y: 20, line: "FWD" },
+      { id: "ST1", label: "Spits 1", x: 37, y: 20, line: "FWD" },
+      { id: "ST2", label: "Spits 2", x: 63, y: 20, line: "FWD" },
     ];
   }
-
-  const midfield: FieldSlot[] =
-    midfieldVariant === "POINT_BACK"
-      ? [
-          { id: "DM", label: "Controlerende 6", x: 50, y: 60, line: "MID" },
-          { id: "AMR", label: "8/10 rechts", x: 62, y: 47, line: "MID" },
-          { id: "AML", label: "8/10 links", x: 38, y: 47, line: "MID" },
-        ]
-      : [
-          { id: "DMR", label: "6 rechts", x: 58, y: 58, line: "MID" },
-          { id: "DML", label: "6 links", x: 42, y: 58, line: "MID" },
-          { id: "AM", label: "10", x: 50, y: 44, line: "MID" },
-        ];
-
+  if (formation === "4-3-3_POINT_FORWARD") {
+    return [
+      ...DEF_SLOTS,
+      { id: "DMR", label: "6 rechts", x: 63, y: 58, line: "MID" },
+      { id: "DML", label: "6 links", x: 37, y: 58, line: "MID" },
+      { id: "AM", label: "10", x: 50, y: 44, line: "MID" },
+      { id: "RW", label: "Rechtsbuiten", x: 78, y: 18, line: "FWD" },
+      { id: "ST", label: "Spits", x: 50, y: 14, line: "FWD" },
+      { id: "LW", label: "Linksbuiten", x: 22, y: 18, line: "FWD" },
+    ];
+  }
+  // 4-3-3_POINT_BACK
   return [
-    { id: "GK", label: "Keeper", x: 50, y: 92, line: "GK" },
-    { id: "RB", label: "Rechtsback", x: 80, y: 72, line: "DEF" },
-    { id: "RCB", label: "Rechter CV", x: 60, y: 80, line: "DEF" },
-    { id: "LCB", label: "Linker CV", x: 40, y: 80, line: "DEF" },
-    { id: "LB", label: "Linksback", x: 20, y: 72, line: "DEF" },
-    ...midfield,
+    ...DEF_SLOTS,
+    { id: "DM", label: "Controlerende 6", x: 50, y: 60, line: "MID" },
+    { id: "AMR", label: "8/10 rechts", x: 62, y: 47, line: "MID" },
+    { id: "AML", label: "8/10 links", x: 38, y: 47, line: "MID" },
     { id: "RW", label: "Rechtsbuiten", x: 78, y: 18, line: "FWD" },
     { id: "ST", label: "Spits", x: 50, y: 14, line: "FWD" },
     { id: "LW", label: "Linksbuiten", x: 22, y: 18, line: "FWD" },
@@ -89,9 +100,8 @@ export default function SquadPlanningPage({
   const [includeFeederTeams, setIncludeFeederTeams] = React.useState(true);
   const [selectedType, setSelectedType] = React.useState<PlayerTypeValue>("INTERNAL");
   const [seasonYear, setSeasonYear] = React.useState(defaultSeasonYear);
-  const [formation, setFormation] = React.useState<Formation>("4-3-3");
-  const [midfieldVariant, setMidfieldVariant] = React.useState<MidfieldVariant>("POINT_BACK");
-  const slots = React.useMemo(() => getSlots(formation, midfieldVariant), [formation, midfieldVariant]);
+  const [formation, setFormation] = React.useState<Formation>("4-3-3_POINT_BACK");
+  const slots = React.useMemo(() => getSlots(formation), [formation]);
   const [assignments, setAssignments] = React.useState<Record<string, string[]>>({});
   const [pendingDrop, setPendingDrop] = React.useState<{
     playerId: string;
@@ -190,7 +200,7 @@ export default function SquadPlanningPage({
       <div className="flex flex-wrap items-center justify-between gap-3">
         {/* Linkerzijde: teamselectie + filters */}
         <div className="flex flex-wrap items-center gap-3">
-          <div className="inline-flex items-center gap-2 rounded-full bg-bg-secondary/60 border border-border-dark p-1">
+          <div className="inline-flex items-center gap-1 rounded-md bg-bg-secondary/80 border border-border-dark shadow-sm p-0.5">
             {teams.map((team) => {
               const active = team.id === selectedTeamId;
               return (
@@ -199,10 +209,10 @@ export default function SquadPlanningPage({
                   type="button"
                   onClick={() => setSelectedTeamId(team.id)}
                   className={cn(
-                    "px-3 py-1.5 text-xs font-medium rounded-full transition-colors",
+                    "px-3 py-1 text-xs font-medium rounded-md transition-colors",
                     active
-                      ? "bg-accent-primary text-primary-foreground shadow-[0_0_10px_rgba(var(--primary-rgb,255,106,0),0.4)]"
-                      : "text-text-muted hover:text-text-primary hover:bg-bg-primary/60"
+                      ? "bg-accent-primary text-primary-foreground shadow-[0_0_8px_rgba(var(--primary-rgb,255,106,0),0.5)]"
+                      : "text-text-muted hover:text-text-primary hover:bg-bg-primary/70"
                   )}
                 >
                   {team.code || team.name}
@@ -228,20 +238,11 @@ export default function SquadPlanningPage({
             onChange={(e) => setFormation(e.target.value as Formation)}
             className="border border-border-dark rounded px-2 py-1 text-xs bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
           >
-            <option value="4-3-3">4-3-3</option>
-            <option value="4-4-2">4-4-2</option>
+            <option value="4-3-3_POINT_BACK">4-3-3 p.n.v.</option>
+            <option value="4-3-3_POINT_FORWARD">4-3-3 p.n.a.</option>
+            <option value="4-4-2_DIAMOND">4-4-2 ruit</option>
+            <option value="4-4-2_SQUARE">4-4-2 vierkant</option>
           </select>
-
-          {formation === "4-3-3" && (
-            <select
-              value={midfieldVariant}
-              onChange={(e) => setMidfieldVariant(e.target.value as MidfieldVariant)}
-              className="border border-border-dark rounded px-2 py-1 text-xs bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
-            >
-              <option value="POINT_BACK">POINT_BACK</option>
-              <option value="POINT_FORWARD">POINT_FORWARD</option>
-            </select>
-          )}
 
           <label className="text-xs text-text-muted flex items-center gap-2">
             <input
