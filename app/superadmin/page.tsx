@@ -10,6 +10,20 @@ export default async function SuperadminPage() {
     redirect('/dashboard');
   }
 
+  // Auto-promote clubs when trial ends
+  await prisma.club.updateMany({
+    where: {
+      status: 'PROEFPERIODE' as any,
+      trialEndsAt: { lte: new Date() } as any,
+    } as any,
+    data: {
+      status: 'ACTIEF' as any,
+      trialStartsAt: null,
+      trialEndsAt: null,
+      billingStatus: 'ACTIVE' as any,
+    } as any,
+  });
+
   const clubs = await prisma.club.findMany({
     where: { name: { not: 'Platform' } },
     orderBy: { name: 'asc' },
@@ -29,6 +43,8 @@ export default async function SuperadminPage() {
       id: club.id,
       name: club.name,
       status: (club as any).status ?? 'ACTIEF',
+      trialStartsAt: (club as any).trialStartsAt ? (club as any).trialStartsAt.toISOString() : null,
+      trialEndsAt: (club as any).trialEndsAt ? (club as any).trialEndsAt.toISOString() : null,
       userCount: club._count.users,
       playerCount: club._count.players,
       totalLogins,

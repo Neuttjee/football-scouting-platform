@@ -1,8 +1,8 @@
 'use client';
 
+import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import { DataTable } from '@/components/DataTable';
-import { Badge } from '@/components/ui/badge';
 import { Plus } from 'lucide-react';
 import {
   DropdownMenu,
@@ -11,12 +11,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { clearSelectedClub, deleteClub, selectClub, updateClubStatus } from './actions';
+import { StatusPill } from '@/components/StatusPill';
+import { ClubStatusModal } from './ClubStatusModal';
+import { clearSelectedClub, deleteClub, selectClub, updateClubStatusInteractive } from './actions';
 
 type ClubRow = {
   id: string;
   name: string;
   status: 'ACTIEF' | 'INACTIEF' | 'PROEFPERIODE' | 'GESCHORST';
+  trialStartsAt?: string | null;
+  trialEndsAt?: string | null;
   userCount: number;
   playerCount: number;
   totalLogins: number;
@@ -31,19 +35,6 @@ function formatLastLogin(isoDate: string | null): string {
   }).format(new Date(isoDate));
 }
 
-function getStatusBadgeVariant(status: ClubRow['status']): 'default' | 'secondary' | 'outline' | 'destructive' {
-  switch (status) {
-    case 'ACTIEF':
-      return 'default';
-    case 'PROEFPERIODE':
-      return 'secondary';
-    case 'INACTIEF':
-      return 'outline';
-    case 'GESCHORST':
-      return 'destructive';
-  }
-}
-
 function getStatusLabel(status: ClubRow['status']): string {
   switch (status) {
     case 'ACTIEF':
@@ -54,6 +45,19 @@ function getStatusLabel(status: ClubRow['status']): string {
       return 'Proefperiode';
     case 'GESCHORST':
       return 'Geschorst';
+  }
+}
+
+function getStatusTone(status: ClubRow['status']): 'success' | 'danger' | 'warning' | 'neutral' {
+  switch (status) {
+    case 'ACTIEF':
+      return 'success';
+    case 'PROEFPERIODE':
+      return 'warning';
+    case 'INACTIEF':
+      return 'danger';
+    case 'GESCHORST':
+      return 'danger';
   }
 }
 
@@ -77,9 +81,18 @@ export function SuperadminClubsTable({
     router.refresh();
   };
 
-  const handleSetStatus = async (clubId: string, status: ClubRow['status']) => {
+  const [statusModalOpen, setStatusModalOpen] = React.useState(false);
+  const [statusClub, setStatusClub] = React.useState<ClubRow | null>(null);
+
+  const openStatusModal = (club: ClubRow) => {
+    setStatusClub(club);
+    setStatusModalOpen(true);
+  };
+
+  const handleStatusSave = async (payload: any) => {
+    if (!statusClub) return;
     try {
-      await updateClubStatus(clubId, status);
+      await updateClubStatusInteractive(statusClub.id, payload);
       router.refresh();
     } catch (err) {
       console.error(err);
@@ -101,15 +114,16 @@ export function SuperadminClubsTable({
   };
 
   return (
+    <>
     <DataTable.Root>
       <DataTable.Header>
         <DataTable.HeaderRow>
           <DataTable.HeaderCell>Club</DataTable.HeaderCell>
-          <DataTable.HeaderCell>Status</DataTable.HeaderCell>
           <DataTable.HeaderCell className="text-right">Gebruikers</DataTable.HeaderCell>
           <DataTable.HeaderCell className="text-right">Spelers</DataTable.HeaderCell>
           <DataTable.HeaderCell className="text-right">Aantal logins</DataTable.HeaderCell>
           <DataTable.HeaderCell>Laatste login</DataTable.HeaderCell>
+          <DataTable.HeaderCell>Status</DataTable.HeaderCell>
           <DataTable.HeaderCell className="text-right">Acties</DataTable.HeaderCell>
         </DataTable.HeaderRow>
       </DataTable.Header>
@@ -120,14 +134,20 @@ export function SuperadminClubsTable({
           rows.map((row) => (
             <DataTable.Row key={row.id}>
               <DataTable.Cell className="font-medium text-primary-brand">{row.name}</DataTable.Cell>
-              <DataTable.Cell>
-                <Badge variant={getStatusBadgeVariant(row.status)}>{getStatusLabel(row.status)}</Badge>
-              </DataTable.Cell>
               <DataTable.Cell className="text-right">{row.userCount}</DataTable.Cell>
               <DataTable.Cell className="text-right">{row.playerCount}</DataTable.Cell>
               <DataTable.Cell className="text-right">{row.totalLogins}</DataTable.Cell>
               <DataTable.Cell className="text-muted-foreground">
                 {formatLastLogin(row.lastLogin)}
+              </DataTable.Cell>
+              <DataTable.Cell>
+                <StatusPill tone={getStatusTone(row.status)}>
+                  {row.status === 'PROEFPERIODE' && row.trialEndsAt
+                    ? `Proefperiode (t/m ${new Intl.DateTimeFormat('nl-NL', { dateStyle: 'short' }).format(
+                        new Date(row.trialEndsAt)
+                      )})`
+                    : getStatusLabel(row.status)}
+                </StatusPill>
               </DataTable.Cell>
               <DataTable.Cell className="text-right">
                 <div className="flex justify-end pr-2">
@@ -156,22 +176,10 @@ export function SuperadminClubsTable({
                       <DropdownMenuSeparator />
 
                       <DropdownMenuItem
-                        onClick={() => handleSetStatus(row.id, row.status === 'ACTIEF' ? 'INACTIEF' : 'ACTIEF')}
+                        onClick={() => openStatusModal(row)}
                         className="cursor-pointer focus:bg-bg-hover focus:text-accent-primary text-text-primary text-xs"
                       >
-                        {row.status === 'ACTIEF' ? 'Inactief zetten' : 'Activeren'}
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => handleSetStatus(row.id, 'PROEFPERIODE')}
-                        className="cursor-pointer focus:bg-bg-hover focus:text-accent-primary text-text-primary text-xs"
-                      >
-                        Status: Proefperiode
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => handleSetStatus(row.id, 'GESCHORST')}
-                        className="cursor-pointer focus:bg-bg-hover focus:text-accent-primary text-text-primary text-xs"
-                      >
-                        Status: Geschorst
+                        Status wijzigen
                       </DropdownMenuItem>
 
                       <DropdownMenuSeparator />
@@ -191,5 +199,12 @@ export function SuperadminClubsTable({
         )}
       </DataTable.Body>
     </DataTable.Root>
+    <ClubStatusModal
+      open={statusModalOpen}
+      onOpenChange={setStatusModalOpen}
+      club={statusClub}
+      onSave={handleStatusSave}
+    />
+    </>
   );
 }

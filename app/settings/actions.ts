@@ -10,7 +10,11 @@ import crypto from 'crypto';
 export async function updateClubBranding(formData: FormData) {
   const session = await getSession();
   if (!session || (session.user.role !== 'ADMIN' && session.user.role !== 'SUPERADMIN')) throw new Error('Unauthorized');
-  const clubId = getEffectiveClubId(session);
+  let clubId = getEffectiveClubId(session);
+  if (!clubId && session.user.role === 'SUPERADMIN') {
+    const fromForm = (formData.get('clubId') as string | null)?.trim() || null;
+    if (fromForm) clubId = fromForm;
+  }
   if (!clubId) throw new Error('Geen club geselecteerd');
 
   const primaryColor = sanitizePrimaryColor(formData.get('primaryColor') as string);

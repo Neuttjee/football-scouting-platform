@@ -32,6 +32,22 @@ export default async function RootLayout({
     });
   }
 
+  // Auto-promote club when a trial ends (no background job needed).
+  if (club && (club as any).status === 'PROEFPERIODE' && (club as any).trialEndsAt) {
+    const endsAt = new Date((club as any).trialEndsAt);
+    if (!Number.isNaN(endsAt.getTime()) && endsAt.getTime() <= Date.now()) {
+      club = await prisma.club.update({
+        where: { id: (club as any).id },
+        data: {
+          status: 'ACTIEF' as any,
+          trialStartsAt: null,
+          trialEndsAt: null,
+          billingStatus: 'ACTIVE' as any,
+        } as any,
+      });
+    }
+  }
+
   const primaryColor =
     session?.user?.role === 'SUPERADMIN'
       ? DEFAULT_PRIMARY_COLOR

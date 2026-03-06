@@ -7,6 +7,7 @@ import { useTransition } from 'react';
 import { Plus } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { DataTable } from "@/components/DataTable"
+import { StatusPill } from "@/components/StatusPill";
 
 type User = {
   id: string;
@@ -82,19 +83,11 @@ export function UserTable({ users, currentUserId }: { users: User[], currentUser
                 <DataTable.Cell>{u.role}</DataTable.Cell>
                 <DataTable.Cell>
                   {(!u.passwordHash && u.inviteToken) ? (
-                    <span className="px-2 py-1 rounded text-xs bg-yellow-100 text-yellow-800">
-                      Uitgenodigd
-                    </span>
+                    <StatusPill tone="warning">Uitgenodigd</StatusPill>
                   ) : (
-                    <span
-                      className={`px-2 py-1 rounded text-xs ${
-                        u.isActive
-                          ? "bg-green-100 text-green-800"
-                          : "bg-red-100 text-red-800"
-                      }`}
-                    >
+                    <StatusPill tone={u.isActive ? "success" : "danger"}>
                       {u.isActive ? "Actief" : "Inactief"}
-                    </span>
+                    </StatusPill>
                   )}
                 </DataTable.Cell>
                 <DataTable.Cell className="text-right">

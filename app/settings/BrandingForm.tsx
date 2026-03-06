@@ -63,6 +63,7 @@ export function BrandingForm({ club }: { club: any }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      <input type="hidden" name="clubId" value={club?.id || ""} />
       <div className="flex flex-col sm:flex-row gap-8">
         <div className="flex-1">
           <label className="block text-sm font-medium mb-2">Club Logo</label>

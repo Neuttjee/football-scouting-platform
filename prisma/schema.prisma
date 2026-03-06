@@ -19,6 +19,14 @@ enum ClubStatus {
   GESCHORST
 }
 
+enum BillingStatus {
+  ACTIVE
+  TRIAL
+  PAST_DUE
+  PAUSED
+  CANCELED
+}
+
 model Club {
   id             String          @id @default(uuid())
   name           String
@@ -26,6 +34,12 @@ model Club {
   primaryColor   String?
   agingThreshold Int             @default(30)
   status         ClubStatus      @default(ACTIEF)
+  trialStartsAt  DateTime?
+  trialEndsAt    DateTime?
+  billingStatus  BillingStatus   @default(ACTIVE)
+  billingProvider String?
+  billingCustomerId String?
+  billingSubscriptionId String?
 
   users          User[]
   teams          Team[]
