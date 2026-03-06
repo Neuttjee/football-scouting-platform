@@ -4,7 +4,10 @@ import { getSession } from '@/lib/auth';
 
 export async function POST(request: Request): Promise<NextResponse> {
   const session = await getSession();
-  if (!session || session.user.role !== 'ADMIN') {
+  if (
+    !session ||
+    (session.user.role !== 'ADMIN' && session.user.role !== 'SUPERADMIN')
+  ) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
