@@ -23,6 +23,22 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'User already exists' }, { status: 400 });
     }
 
+    const [settings, activeUserCount] = await Promise.all([
+      prisma.clubSettings.findUnique({ where: { clubId } }),
+      prisma.user.count({ where: { clubId, isActive: true } }),
+    ]);
+
+    const maxUsers = settings?.maxUsers ?? 999;
+    if (activeUserCount >= maxUsers) {
+      return NextResponse.json(
+        {
+          error:
+            'Maximaal aantal gebruikers voor deze club is bereikt. Verhoog het maximum in het superadmin clubprofiel of deactiveer bestaande gebruikers.',
+        },
+        { status: 400 },
+      );
+    }
+
     const inviteToken = crypto.randomBytes(32).toString('hex');
     const inviteTokenExpires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 

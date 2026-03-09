@@ -30,8 +30,10 @@ enum BillingStatus {
 model Club {
   id             String          @id @default(uuid())
   name           String
+  shortName      String?
   logo           String?
   primaryColor   String?
+  secondaryColor String?
   agingThreshold Int             @default(30)
   status         ClubStatus      @default(ACTIEF)
   trialStartsAt  DateTime?
@@ -41,6 +43,15 @@ model Club {
   billingCustomerId String?
   billingSubscriptionId String?
 
+  contactName    String?
+  contactEmail   String?
+  contactPhone   String?
+
+  settings       ClubSettings?
+  features       ClubFeature[]
+  subscription   ClubSubscription?
+  internalNote   ClubInternalNote?
+
   users          User[]
   teams          Team[]
   players        Player[]
@@ -49,6 +60,108 @@ model Club {
 
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
+}
+
+model ClubSettings {
+  id          String   @id @default(uuid())
+  clubId      String   @unique
+  club        Club     @relation(fields: [clubId], references: [id], onDelete: Cascade)
+
+  maxUsers    Int      @default(999)
+  settingsJson Json?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ClubFeature {
+  id        String   @id @default(uuid())
+  clubId    String
+  club      Club     @relation(fields: [clubId], references: [id], onDelete: Cascade)
+
+  key       String
+  enabled   Boolean  @default(false)
+  configJson Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([clubId, key])
+  @@index([clubId])
+}
+
+enum SubscriptionPlan {
+  TRIAL
+  BASIC
+  PREMIUM
+  CUSTOM
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAUSED
+  CANCELED
+  EXPIRED
+}
+
+enum BillingCycle {
+  MONTHLY
+  YEARLY
+}
+
+enum PaymentStatus {
+  PAID
+  OPEN
+  PAST_DUE
+}
+
+enum PaymentMethod {
+  MANUAL
+  INVOICE
+  DIRECT_DEBIT
+}
+
+model ClubSubscription {
+  id                     String             @id @default(uuid())
+  clubId                 String             @unique
+  club                   Club               @relation(fields: [clubId], references: [id], onDelete: Cascade)
+
+  plan                   SubscriptionPlan
+  status                 SubscriptionStatus
+  billingCycle           BillingCycle
+
+  priceMinor             Int?
+  currency               String             @default("EUR")
+
+  startsAt               DateTime?
+  renewsAt               DateTime?
+  endsAt                 DateTime?
+
+  paymentStatus          PaymentStatus
+  paymentMethod          PaymentMethod
+
+  invoiceReference       String?
+  customerNumber         String?
+
+  notes                  String?
+
+  provider               String?
+  providerCustomerId     String?
+  providerSubscriptionId String?
+
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @updatedAt
+}
+
+model ClubInternalNote {
+  id        String   @id @default(uuid())
+  clubId    String   @unique
+  club      Club     @relation(fields: [clubId], references: [id], onDelete: Cascade)
+
+  notes     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model User {

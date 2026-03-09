@@ -8,6 +8,8 @@ import { MobileNav } from '@/components/MobileNav';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { Topbar } from '@/components/Topbar';
 import { hexToRgb, sanitizePrimaryColor, DEFAULT_PRIMARY_COLOR } from '@/lib/branding';
+import { ClubConfigProvider } from '@/components/club/ClubConfigProvider';
+import { getClubConfigByClubId } from '@/lib/clubConfig';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 const jetbrainsMono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono' });
@@ -25,11 +27,17 @@ export default async function RootLayout({
   const session = await getSession();
   const effectiveClubId = getEffectiveClubId(session);
   let club = null;
+   let clubConfig = null;
 
   if (session && effectiveClubId) {
-    club = await prisma.club.findUnique({
-      where: { id: effectiveClubId },
-    });
+    const [clubRecord, config] = await Promise.all([
+      prisma.club.findUnique({
+        where: { id: effectiveClubId },
+      }),
+      getClubConfigByClubId(effectiveClubId),
+    ]);
+    club = clubRecord;
+    clubConfig = config;
   }
 
   // Auto-promote club when a trial ends (no background job needed).
@@ -75,18 +83,20 @@ export default async function RootLayout({
           disableTransitionOnChange
         >
           {session ? (
-            <div className="flex h-screen overflow-hidden">
-              <Sidebar role={session.user.role} clubName={club?.name} clubLogo={club?.logo} />
-              <div className="flex-1 flex flex-col overflow-hidden">
-                <Topbar />
-                <main className="flex-1 overflow-y-auto pb-16 md:pb-0 relative bg-bg-secondary">
-                  <div className="p-4 md:p-8 w-full max-w-[1600px] mx-auto">
-                    {children}
-                  </div>
-                </main>
+            <ClubConfigProvider value={clubConfig}>
+              <div className="flex h-screen overflow-hidden">
+                <Sidebar role={session.user.role} clubName={club?.name} clubLogo={club?.logo} />
+                <div className="flex-1 flex flex-col overflow-hidden">
+                  <Topbar />
+                  <main className="flex-1 overflow-y-auto pb-16 md:pb-0 relative bg-bg-secondary">
+                    <div className="p-4 md:p-8 w-full max-w-[1600px] mx-auto">
+                      {children}
+                    </div>
+                  </main>
+                </div>
+                <MobileNav role={session.user.role} />
               </div>
-              <MobileNav role={session.user.role} />
-            </div>
+            </ClubConfigProvider>
           ) : (
             children
           )}

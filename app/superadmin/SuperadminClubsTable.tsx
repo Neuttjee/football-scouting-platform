@@ -156,6 +156,15 @@ export function SuperadminClubsTable({
                       <Plus className="h-4 w-4" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="bg-bg-card border-border-dark min-w-[200px]">
+                      <DropdownMenuItem
+                        onClick={() => router.push(`/superadmin/clubs/${row.id}`)}
+                        className="cursor-pointer focus:bg-bg-hover focus:text-accent-primary text-text-primary text-xs"
+                      >
+                        Clubprofiel
+                      </DropdownMenuItem>
+
+                      <DropdownMenuSeparator />
+
                       {activeClubId === row.id ? (
                         <DropdownMenuItem
                           onClick={handleClear}

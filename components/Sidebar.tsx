@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { LogoutButton } from './LogoutButton';
+import { useHasFeature } from '@/components/club/ClubConfigProvider';
+import type { ClubFeatureKey } from '@/lib/clubFeatures';
 
 interface SidebarProps {
   role: string;
@@ -12,13 +14,17 @@ interface SidebarProps {
 
 export function Sidebar({ role, clubName, clubLogo }: SidebarProps) {
   const pathname = usePathname();
+  const hasTasks = useHasFeature('tasks');
+  const hasContacts = useHasFeature('contact_logs');
+  const hasSquadPlanning = useHasFeature('internal_players'); // selectie planning leunt op interne spelers
+  const hasDashboard = useHasFeature('dashboard');
 
-  const navItems = [
-    { href: '/dashboard', label: 'Dashboard' },
-    { href: '/players', label: 'Spelers' },
-    { href: '/squad-planning', label: 'Selectie planning' },
-    { href: '/tasks', label: 'Taken' },
-    { href: '/contacts', label: 'Contacten' },
+  const navItems: { href: string; label: string; featureKey?: ClubFeatureKey }[] = [
+    { href: '/dashboard', label: 'Dashboard', featureKey: 'dashboard' },
+    { href: '/players', label: 'Spelers', featureKey: 'internal_players' },
+    { href: '/squad-planning', label: 'Selectie planning', featureKey: 'internal_players' },
+    { href: '/tasks', label: 'Taken', featureKey: 'tasks' },
+    { href: '/contacts', label: 'Contacten', featureKey: 'contact_logs' },
   ];
 
   if (role === 'ADMIN' || role === 'SUPERADMIN') {
@@ -35,6 +41,11 @@ export function Sidebar({ role, clubName, clubLogo }: SidebarProps) {
       </div>
       <nav className="flex-1 p-4 space-y-2 mt-4">
         {navItems.map((item) => {
+          if (item.featureKey === 'dashboard' && !hasDashboard) return null;
+          if (item.featureKey === 'internal_players' && !hasSquadPlanning) return null;
+          if (item.featureKey === 'tasks' && !hasTasks) return null;
+          if (item.featureKey === 'contact_logs' && !hasContacts) return null;
+
           const isActive = pathname.startsWith(item.href);
           return (
             <Link 
