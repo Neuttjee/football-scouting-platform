@@ -89,8 +89,10 @@ export function PlayerForm({
   React.useEffect(() => {
     if (isInternal) {
       setCurrentClubValue(clubName || initialValues.currentClub || "");
+    } else if (mode === "create" && initialValues.type === "EXTERNAL") {
+      setCurrentClubValue("");
     }
-  }, [isInternal, clubName, initialValues.currentClub]);
+  }, [isInternal, clubName, initialValues.currentClub, initialValues.type, mode]);
 
   const [selectedTeamId, setSelectedTeamId] = React.useState<string | null>(
     (initialValues.teamId as string | null) ?? null

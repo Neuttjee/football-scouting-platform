@@ -28,7 +28,7 @@ import {
 } from "@/components/ui/table";
 import { DataTable } from "@/components/DataTable";
 import { cn } from "@/lib/utils";
-import { Star, Plus } from "lucide-react";
+import { Star, Settings } from "lucide-react";
 import { PlayerActionsMenu, PlayerForActions } from "@/components/PlayerActionsMenu";
 
 type InternalPlayer = {
@@ -340,6 +340,8 @@ export function InternalPlayersTable({
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] =
     React.useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<Record<string, boolean>>({});
 
   const columns = React.useMemo(() => INTERNAL_COLUMNS, []);
   const table = useReactTable({
@@ -355,7 +357,9 @@ export function InternalPlayersTable({
     state: {
       sorting,
       columnFilters,
+      columnVisibility,
     },
+    onColumnVisibilityChange: setColumnVisibility,
     meta: {
       clubUsers,
       clubName,
@@ -365,6 +369,37 @@ export function InternalPlayersTable({
 
   return (
     <DataTable.Wrapper>
+      <div className="flex justify-end mb-2">
+        <Popover>
+          <PopoverTrigger asChild>
+            <button className="h-8 px-3 text-xs rounded border border-border-dark bg-bg-primary text-text-primary hover:border-accent-primary/60 flex items-center justify-center">
+              <Settings className="h-4 w-4" />
+              <span className="sr-only">Kolommen</span>
+            </button>
+          </PopoverTrigger>
+          <PopoverContent className="w-56 p-2 bg-bg-card border-border-dark shadow-lg" align="end">
+            <div className="space-y-1">
+              {table
+                .getAllLeafColumns()
+                .filter((column) => column.id !== "actions" && column.id !== "name")
+                .map((column) => (
+                  <label key={column.id} className="flex items-center gap-2 text-sm text-text-primary">
+                    <Checkbox
+                      checked={column.getIsVisible()}
+                      onCheckedChange={(val) => column.toggleVisibility(Boolean(val))}
+                      className="border-border-dark data-[state=checked]:bg-accent-primary data-[state=checked]:border-accent-primary"
+                    />
+                    <span className="truncate">
+                      {typeof column.columnDef.header === "string"
+                        ? column.columnDef.header
+                        : column.id}
+                    </span>
+                  </label>
+                ))}
+            </div>
+          </PopoverContent>
+        </Popover>
+      </div>
       <Table className="min-w-max">
         <TableHeader className="bg-bg-secondary">
             {table.getHeaderGroups().map((headerGroup) => (

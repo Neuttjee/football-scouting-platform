@@ -48,6 +48,7 @@ async function savePlayerLogic(playerId: string | null, formData: FormData) {
   const contractEndDate = contractEndDateStr ? new Date(contractEndDateStr) : null;
 
   const safeType = playerTypeInput === 'INTERNAL' ? 'INTERNAL' : 'EXTERNAL';
+  const isInternalType = safeType === 'INTERNAL';
 
   let resolvedTeamId: string | null = null;
   let resolvedTeamName: string | null = team || null;
@@ -87,60 +88,50 @@ async function savePlayerLogic(playerId: string | null, formData: FormData) {
   // - step wordt gewoon opgeslagen zoals gekozen
   // - status komt direct uit het formulier (statusInput)
 
+  const baseData: any = {
+    name,
+    position,
+    secondaryPosition,
+    favoritePosition,
+    preferredFoot,
+    type: safeType,
+    dateOfBirth,
+    age,
+    step,
+    status: statusInput,
+    currentClub,
+    advies,
+    niveau: resolvedNiveau,
+    contactPerson,
+    notes,
+    isTopTalent,
+  };
+
+  if (isInternalType) {
+    baseData.team = resolvedTeamName;
+    baseData.teamId = resolvedTeamId;
+    baseData.joinedAt = joinedAt;
+    baseData.contractEndDate = contractEndDate;
+    baseData.optionYear = optionYear;
+    baseData.distanceFromClubKm = distanceFromClubKm;
+  } else {
+    baseData.team = team || null;
+    baseData.teamId = null;
+    baseData.joinedAt = null;
+    baseData.contractEndDate = null;
+    baseData.optionYear = false;
+    baseData.distanceFromClubKm = null;
+  }
+
   if (playerId) {
     await prisma.player.update({
       where: { id: playerId, clubId },
-      data: {
-        name,
-        position,
-        secondaryPosition,
-        favoritePosition,
-        preferredFoot,
-        team: safeType === 'INTERNAL' ? resolvedTeamName : team,
-        teamId: safeType === 'INTERNAL' ? resolvedTeamId : null,
-        dateOfBirth,
-        age,
-        type: safeType,
-        joinedAt: safeType === 'INTERNAL' ? joinedAt : null,
-        contractEndDate: safeType === 'INTERNAL' ? contractEndDate : null,
-        optionYear: safeType === 'INTERNAL' ? optionYear : false,
-        isTopTalent,
-        distanceFromClubKm: safeType === 'INTERNAL' ? distanceFromClubKm : null,
-        step,
-        status: statusInput, // direct uit formulier
-        currentClub,
-        advies,
-        niveau: resolvedNiveau,
-        contactPerson,
-        notes,
-      },
+      data: baseData,
     });
   } else {
-    // Create
     await prisma.player.create({
       data: {
-        name,
-        position,
-        secondaryPosition,
-        favoritePosition,
-        preferredFoot,
-        team: safeType === 'INTERNAL' ? resolvedTeamName : team,
-        teamId: safeType === 'INTERNAL' ? resolvedTeamId : null,
-        dateOfBirth,
-        age,
-        type: safeType,
-        joinedAt: safeType === 'INTERNAL' ? joinedAt : null,
-        contractEndDate: safeType === 'INTERNAL' ? contractEndDate : null,
-        optionYear: safeType === 'INTERNAL' ? optionYear : false,
-        isTopTalent,
-        distanceFromClubKm: safeType === 'INTERNAL' ? distanceFromClubKm : null,
-        step,
-        status: statusInput, // direct uit formulier
-        currentClub,
-        advies,
-        niveau: resolvedNiveau,
-        contactPerson,
-        notes,
+        ...baseData,
         clubId,
         createdById: session.user.id,
       },

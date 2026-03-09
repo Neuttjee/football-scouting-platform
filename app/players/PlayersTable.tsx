@@ -32,6 +32,7 @@ import { updatePlayerField } from "./actions"
 import { targetSteps, targetStatuses, adviesOptions } from "@/lib/statusMapping"
 import { calculateAgeFromDate } from "@/lib/age"
 import { PlayerActionsMenu, PlayerForActions } from "@/components/PlayerActionsMenu";
+import { Settings, Star } from "lucide-react";
 
 interface Player extends PlayerForActions {
   niveau: string | null;
@@ -121,9 +122,7 @@ export function getColumns(clubUsers: any[], clubName: string | null): ColumnDef
               >
                 {player.name}
                 {player.isTopTalent && (
-                  <span className="inline-flex items-center rounded-full bg-accent-primary/10 px-2 py-0.5 text-[10px] font-semibold text-accent-primary uppercase tracking-wide">
-                    Top
-                  </span>
+                  <Star className="ml-1 size-4 text-[#FFD700]" fill="#FFD700" />
                 )}
               </Link>
             </HoverCardTrigger>
@@ -382,8 +381,9 @@ export function PlayersTable({ data, clubUsers = [], clubName = null }: { data: 
       <div className="flex justify-end mb-2">
         <Popover>
           <PopoverTrigger asChild>
-            <button className="h-8 px-3 text-xs rounded border border-border-dark bg-bg-primary text-text-primary hover:border-accent-primary/60">
-              Kolommen
+            <button className="h-8 px-3 text-xs rounded border border-border-dark bg-bg-primary text-text-primary hover:border-accent-primary/60 flex items-center justify-center">
+              <Settings className="h-4 w-4" />
+              <span className="sr-only">Kolommen</span>
             </button>
           </PopoverTrigger>
           <PopoverContent className="w-56 p-2 bg-bg-card border-border-dark shadow-lg" align="end">
