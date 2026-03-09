@@ -51,17 +51,11 @@ export default async function DashboardPage() {
       by: ['status'],
       where: { clubId, type: 'EXTERNAL' },
       _count: { _all: true },
-      orderBy: {
-        _count: { _all: 'desc' },
-      },
     }),
     prisma.player.groupBy({
       by: ['position'],
       where: { clubId, type: 'INTERNAL' },
       _count: { _all: true },
-      orderBy: {
-        _count: { _all: 'desc' },
-      },
     }),
   ]);
 
