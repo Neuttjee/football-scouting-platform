@@ -27,7 +27,8 @@ export function Sidebar({ role, clubName, clubLogo }: SidebarProps) {
     { href: '/contacts', label: 'Contacten', featureKey: 'contact_logs' },
   ];
 
-  if (role === 'ADMIN' || role === 'SUPERADMIN') {
+  // Alleen instellingen tonen als er een clubcontext is
+  if ((role === 'ADMIN' || role === 'SUPERADMIN') && clubName) {
     navItems.push({ href: '/settings', label: 'Instellingen' });
   }
 

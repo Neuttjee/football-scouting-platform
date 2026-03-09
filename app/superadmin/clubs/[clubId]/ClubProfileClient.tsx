@@ -68,7 +68,15 @@ export function ClubProfileClient({
     };
 
   const maxUsers = settings?.maxUsers ?? 999;
-  const freeSeats = Math.max(0, maxUsers - userStats.activeUsers);
+  const planMaxUsers =
+    subscription?.plan === "BASIC"
+      ? 5
+      : subscription?.plan === "PREMIUM"
+      ? 10
+      : subscription?.plan === "CUSTOM"
+      ? 15
+      : maxUsers;
+  const freeSeats = Math.max(0, planMaxUsers - userStats.activeUsers);
 
   const statusTone = (() => {
     const status = (club as any).status;
@@ -114,7 +122,7 @@ export function ClubProfileClient({
       </div>
 
       <Tabs defaultValue="general" className="space-y-4">
-        <TabsList>
+        <TabsList className="inline-flex items-center gap-1 rounded-md bg-bg-secondary/80 border border-border-dark shadow-sm p-1 w-fit">
           <TabsTrigger value="general">Algemeen</TabsTrigger>
           <TabsTrigger value="modules">Modules</TabsTrigger>
           <TabsTrigger value="subscription">Abonnement</TabsTrigger>
@@ -337,7 +345,7 @@ export function ClubProfileClient({
                     <div className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
                       Maximaal toegestaan
                     </div>
-                    <div className="text-2xl font-semibold">{maxUsers}</div>
+                    <div className="text-2xl font-semibold">{planMaxUsers}</div>
                   </div>
                   <div className="rounded-lg bg-bg-primary/70 border border-border-dark p-4">
                     <div className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
