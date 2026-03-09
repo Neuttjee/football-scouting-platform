@@ -10,10 +10,9 @@ type PageProps = {
 };
 
 export default async function ClubProfilePage({ params }: PageProps) {
-  const club = await prisma.club.findFirst({
+  const club = await prisma.club.findUnique({
     where: {
       id: params.clubId,
-      name: { not: 'Platform' },
     },
     include: {
       settings: true,
