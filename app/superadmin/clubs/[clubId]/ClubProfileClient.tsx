@@ -18,6 +18,7 @@ import {
   updateClubFeatures,
   updateClubLimits,
   updateClubSubscription,
+  updateClubPlan,
   updateClubInternalNotes,
 } from "./actions";
 
