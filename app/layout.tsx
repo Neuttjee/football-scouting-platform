@@ -57,13 +57,15 @@ export default async function RootLayout({
     }
   }
 
+  const basePrimaryColor =
+    club?.primaryColor ? sanitizePrimaryColor(club.primaryColor) : DEFAULT_PRIMARY_COLOR;
+
   return (
     <RootClientLayout
-      primaryColor={
-        club?.primaryColor ? sanitizePrimaryColor(club.primaryColor) : DEFAULT_PRIMARY_COLOR
-      }
+      primaryColor={basePrimaryColor}
+      primaryRgb={hexToRgb(basePrimaryColor)}
       defaultPrimaryColor={DEFAULT_PRIMARY_COLOR}
-      hexToRgb={hexToRgb}
+      defaultPrimaryRgb={hexToRgb(DEFAULT_PRIMARY_COLOR)}
     >
       <body
         className={`antialiased bg-background text-foreground ${inter.variable} ${jetbrainsMono.variable} font-sans`}

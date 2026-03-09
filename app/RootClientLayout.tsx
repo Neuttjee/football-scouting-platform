@@ -7,24 +7,27 @@ type Props = {
   children: React.ReactNode;
   primaryColor: string;
   defaultPrimaryColor: string;
-  hexToRgb: (hex: string) => string;
+  primaryRgb: string;
+  defaultPrimaryRgb: string;
 };
 
 export function RootClientLayout({
   children,
   primaryColor,
   defaultPrimaryColor,
-  hexToRgb,
+  primaryRgb,
+  defaultPrimaryRgb,
 }: Props) {
   const pathname = usePathname();
 
   const isSuperadminRoute = pathname.startsWith("/superadmin");
 
   const effectivePrimary = isSuperadminRoute ? defaultPrimaryColor : primaryColor;
+  const effectiveRgb = isSuperadminRoute ? defaultPrimaryRgb : primaryRgb;
 
   const customStyles = {
     "--primary-color": effectivePrimary,
-    "--primary-rgb": hexToRgb(effectivePrimary),
+    "--primary-rgb": effectiveRgb,
   } as React.CSSProperties;
 
   return (
