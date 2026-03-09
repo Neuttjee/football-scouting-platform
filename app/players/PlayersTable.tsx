@@ -4,6 +4,7 @@ import * as React from "react"
 import {
   ColumnDef,
   ColumnFiltersState,
+  ColumnVisibilityState,
   SortingState,
   flexRender,
   getCoreRowModel,
@@ -115,8 +116,16 @@ export function getColumns(clubUsers: any[], clubName: string | null): ColumnDef
         return (
           <HoverCard>
             <HoverCardTrigger asChild>
-              <Link href={`/players/${player.id}/profile`} className="font-medium text-text-primary hover:text-accent-primary transition-colors cursor-pointer">
+              <Link
+                href={`/players/${player.id}/profile`}
+                className="font-medium text-text-primary hover:text-accent-primary transition-colors cursor-pointer flex items-center gap-1"
+              >
                 {player.name}
+                {player.isTopTalent && (
+                  <span className="inline-flex items-center rounded-full bg-accent-primary/10 px-2 py-0.5 text-[10px] font-semibold text-accent-primary uppercase tracking-wide">
+                    Top
+                  </span>
+                )}
               </Link>
             </HoverCardTrigger>
             <HoverCardContent className="w-80 bg-bg-card border-accent-primary shadow-[0_0_30px_rgba(0,0,0,0.5)] z-50">
@@ -347,6 +356,7 @@ function Filter({
 export function PlayersTable({ data, clubUsers = [], clubName = null }: { data: Player[], clubUsers?: any[], clubName?: string | null }) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
+  const [columnVisibility, setColumnVisibility] = React.useState<ColumnVisibilityState>({})
 
   const columns = React.useMemo(() => getColumns(clubUsers, clubName), [clubUsers, clubName]);
 
@@ -363,11 +373,43 @@ export function PlayersTable({ data, clubUsers = [], clubName = null }: { data: 
     state: {
       sorting,
       columnFilters,
+      columnVisibility,
     },
+    onColumnVisibilityChange: setColumnVisibility,
   })
 
   return (
     <DataTable.Wrapper>
+      <div className="flex justify-end mb-2">
+        <Popover>
+          <PopoverTrigger asChild>
+            <button className="h-8 px-3 text-xs rounded border border-border-dark bg-bg-primary text-text-primary hover:border-accent-primary/60">
+              Kolommen
+            </button>
+          </PopoverTrigger>
+          <PopoverContent className="w-56 p-2 bg-bg-card border-border-dark shadow-lg" align="end">
+            <div className="space-y-1">
+              {table
+                .getAllLeafColumns()
+                .filter((column) => column.id !== "actions" && column.id !== "name")
+                .map((column) => (
+                  <label key={column.id} className="flex items-center gap-2 text-sm text-text-primary">
+                    <Checkbox
+                      checked={column.getIsVisible()}
+                      onCheckedChange={(val) => column.toggleVisibility(Boolean(val))}
+                      className="border-border-dark data-[state=checked]:bg-accent-primary data-[state=checked]:border-accent-primary"
+                    />
+                    <span className="truncate">
+                      {typeof column.columnDef.header === "string"
+                        ? column.columnDef.header
+                        : column.id}
+                    </span>
+                  </label>
+                ))}
+            </div>
+          </PopoverContent>
+        </Popover>
+      </div>
       <Table className="min-w-max">
         <TableHeader className="bg-bg-secondary">
           {table.getHeaderGroups().map((headerGroup) => (

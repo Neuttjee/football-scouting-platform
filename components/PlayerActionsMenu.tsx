@@ -227,17 +227,10 @@ export function PlayerActionsMenu({
             <p className="text-sm text-text-secondary">
               Weet je zeker dat je <strong>{player.name}</strong> wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
             </p>
-            <div className="flex justify-end gap-2 pt-2">
-              <Button
-                variant="outline"
-                className="border-border-dark text-text-primary hover:bg-bg-hover"
-                onClick={() => setOpenDelete(false)}
-              >
-                Annuleren
-              </Button>
+            <div className="flex justify-end pt-2">
               <Button
                 variant="destructive"
-                className="bg-red-600 hover:bg-red-700 text-white"
+                className="btn-premium bg-red-600 hover:bg-red-700 text-white"
                 onClick={handleDelete}
               >
                 Verwijderen

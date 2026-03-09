@@ -104,7 +104,7 @@ async function savePlayerLogic(playerId: string | null, formData: FormData) {
         joinedAt: safeType === 'INTERNAL' ? joinedAt : null,
         contractEndDate: safeType === 'INTERNAL' ? contractEndDate : null,
         optionYear: safeType === 'INTERNAL' ? optionYear : false,
-        isTopTalent: safeType === 'INTERNAL' ? isTopTalent : false,
+        isTopTalent,
         distanceFromClubKm: safeType === 'INTERNAL' ? distanceFromClubKm : null,
         step,
         status: statusInput, // direct uit formulier
@@ -132,7 +132,7 @@ async function savePlayerLogic(playerId: string | null, formData: FormData) {
         joinedAt: safeType === 'INTERNAL' ? joinedAt : null,
         contractEndDate: safeType === 'INTERNAL' ? contractEndDate : null,
         optionYear: safeType === 'INTERNAL' ? optionYear : false,
-        isTopTalent: safeType === 'INTERNAL' ? isTopTalent : false,
+        isTopTalent,
         distanceFromClubKm: safeType === 'INTERNAL' ? distanceFromClubKm : null,
         step,
         status: statusInput, // direct uit formulier

@@ -118,6 +118,7 @@ export default async function PlayersPage() {
       age: p.dateOfBirth ? calculateAgeFromDate(p.dateOfBirth) : p.age ?? null,
       advies: p.advies,
       notes: p.notes,
+      isTopTalent: p.isTopTalent,
     }));
 
   const internalPlayers: InternalPlayerForPage[] = players

@@ -58,6 +58,7 @@ export function PlayerForm({
   const [playerType, setPlayerType] = React.useState<PlayerTypeValue>(
     initialValues.type === "INTERNAL" ? "INTERNAL" : "EXTERNAL"
   );
+  const [name, setName] = React.useState(initialValues.name || "");
   const [currentClubValue, setCurrentClubValue] = React.useState(
     initialValues.currentClub || ""
   );
@@ -75,6 +76,7 @@ export function PlayerForm({
     const fd = new FormData(e.currentTarget);
     // zorg dat type altijd goed meegaat
     fd.set("type", playerType);
+    fd.set("name", name);
     await onSubmit(fd);
   };
 
@@ -182,16 +184,14 @@ export function PlayerForm({
               size="sm"
             />
           </div>
-          {isInternal && (
-            <label className="flex items-center gap-2 text-sm text-text-secondary">
-              <input
-                type="checkbox"
-                name="isTopTalent"
-                defaultChecked={!!initialValues.isTopTalent}
-              />
-              Top speler
-            </label>
-          )}
+          <label className="flex items-center gap-2 text-sm text-text-secondary">
+            <input
+              type="checkbox"
+              name="isTopTalent"
+              defaultChecked={!!initialValues.isTopTalent}
+            />
+            {isInternal ? "Top speler" : "Top prioriteit"}
+          </label>
         </div>
 
         {/* Naam */}
@@ -202,7 +202,8 @@ export function PlayerForm({
           <input
             type="text"
             name="name"
-            defaultValue={initialValues.name || ""}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             required
             className="w-full border border-border-dark rounded p-2 bg-background focus:border-accent-primary focus-visible:outline-none"
           />
@@ -366,7 +367,7 @@ export function PlayerForm({
             Speler
           </div>
           <div className="font-medium text-sm text-text-primary">
-            {initialValues.name || "-"}
+            {name || "-"}
           </div>
         </div>
 
