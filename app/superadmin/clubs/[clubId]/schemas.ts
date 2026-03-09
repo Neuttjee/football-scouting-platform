@@ -12,7 +12,7 @@ export const clubGeneralSchema = z.object({
 });
 
 export const clubFeaturesSchema = z.object({
-  features: z.record(z.boolean()),
+  features: z.record(z.string(), z.boolean()),
 });
 
 export const clubLimitsSchema = z.object({
