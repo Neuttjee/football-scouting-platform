@@ -4,7 +4,6 @@ import * as React from "react"
 import {
   ColumnDef,
   ColumnFiltersState,
-  ColumnVisibility,
   SortingState,
   flexRender,
   getCoreRowModel,
@@ -356,7 +355,7 @@ function Filter({
 export function PlayersTable({ data, clubUsers = [], clubName = null }: { data: Player[], clubUsers?: any[], clubName?: string | null }) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
-  const [columnVisibility, setColumnVisibility] = React.useState<ColumnVisibility>({})
+  const [columnVisibility, setColumnVisibility] = React.useState<Record<string, boolean>>({})
 
   const columns = React.useMemo(() => getColumns(clubUsers, clubName), [clubUsers, clubName]);
 
