@@ -84,9 +84,12 @@ export async function updateClubFeatures(clubId: string, formData: FormData) {
     features: Object.fromEntries(featureEntries),
   });
 
+  const featuresRecord = parsed.features as Record<string, boolean>;
+
   await prisma.$transaction(
-    Object.entries(parsed.features).map(([key, enabled]) =>
-      prisma.clubFeature.upsert({
+    Object.entries(featuresRecord).map(([key, enabled]) => {
+      const enabledBool: boolean = enabled;
+      return prisma.clubFeature.upsert({
         where: {
           clubId_key: {
             clubId,
@@ -96,13 +99,13 @@ export async function updateClubFeatures(clubId: string, formData: FormData) {
         create: {
           clubId,
           key,
-          enabled,
+          enabled: enabledBool,
         },
         update: {
-          enabled,
+          enabled: enabledBool,
         },
-      }),
-    ),
+      });
+    }),
   );
 
   revalidatePath(`/superadmin/clubs/${clubId}`);
