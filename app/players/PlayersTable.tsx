@@ -378,10 +378,10 @@ export function PlayersTable({ data, clubUsers = [], clubName = null }: { data: 
 
   return (
     <DataTable.Wrapper>
-      <div className="flex justify-end mb-2">
+      <div className="relative">
         <Popover>
           <PopoverTrigger asChild>
-            <button className="h-8 px-3 text-xs rounded border border-border-dark bg-bg-primary text-text-primary hover:border-accent-primary/60 flex items-center justify-center">
+            <button className="absolute top-2 right-2 h-8 w-8 rounded border border-border-dark bg-bg-secondary/80 text-text-primary hover:border-accent-primary/60 flex items-center justify-center backdrop-blur-sm">
               <Settings className="h-4 w-4" />
               <span className="sr-only">Kolommen</span>
             </button>
@@ -408,8 +408,7 @@ export function PlayersTable({ data, clubUsers = [], clubName = null }: { data: 
             </div>
           </PopoverContent>
         </Popover>
-      </div>
-      <Table className="min-w-max">
+        <Table className="min-w-max">
         <TableHeader className="bg-bg-secondary">
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id} className="border-border-dark hover:bg-transparent">
@@ -467,7 +466,8 @@ export function PlayersTable({ data, clubUsers = [], clubName = null }: { data: 
             </TableRow>
           )}
         </TableBody>
-      </Table>
+        </Table>
+      </div>
     </DataTable.Wrapper>
   )
 }
