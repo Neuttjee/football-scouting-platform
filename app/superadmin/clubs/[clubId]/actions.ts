@@ -9,6 +9,7 @@ import {
   clubLimitsSchema,
   clubSubscriptionSchema,
   clubInternalNotesSchema,
+  clubPlanSchema,
 } from './schemas';
 import { CLUB_FEATURE_DEFINITIONS } from '@/lib/clubFeatures';
 import { sanitizePrimaryColor } from '@/lib/branding';
@@ -191,6 +192,43 @@ export async function updateClubSubscription(clubId: string, formData: FormData)
       invoiceReference: parsed.invoiceReference || null,
       customerNumber: parsed.customerNumber || null,
       notes: parsed.notes || null,
+    } as any,
+  });
+
+  revalidatePath(`/superadmin/clubs/${clubId}`);
+}
+
+export async function updateClubPlan(clubId: string, formData: FormData) {
+  await assertSuperadmin();
+
+  const raw = {
+    plan: (formData.get('plan') as string) ?? 'BASIC',
+    status: (formData.get('status') as string) ?? 'ACTIVE',
+  };
+
+  const parsed = clubPlanSchema.parse(raw);
+
+  await prisma.clubSubscription.upsert({
+    where: { clubId },
+    create: {
+      clubId,
+      plan: parsed.plan,
+      status: parsed.status,
+      billingCycle: 'MONTHLY',
+      priceMinor: null,
+      currency: 'EUR',
+      startsAt: null,
+      renewsAt: null,
+      endsAt: null,
+      paymentStatus: 'OPEN',
+      paymentMethod: 'MANUAL',
+      invoiceReference: null,
+      customerNumber: null,
+      notes: null,
+    } as any,
+    update: {
+      plan: parsed.plan,
+      status: parsed.status,
     } as any,
   });
 

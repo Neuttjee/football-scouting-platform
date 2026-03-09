@@ -23,7 +23,7 @@ export default async function ClubProfilePage({ params }: PageProps) {
       subscription: true,
       internalNote: true,
       users: {
-        select: { id: true, isActive: true },
+        select: { id: true, name: true, email: true, role: true, isActive: true },
       },
     },
   });
@@ -46,6 +46,7 @@ export default async function ClubProfilePage({ params }: PageProps) {
       subscription={club.subscription}
       internalNote={club.internalNote}
       userStats={{ activeUsers }}
+      clubUsers={club.users}
     />
   );
 }

@@ -39,6 +39,11 @@ export const clubSubscriptionSchema = z.object({
   notes: z.string().nullable().optional(),
 });
 
+export const clubPlanSchema = z.object({
+  plan: z.enum(['TRIAL', 'BASIC', 'PREMIUM', 'CUSTOM']),
+  status: z.enum(['ACTIVE', 'PAUSED', 'CANCELED', 'EXPIRED']),
+});
+
 export const clubInternalNotesSchema = z.object({
   notes: z.string().nullable().optional(),
 });

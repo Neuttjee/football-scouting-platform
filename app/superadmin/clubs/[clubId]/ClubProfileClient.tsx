@@ -30,6 +30,13 @@ type ClubProfileClientProps = {
   userStats: {
     activeUsers: number;
   };
+  clubUsers: {
+    id: string;
+    name: string | null;
+    email: string | null;
+    role: string;
+    isActive: boolean;
+  }[];
 };
 
 export function ClubProfileClient({
@@ -39,6 +46,7 @@ export function ClubProfileClient({
   subscription,
   internalNote,
   userStats,
+  clubUsers,
 }: ClubProfileClientProps) {
   const [savingSection, setSavingSection] = React.useState<string | null>(null);
 
@@ -108,8 +116,8 @@ export function ClubProfileClient({
         <TabsList>
           <TabsTrigger value="general">Algemeen</TabsTrigger>
           <TabsTrigger value="modules">Modules</TabsTrigger>
-          <TabsTrigger value="limits">Gebruikers &amp; limieten</TabsTrigger>
           <TabsTrigger value="subscription">Abonnement</TabsTrigger>
+          <TabsTrigger value="billing">Facturatie</TabsTrigger>
           <TabsTrigger value="internal">Intern beheer</TabsTrigger>
         </TabsList>
 
@@ -272,17 +280,49 @@ export function ClubProfileClient({
           </Card>
         </TabsContent>
 
-        <TabsContent value="limits">
+        <TabsContent value="subscription">
           <Card>
             <CardHeader>
-              <CardTitle>Gebruikers &amp; limieten</CardTitle>
+              <CardTitle>Abonnement</CardTitle>
               <CardDescription>
-                Stel het maximale aantal gebruikers in en bekijk bezetting.
+                Kies het abonnementsniveau en basisparameters. Facturatiegegevens stel je in op het tabblad Facturatie.
               </CardDescription>
             </CardHeader>
-            <form onSubmit={handleSubmit("limits", updateClubLimits)}>
+            <form onSubmit={handleSubmit("subscription", updateClubPlan)}>
               <input type="hidden" name="clubId" value={club.id} />
               <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="space-y-2">
+                    <label className="block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      Abonnementstype
+                    </label>
+                    <select
+                      name="plan"
+                      defaultValue={subscription?.plan || "BASIC"}
+                      className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
+                    >
+                      <option value="BASIC">Scout Core (tot 5 gebruikers)</option>
+                      <option value="PREMIUM">Scout Pro (tot 10 gebruikers)</option>
+                      <option value="CUSTOM">Scout Elite (tot 15 gebruikers)</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      Status
+                    </label>
+                    <select
+                      name="status"
+                      defaultValue={subscription?.status || "ACTIVE"}
+                      className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
+                    >
+                      <option value="ACTIVE">Actief</option>
+                      <option value="PAUSED">Gepauzeerd</option>
+                      <option value="CANCELED">Opgezegd</option>
+                      <option value="EXPIRED">Verlopen</option>
+                    </select>
+                  </div>
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="rounded-lg bg-bg-primary/70 border border-border-dark p-4">
                     <div className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
@@ -308,76 +348,67 @@ export function ClubProfileClient({
                   </div>
                 </div>
 
-                <div className="max-w-xs space-y-2">
-                  <label className="block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                    Maximaal aantal gebruikers
-                  </label>
-                  <input
-                    type="number"
-                    name="maxUsers"
-                    min={1}
-                    max={10000}
-                    defaultValue={maxUsers}
-                    className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
-                  />
+                <div className="space-y-2">
+                  <h3 className="text-sm font-semibold text-text-primary">Gebruikers</h3>
                   <p className="text-xs text-muted-foreground">
-                    Wordt gebruikt voor licenties, pricing en seats-beheer.
+                    Overzicht van alle gebruikers die aan deze club zijn gekoppeld.
                   </p>
-                </div>
-              </CardContent>
-              <CardFooter className="flex justify-end pt-4">
-                <button
-                  type="submit"
-                  className="btn-premium text-white px-6 py-2 rounded-lg transition disabled:opacity-50 font-medium"
-                  disabled={savingSection === "limits"}
-                >
-                  {savingSection === "limits" ? "Opslaan..." : "Opslaan"}
-                </button>
-              </CardFooter>
-            </form>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="subscription">
-          <Card>
-            <CardHeader>
-              <CardTitle>Abonnement</CardTitle>
-              <CardDescription>
-                Kies het abonnementsniveau en basisparameters. Facturatiegegevens stel je in op het tabblad Facturatie.
-              </CardDescription>
-            </CardHeader>
-            <form onSubmit={handleSubmit("subscription", updateClubSubscription)}>
-              <input type="hidden" name="clubId" value={club.id} />
-              <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="space-y-2">
-                    <label className="block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                      Abonnementstype
-                    </label>
-                    <select
-                      name="plan"
-                      defaultValue={subscription?.plan || "CORE"}
-                      className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
-                    >
-                      <option value="CORE">Scout Core (tot 5 gebruikers)</option>
-                      <option value="PRO">Scout Pro (tot 10 gebruikers)</option>
-                      <option value="ELITE">Scout Elite (tot 15 gebruikers)</option>
-                    </select>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                      Status
-                    </label>
-                    <select
-                      name="status"
-                      defaultValue={subscription?.status || "ACTIVE"}
-                      className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
-                    >
-                      <option value="ACTIVE">Actief</option>
-                      <option value="PAUSED">Gepauzeerd</option>
-                      <option value="CANCELED">Opgezegd</option>
-                      <option value="EXPIRED">Verlopen</option>
-                    </select>
+                  <div className="overflow-x-auto border border-border-dark rounded-lg">
+                    <table className="min-w-full text-sm">
+                      <thead className="bg-bg-secondary">
+                        <tr>
+                          <th className="px-3 py-2 text-left text-xs font-semibold text-text-secondary uppercase tracking-wide">
+                            Naam
+                          </th>
+                          <th className="px-3 py-2 text-left text-xs font-semibold text-text-secondary uppercase tracking-wide">
+                            E-mailadres
+                          </th>
+                          <th className="px-3 py-2 text-left text-xs font-semibold text-text-secondary uppercase tracking-wide">
+                            Rol
+                          </th>
+                          <th className="px-3 py-2 text-left text-xs font-semibold text-text-secondary uppercase tracking-wide">
+                            Status
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {clubUsers.length === 0 ? (
+                          <tr>
+                            <td
+                              colSpan={4}
+                              className="px-3 py-4 text-center text-xs text-text-muted"
+                            >
+                              Geen gebruikers gekoppeld aan deze club.
+                            </td>
+                          </tr>
+                        ) : (
+                          clubUsers.map((u) => (
+                            <tr key={u.id} className="border-t border-border-dark">
+                              <td className="px-3 py-2 text-text-primary">
+                                {u.name || "-"}
+                              </td>
+                              <td className="px-3 py-2 text-text-secondary">
+                                {u.email || "-"}
+                              </td>
+                              <td className="px-3 py-2 text-text-secondary">
+                                {u.role}
+                              </td>
+                              <td className="px-3 py-2">
+                                <span
+                                  className={
+                                    u.isActive
+                                      ? "inline-flex items-center rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/40 px-2 py-0.5 text-[11px] font-medium"
+                                      : "inline-flex items-center rounded-full bg-red-500/10 text-red-400 border border-red-500/40 px-2 py-0.5 text-[11px] font-medium"
+                                  }
+                                >
+                                  {u.isActive ? "Actief" : "Inactief"}
+                                </span>
+                              </td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
                   </div>
                 </div>
               </CardContent>
@@ -388,6 +419,182 @@ export function ClubProfileClient({
                   disabled={savingSection === "subscription"}
                 >
                   {savingSection === "subscription" ? "Opslaan..." : "Opslaan"}
+                </button>
+              </CardFooter>
+            </form>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="billing">
+          <Card>
+            <CardHeader>
+              <CardTitle>Facturatie</CardTitle>
+              <CardDescription>
+                Beheer factuurgegevens, betaalstatus en facturatieperiode voor deze club.
+              </CardDescription>
+            </CardHeader>
+            <form onSubmit={handleSubmit("billing", updateClubSubscription)}>
+              <input type="hidden" name="clubId" value={club.id} />
+              <input type="hidden" name="plan" value={subscription?.plan || "BASIC"} />
+              <input type="hidden" name="status" value={subscription?.status || "ACTIVE"} />
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="space-y-2">
+                    <label className="block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      Facturatieperiode
+                    </label>
+                    <select
+                      name="billingCycle"
+                      defaultValue={subscription?.billingCycle || "MONTHLY"}
+                      className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
+                    >
+                      <option value="MONTHLY">Maandelijks</option>
+                      <option value="YEARLY">Jaarlijks</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      Prijs (centen)
+                    </label>
+                    <input
+                      type="number"
+                      name="priceMinor"
+                      min={0}
+                      defaultValue={subscription?.priceMinor ?? ""}
+                      className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
+                      placeholder="Bijv. 9900 voor €99,00"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      Valuta
+                    </label>
+                    <input
+                      name="currency"
+                      defaultValue={subscription?.currency || "EUR"}
+                      className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="space-y-2">
+                    <label className="block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      Betaalstatus
+                    </label>
+                    <select
+                      name="paymentStatus"
+                      defaultValue={subscription?.paymentStatus || "OPEN"}
+                      className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
+                    >
+                      <option value="PAID">Betaald</option>
+                      <option value="OPEN">Openstaand</option>
+                      <option value="PAST_DUE">Te laat</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      Ingangsdatum
+                    </label>
+                    <input
+                      type="date"
+                      name="startsAt"
+                      defaultValue={
+                        subscription?.startsAt
+                          ? new Date(subscription.startsAt).toISOString().slice(0, 10)
+                          : ""
+                      }
+                      className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      Verlengdatum
+                    </label>
+                    <input
+                      type="date"
+                      name="renewsAt"
+                      defaultValue={
+                        subscription?.renewsAt
+                          ? new Date(subscription.renewsAt).toISOString().slice(0, 10)
+                          : ""
+                      }
+                      className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="space-y-2">
+                    <label className="block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      Einddatum
+                    </label>
+                    <input
+                      type="date"
+                      name="endsAt"
+                      defaultValue={
+                        subscription?.endsAt
+                          ? new Date(subscription.endsAt).toISOString().slice(0, 10)
+                          : ""
+                      }
+                      className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      Betalmethode
+                    </label>
+                    <select
+                      name="paymentMethod"
+                      defaultValue={subscription?.paymentMethod || "MANUAL"}
+                      className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
+                    >
+                      <option value="MANUAL">Handmatig</option>
+                      <option value="INVOICE">Factuur</option>
+                      <option value="DIRECT_DEBIT">Incasso</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                      Factuurreferentie / klantnummer
+                    </label>
+                    <div className="flex flex-col gap-2">
+                      <input
+                        name="invoiceReference"
+                        defaultValue={subscription?.invoiceReference || ""}
+                        className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
+                        placeholder="Factuurreferentie"
+                      />
+                      <input
+                        name="customerNumber"
+                        defaultValue={subscription?.customerNumber || ""}
+                        className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
+                        placeholder="Klantnummer"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    Betaalnotities
+                  </label>
+                  <textarea
+                    name="notes"
+                    defaultValue={subscription?.notes || ""}
+                    rows={4}
+                    className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none text-sm"
+                    placeholder="Interne betaalafspraken, korting, betalingsgedrag..."
+                  />
+                </div>
+              </CardContent>
+              <CardFooter className="flex justify-end pt-4">
+                <button
+                  type="submit"
+                  className="btn-premium text-white px-6 py-2 rounded-lg transition disabled:opacity-50 font-medium"
+                  disabled={savingSection === "billing"}
+                >
+                  {savingSection === "billing" ? "Opslaan..." : "Opslaan"}
                 </button>
               </CardFooter>
             </form>
