@@ -1,7 +1,7 @@
-\"use client\";
+"use client";
 
-import * as React from \"react\";
-import { usePathname } from \"next/navigation\";
+import * as React from "react";
+import { usePathname } from "next/navigation";
 
 type Props = {
   children: React.ReactNode;
@@ -18,17 +18,17 @@ export function RootClientLayout({
 }: Props) {
   const pathname = usePathname();
 
-  const isSuperadminRoute = pathname.startsWith(\"/superadmin\");
+  const isSuperadminRoute = pathname.startsWith("/superadmin");
 
   const effectivePrimary = isSuperadminRoute ? defaultPrimaryColor : primaryColor;
 
-  const customStyles: React.CSSProperties = {
-    \"--primary-color\": effectivePrimary,
-    \"--primary-rgb\": hexToRgb(effectivePrimary),
-  };
+  const customStyles = {
+    "--primary-color": effectivePrimary,
+    "--primary-rgb": hexToRgb(effectivePrimary),
+  } as React.CSSProperties;
 
   return (
-    <html lang=\"nl\" suppressHydrationWarning style={customStyles}>
+    <html lang="nl" suppressHydrationWarning style={customStyles}>
       {children}
     </html>
   );
