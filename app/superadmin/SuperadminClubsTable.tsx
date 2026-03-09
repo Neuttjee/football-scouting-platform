@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { DataTable } from '@/components/DataTable';
 import { Plus } from 'lucide-react';
@@ -132,8 +133,20 @@ export function SuperadminClubsTable({
           <DataTable.Empty colSpan={7}>Geen clubs. Klik op &quot;Club toevoegen&quot; om te starten.</DataTable.Empty>
         ) : (
           rows.map((row) => (
-            <DataTable.Row key={row.id}>
-              <DataTable.Cell className="font-medium text-primary-brand">{row.name}</DataTable.Cell>
+          <DataTable.Row key={row.id}>
+            <DataTable.Cell className="font-medium">
+              <button
+                type="button"
+                onClick={() => router.push(`/superadmin/clubs/${row.id}`)}
+                className={
+                  activeClubId === row.id
+                    ? 'text-[#FF6A00] hover:text-[#ff8533] underline-offset-2 hover:underline'
+                    : 'text-primary-brand hover:text-accent-primary underline-offset-2 hover:underline'
+                }
+              >
+                {row.name}
+              </button>
+            </DataTable.Cell>
               <DataTable.Cell className="text-right">{row.userCount}</DataTable.Cell>
               <DataTable.Cell className="text-right">{row.playerCount}</DataTable.Cell>
               <DataTable.Cell className="text-right">{row.totalLogins}</DataTable.Cell>

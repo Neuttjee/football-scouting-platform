@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   Card,
@@ -78,11 +79,20 @@ export function ClubProfileClient({
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap justify-between gap-4 items-center">
-        <div>
-          <h1 className="text-3xl font-bold">{club.name}</h1>
-          <p className="text-sm text-muted-foreground">
-            Beheer clubinstellingen, modules, limieten en abonnement als superadmin.
-          </p>
+        <div className="space-y-2">
+          <Link
+            href="/superadmin"
+            className="text-text-muted hover:text-text-primary transition-colors text-sm uppercase tracking-wider font-medium inline-flex items-center gap-1"
+          >
+            <span>←</span>
+            <span>Terug naar clubs</span>
+          </Link>
+          <div>
+            <h1 className="text-3xl font-bold">{club.name}</h1>
+            <p className="text-sm text-muted-foreground">
+              Beheer clubinstellingen, modules, limieten en abonnement als superadmin.
+            </p>
+          </div>
         </div>
         <div className="flex flex-col items-end gap-2">
           <StatusPill tone={statusTone as any}>

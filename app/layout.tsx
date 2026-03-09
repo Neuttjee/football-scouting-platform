@@ -10,6 +10,7 @@ import { Topbar } from '@/components/Topbar';
 import { hexToRgb, sanitizePrimaryColor, DEFAULT_PRIMARY_COLOR } from '@/lib/branding';
 import { ClubConfigProvider } from '@/components/club/ClubConfigProvider';
 import { getClubConfigByClubId } from '@/lib/clubConfig';
+import { RootClientLayout } from './RootClientLayout';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 const jetbrainsMono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono' });
@@ -27,7 +28,7 @@ export default async function RootLayout({
   const session = await getSession();
   const effectiveClubId = getEffectiveClubId(session);
   let club = null;
-   let clubConfig = null;
+  let clubConfig = null;
 
   if (session && effectiveClubId) {
     const [clubRecord, config] = await Promise.all([
@@ -56,22 +57,13 @@ export default async function RootLayout({
     }
   }
 
-  const primaryColor =
-    club?.primaryColor
-      ? sanitizePrimaryColor(club.primaryColor)
-      : DEFAULT_PRIMARY_COLOR;
-
-  // Whitelabel styling variables
-  const customStyles = {
-    '--primary-color': primaryColor,
-    '--primary-rgb': hexToRgb(primaryColor),
-  } as React.CSSProperties;
-
   return (
-    <html
-      lang="nl"
-      suppressHydrationWarning
-      style={customStyles} // <<-- HIER staat nu de primary kleur
+    <RootClientLayout
+      primaryColor={
+        club?.primaryColor ? sanitizePrimaryColor(club.primaryColor) : DEFAULT_PRIMARY_COLOR
+      }
+      defaultPrimaryColor={DEFAULT_PRIMARY_COLOR}
+      hexToRgb={hexToRgb}
     >
       <body
         className={`antialiased bg-background text-foreground ${inter.variable} ${jetbrainsMono.variable} font-sans`}
@@ -102,6 +94,6 @@ export default async function RootLayout({
           )}
         </ThemeProvider>
       </body>
-    </html>
+    </RootClientLayout>
   );
 }

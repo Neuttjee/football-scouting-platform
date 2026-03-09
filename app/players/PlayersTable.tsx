@@ -381,7 +381,7 @@ export function PlayersTable({ data, clubUsers = [], clubName = null }: { data: 
       <div className="relative">
         <Popover>
           <PopoverTrigger asChild>
-            <button className="absolute top-2 right-2 h-8 w-8 rounded border border-border-dark bg-bg-secondary/80 text-text-primary hover:border-accent-primary/60 flex items-center justify-center backdrop-blur-sm">
+            <button className="absolute top-2 right-2 h-8 w-8 rounded bg-transparent text-text-muted hover:text-accent-primary flex items-center justify-center">
               <Settings className="h-4 w-4" />
               <span className="sr-only">Kolommen</span>
             </button>
