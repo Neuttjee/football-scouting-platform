@@ -107,9 +107,9 @@ export function ClubProfileClient({
       <Tabs defaultValue="general" className="space-y-4">
         <TabsList>
           <TabsTrigger value="general">Algemeen</TabsTrigger>
-          <TabsTrigger value="modules">Modules &amp; features</TabsTrigger>
+          <TabsTrigger value="modules">Modules</TabsTrigger>
           <TabsTrigger value="limits">Gebruikers &amp; limieten</TabsTrigger>
-          <TabsTrigger value="subscription">Abonnement &amp; facturatie</TabsTrigger>
+          <TabsTrigger value="subscription">Abonnement</TabsTrigger>
           <TabsTrigger value="internal">Intern beheer</TabsTrigger>
         </TabsList>
 
@@ -134,17 +134,6 @@ export function ClubProfileClient({
                       defaultValue={club.name}
                       required
                       className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                      Korte naam
-                    </label>
-                    <input
-                      name="shortName"
-                      defaultValue={(club as any).shortName || ""}
-                      className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
-                      placeholder="Bijv. PSV O13"
                     />
                   </div>
                 </div>
@@ -200,23 +189,13 @@ export function ClubProfileClient({
                       </span>
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <label className="block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                      Secundaire kleur
-                    </label>
-                    <div className="flex items-center gap-4">
-                      <input
-                        type="color"
-                        name="secondaryColor"
-                        defaultValue={(club as any).secondaryColor || "#1F2933"}
-                        className="h-10 w-20 border-0 rounded cursor-pointer bg-transparent"
-                      />
-                      <span className="text-xs text-muted-foreground">
-                        Kan later worden gebruikt voor extra merkaccenten.
-                      </span>
-                    </div>
-                  </div>
                 </div>
+
+                <input
+                  type="hidden"
+                  name="secondaryColor"
+                  defaultValue={(club as any).secondaryColor || "#1F2933"}
+                />
 
                 <div className="space-y-2">
                   <label className="block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
@@ -227,17 +206,16 @@ export function ClubProfileClient({
                     defaultValue={internalNote?.notes || ""}
                     rows={4}
                     className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none text-sm"
-                    placeholder="Interne afspraken, context of bijzonderheden bij deze club."
                   />
                 </div>
               </CardContent>
-              <CardFooter className="flex justify-end">
+              <CardFooter className="flex justify-end pt-4">
                 <button
                   type="submit"
                   className="btn-premium text-white px-6 py-2 rounded-lg transition disabled:opacity-50 font-medium"
                   disabled={savingSection === "general"}
                 >
-                  {savingSection === "general" ? "Opslaan..." : "Algemeen opslaan"}
+                  {savingSection === "general" ? "Opslaan..." : "Opslaan"}
                 </button>
               </CardFooter>
             </form>
@@ -247,7 +225,7 @@ export function ClubProfileClient({
         <TabsContent value="modules">
           <Card>
             <CardHeader>
-              <CardTitle>Modules &amp; features</CardTitle>
+              <CardTitle>Modules</CardTitle>
               <CardDescription>
                 Bepaal welke onderdelen van het platform beschikbaar zijn voor deze club.
               </CardDescription>
@@ -256,7 +234,9 @@ export function ClubProfileClient({
               <input type="hidden" name="clubId" value={club.id} />
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {CLUB_FEATURE_DEFINITIONS.map((feature) => (
+                  {CLUB_FEATURE_DEFINITIONS.filter((feature) =>
+                    ["dashboard", "external_players", "internal_players", "tasks", "contact_logs", "shortlists", "contracts", "match_reports"].includes(feature.key)
+                  ).map((feature) => (
                     <label
                       key={feature.key}
                       className="flex items-start gap-3 rounded-lg border border-border-dark bg-bg-primary/60 px-3 py-2 cursor-pointer hover:border-accent-primary/60"
@@ -279,13 +259,13 @@ export function ClubProfileClient({
                   ))}
                 </div>
               </CardContent>
-              <CardFooter className="flex justify-end">
+              <CardFooter className="flex justify-end pt-4">
                 <button
                   type="submit"
                   className="btn-premium text-white px-6 py-2 rounded-lg transition disabled:opacity-50 font-medium"
                   disabled={savingSection === "features"}
                 >
-                  {savingSection === "features" ? "Opslaan..." : "Modules opslaan"}
+                  {savingSection === "features" ? "Opslaan..." : "Opslaan"}
                 </button>
               </CardFooter>
             </form>
@@ -345,13 +325,13 @@ export function ClubProfileClient({
                   </p>
                 </div>
               </CardContent>
-              <CardFooter className="flex justify-end">
+              <CardFooter className="flex justify-end pt-4">
                 <button
                   type="submit"
                   className="btn-premium text-white px-6 py-2 rounded-lg transition disabled:opacity-50 font-medium"
                   disabled={savingSection === "limits"}
                 >
-                  {savingSection === "limits" ? "Opslaan..." : "Limieten opslaan"}
+                  {savingSection === "limits" ? "Opslaan..." : "Opslaan"}
                 </button>
               </CardFooter>
             </form>
@@ -361,9 +341,9 @@ export function ClubProfileClient({
         <TabsContent value="subscription">
           <Card>
             <CardHeader>
-              <CardTitle>Abonnement &amp; facturatie</CardTitle>
+              <CardTitle>Abonnement</CardTitle>
               <CardDescription>
-                Beheer abonnementstype, status, prijzen en betaalgegevens. Nog niet gekoppeld aan een payment provider.
+                Kies het abonnementsniveau en basisparameters. Facturatiegegevens stel je in op het tabblad Facturatie.
               </CardDescription>
             </CardHeader>
             <form onSubmit={handleSubmit("subscription", updateClubSubscription)}>
@@ -376,13 +356,12 @@ export function ClubProfileClient({
                     </label>
                     <select
                       name="plan"
-                      defaultValue={subscription?.plan || "CUSTOM"}
+                      defaultValue={subscription?.plan || "CORE"}
                       className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
                     >
-                      <option value="TRIAL">Proef</option>
-                      <option value="BASIC">Basis</option>
-                      <option value="PREMIUM">Premium</option>
-                      <option value="CUSTOM">Maatwerk</option>
+                      <option value="CORE">Scout Core (tot 5 gebruikers)</option>
+                      <option value="PRO">Scout Pro (tot 10 gebruikers)</option>
+                      <option value="ELITE">Scout Elite (tot 15 gebruikers)</option>
                     </select>
                   </div>
                   <div className="space-y-2">
@@ -400,171 +379,15 @@ export function ClubProfileClient({
                       <option value="EXPIRED">Verlopen</option>
                     </select>
                   </div>
-                  <div className="space-y-2">
-                    <label className="block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                      Facturatieperiode
-                    </label>
-                    <select
-                      name="billingCycle"
-                      defaultValue={subscription?.billingCycle || "MONTHLY"}
-                      className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
-                    >
-                      <option value="MONTHLY">Maandelijks</option>
-                      <option value="YEARLY">Jaarlijks</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="space-y-2">
-                    <label className="block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                      Prijs (centen)
-                    </label>
-                    <input
-                      type="number"
-                      name="priceMinor"
-                      min={0}
-                      defaultValue={subscription?.priceMinor ?? ""}
-                      className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
-                      placeholder="Bijv. 9900 voor €99,00"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                      Valuta
-                    </label>
-                    <input
-                      name="currency"
-                      defaultValue={subscription?.currency || "EUR"}
-                      className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                      Betaalstatus
-                    </label>
-                    <select
-                      name="paymentStatus"
-                      defaultValue={subscription?.paymentStatus || "OPEN"}
-                      className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
-                    >
-                      <option value="PAID">Betaald</option>
-                      <option value="OPEN">Openstaand</option>
-                      <option value="PAST_DUE">Te laat</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="space-y-2">
-                    <label className="block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                      Ingangsdatum
-                    </label>
-                    <input
-                      type="date"
-                      name="startsAt"
-                      defaultValue={
-                        subscription?.startsAt
-                          ? new Date(subscription.startsAt)
-                              .toISOString()
-                              .slice(0, 10)
-                          : ""
-                      }
-                      className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                      Verlengdatum
-                    </label>
-                    <input
-                      type="date"
-                      name="renewsAt"
-                      defaultValue={
-                        subscription?.renewsAt
-                          ? new Date(subscription.renewsAt)
-                              .toISOString()
-                              .slice(0, 10)
-                          : ""
-                      }
-                      className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                      Einddatum
-                    </label>
-                    <input
-                      type="date"
-                      name="endsAt"
-                      defaultValue={
-                        subscription?.endsAt
-                          ? new Date(subscription.endsAt)
-                              .toISOString()
-                              .slice(0, 10)
-                          : ""
-                      }
-                      className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                      Betalmethode
-                    </label>
-                    <select
-                      name="paymentMethod"
-                      defaultValue={subscription?.paymentMethod || "MANUAL"}
-                      className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
-                    >
-                      <option value="MANUAL">Handmatig</option>
-                      <option value="INVOICE">Factuur</option>
-                      <option value="DIRECT_DEBIT">Incasso</option>
-                    </select>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                      Factuurreferentie / klantnummer
-                    </label>
-                    <div className="flex flex-col gap-2">
-                      <input
-                        name="invoiceReference"
-                        defaultValue={subscription?.invoiceReference || ""}
-                        className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
-                        placeholder="Factuurreferentie"
-                      />
-                      <input
-                        name="customerNumber"
-                        defaultValue={subscription?.customerNumber || ""}
-                        className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
-                        placeholder="Klantnummer"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                    Betaalnotities
-                  </label>
-                  <textarea
-                    name="notes"
-                    defaultValue={subscription?.notes || ""}
-                    rows={4}
-                    className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none text-sm"
-                    placeholder="Interne betaalafspraken, korting, betalingsgedrag..."
-                  />
                 </div>
               </CardContent>
-              <CardFooter className="flex justify-end">
+              <CardFooter className="flex justify-end pt-4">
                 <button
                   type="submit"
                   className="btn-premium text-white px-6 py-2 rounded-lg transition disabled:opacity-50 font-medium"
                   disabled={savingSection === "subscription"}
                 >
-                  {savingSection === "subscription" ? "Opslaan..." : "Abonnement opslaan"}
+                  {savingSection === "subscription" ? "Opslaan..." : "Opslaan"}
                 </button>
               </CardFooter>
             </form>
@@ -587,16 +410,15 @@ export function ClubProfileClient({
                   defaultValue={internalNote?.notes || ""}
                   rows={10}
                   className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none text-sm"
-                  placeholder="Beschrijf clubspecifieke afspraken, maatwerkmodules, prijsafspraken en supportnotities."
                 />
               </CardContent>
-              <CardFooter className="flex justify-end">
+              <CardFooter className="flex justify-end pt-4">
                 <button
                   type="submit"
                   className="btn-premium text-white px-6 py-2 rounded-lg transition disabled:opacity-50 font-medium"
                   disabled={savingSection === "internal"}
                 >
-                  {savingSection === "internal" ? "Opslaan..." : "Notities opslaan"}
+                  {savingSection === "internal" ? "Opslaan..." : "Opslaan"}
                 </button>
               </CardFooter>
             </form>

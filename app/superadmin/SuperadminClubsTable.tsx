@@ -140,8 +140,8 @@ export function SuperadminClubsTable({
                 onClick={() => router.push(`/superadmin/clubs/${row.id}`)}
                 className={
                   activeClubId === row.id
-                    ? 'text-[#FF6A00] hover:text-[#ff8533] underline-offset-2 hover:underline'
-                    : 'text-primary-brand hover:text-accent-primary underline-offset-2 hover:underline'
+                    ? 'text-[#FF6A00] hover:text-[#ff8533] underline-offset-2 hover:underline cursor-pointer'
+                    : 'text-text-primary hover:text-accent-primary underline-offset-2 hover:underline cursor-pointer'
                 }
               >
                 {row.name}

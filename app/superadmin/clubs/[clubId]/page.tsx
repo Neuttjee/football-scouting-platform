@@ -33,6 +33,9 @@ export default async function ClubProfilePage({ params }: PageProps) {
   }
 
   const featureState = normalizeFeatureState(club.features);
+  // Schakel nog-niet-werkende modules standaard uit
+  (featureState as any).contracts = false;
+  (featureState as any).match_reports = false;
   const activeUsers = club.users.filter((u) => u.isActive).length;
 
   return (
