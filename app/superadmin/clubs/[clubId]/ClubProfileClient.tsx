@@ -1,8 +1,8 @@
-\"use client\";
+"use client";
 
-import * as React from \"react\";
-import Link from \"next/link\";
-import { SegmentedToggle } from \"@/components/SegmentedToggle\";
+import * as React from "react";
+import Link from "next/link";
+import { SegmentedToggle } from "@/components/SegmentedToggle";
 import {
   Card,
   CardHeader,
@@ -40,6 +40,8 @@ type ClubProfileClientProps = {
   }[];
 };
 
+type Section = "general" | "modules" | "subscription" | "billing" | "internal";
+
 export function ClubProfileClient({
   club,
   settings,
@@ -50,12 +52,13 @@ export function ClubProfileClient({
   clubUsers,
 }: ClubProfileClientProps) {
   const [savingSection, setSavingSection] = React.useState<string | null>(null);
+  const [section, setSection] = React.useState<Section>("general");
 
   const handleSubmit =
-    (section: string, action: (clubId: string, formData: FormData) => Promise<void>) =>
+    (sectionKey: string, action: (clubId: string, formData: FormData) => Promise<void>) =>
     async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      setSavingSection(section);
+      setSavingSection(sectionKey);
       try {
         const formData = new FormData(e.currentTarget);
         await action(club.id, formData);
@@ -93,9 +96,6 @@ export function ClubProfileClient({
     }
   })();
 
-  type Section = \"general\" | \"modules\" | \"subscription\" | \"billing\" | \"internal\";
-  const [section, setSection] = React.useState<Section>(\"general\");
-
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap justify-between gap-4 items-center">
@@ -124,21 +124,21 @@ export function ClubProfileClient({
         </div>
       </div>
 
-      <div className=\"space-y-4\">
+      <div className="space-y-4">
         <SegmentedToggle<Section>
           value={section}
           onChange={setSection}
-          size=\"sm\"
+          size="sm"
           options={[
-            { value: \"general\", label: \"Algemeen\" },
-            { value: \"modules\", label: \"Modules\" },
-            { value: \"subscription\", label: \"Abonnement\" },
-            { value: \"billing\", label: \"Facturatie\" },
-            { value: \"internal\", label: \"Intern beheer\" },
+            { value: "general", label: "Algemeen" },
+            { value: "modules", label: "Modules" },
+            { value: "subscription", label: "Abonnement" },
+            { value: "billing", label: "Facturatie" },
+            { value: "internal", label: "Intern beheer" },
           ]}
         />
 
-        {section === \"general\" && (
+        {section === "general" && (
           <Card>
             <CardHeader>
               <CardTitle>Algemene clubgegevens</CardTitle>
@@ -247,7 +247,7 @@ export function ClubProfileClient({
           </Card>
         )}
 
-        {section === \"modules\" && (
+        {section === "modules" && (
           <Card>
             <CardHeader>
               <CardTitle>Modules</CardTitle>
@@ -297,7 +297,7 @@ export function ClubProfileClient({
           </Card>
         )}
 
-        {section === \"subscription\" && (
+        {section === "subscription" && (
           <Card>
             <CardHeader>
               <CardTitle>Abonnement</CardTitle>
@@ -442,7 +442,7 @@ export function ClubProfileClient({
           </Card>
         )}
 
-        {section === \"billing\" && (
+        {section === "billing" && (
           <Card>
             <CardHeader>
               <CardTitle>Facturatie</CardTitle>
@@ -618,7 +618,7 @@ export function ClubProfileClient({
           </Card>
         )}
 
-        {section === \"internal\" && (
+        {section === "internal" && (
           <Card>
             <CardHeader>
               <CardTitle>Intern beheer</CardTitle>
