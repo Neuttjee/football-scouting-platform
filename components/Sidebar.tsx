@@ -32,13 +32,25 @@ export function Sidebar({ role, clubName, clubLogo }: SidebarProps) {
     navItems.push({ href: '/settings', label: 'Instellingen' });
   }
 
+  const appLogo = clubLogo || '/logo.png';
+  const logoAltText = clubLogo ? 'Club Logo' : 'Scouting Platform Logo';
+
   return (
     <aside className="w-48 flex-col hidden md:flex min-h-screen bg-bg-primary border-r border-border-dark">
       <div className="p-4 pt-8 flex flex-col items-center gap-4 text-center">
-        {clubLogo && (
-          <img src={clubLogo} alt="Club Logo" className="h-24 w-24 object-contain rounded-md" />
+        {appLogo && (
+          <img
+            src={appLogo}
+            alt={logoAltText}
+            className="h-24 w-24 object-contain rounded-md"
+            onError={(e) => {
+              (e.target as HTMLImageElement).style.display = 'none';
+            }}
+          />
         )}
-        <span className="leading-tight text-text-primary text-lg font-bold">{clubName || 'Scouting Platform'}</span>
+        <span className="leading-tight text-text-primary text-lg font-bold">
+          {clubName || 'Scouting Platform'}
+        </span>
       </div>
       <nav className="flex-1 p-4 space-y-2 mt-4">
         {navItems.map((item) => {

@@ -107,11 +107,21 @@ export function ClubProfileClient({
             <span>←</span>
             <span>Terug naar clubs</span>
           </Link>
-          <div>
+          <div className="flex items-center gap-3 mt-1">
+            {(club as any).logo ? (
+              <div className="h-10 w-10 rounded-lg bg-bg-secondary border border-border-dark flex items-center justify-center overflow-hidden">
+                <img
+                  src={(club as any).logo}
+                  alt={`Logo van ${club.name}`}
+                  className="h-full w-full object-contain"
+                />
+              </div>
+            ) : (
+              <div className="h-10 w-10 rounded-lg bg-bg-secondary border border-border-dark flex items-center justify-center text-[10px] font-medium text-text-muted uppercase tracking-wide">
+                Geen logo
+              </div>
+            )}
             <h1 className="text-3xl font-bold">{club.name}</h1>
-            <p className="text-sm text-muted-foreground">
-              Beheer clubinstellingen, modules, limieten en abonnement als superadmin.
-            </p>
           </div>
         </div>
         <div className="flex flex-col items-end gap-2">
