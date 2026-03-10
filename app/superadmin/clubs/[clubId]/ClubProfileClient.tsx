@@ -312,7 +312,7 @@ export function ClubProfileClient({
             <CardHeader>
               <CardTitle>Abonnement</CardTitle>
               <CardDescription>
-                Kies het abonnementsniveau en basisparameters. Facturatiegegevens stel je in op het tabblad Facturatie.
+                Kies het abonnementsniveau en basisparameters. 
               </CardDescription>
             </CardHeader>
             <form onSubmit={handleSubmit("subscription", updateClubPlan)}>
