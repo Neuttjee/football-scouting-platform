@@ -1,6 +1,14 @@
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY || '');
+function getResendClient() {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    throw new Error(
+      'RESEND_API_KEY is niet ingesteld. Voeg RESEND_API_KEY toe aan je environment variabelen om e-mails te kunnen versturen.',
+    );
+  }
+  return new Resend(apiKey);
+}
 
 export async function sendInviteEmail(
   email: string,
@@ -64,6 +72,7 @@ ${inviteUrl}
 Deze uitnodiging verloopt na 7 dagen.`;
 
   try {
+    const resend = getResendClient();
     await resend.emails.send({
       from,
       to: email,
@@ -129,6 +138,7 @@ ${resetUrl}
 Heb je dit niet zelf aangevraagd? Negeer deze e-mail dan.`;
 
   try {
+    const resend = getResendClient();
     await resend.emails.send({
       from,
       to: email,
