@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getSession, getEffectiveClubId } from '@/lib/auth';
 import { sendInviteEmail } from '@/lib/email';
-import crypto from 'crypto';
+import { generateInviteToken, hashInviteToken } from '@/lib/inviteTokens';
 import bcrypt from 'bcrypt';
 
 export async function POST(req: Request) {
@@ -39,7 +39,8 @@ export async function POST(req: Request) {
       );
     }
 
-    const inviteToken = crypto.randomBytes(32).toString('hex');
+    const inviteToken = generateInviteToken();
+    const inviteTokenHash = hashInviteToken(inviteToken);
     const inviteTokenExpires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
     const user = await prisma.user.create({
@@ -48,12 +49,14 @@ export async function POST(req: Request) {
         name,
         role,
         clubId,
-        inviteToken,
+        inviteToken: inviteTokenHash,
         inviteTokenExpires,
       },
     });
 
-    await sendInviteEmail(email, inviteToken, role);
+    const club = await prisma.club.findUnique({ where: { id: clubId }, select: { name: true } });
+
+    await sendInviteEmail(email, inviteToken, role, club?.name || null);
 
     return NextResponse.json({ success: true });
   } catch (error) {
@@ -64,9 +67,10 @@ export async function POST(req: Request) {
 
 export async function PUT(req: Request) {
   try {
-    const { token, password } = await req.json();
+    const { token, password, name } = await req.json();
     
-    const user = await prisma.user.findUnique({ where: { inviteToken: token } });
+    const tokenHash = hashInviteToken(token);
+    const user = await prisma.user.findUnique({ where: { inviteToken: tokenHash } });
     if (!user || !user.inviteTokenExpires || user.inviteTokenExpires < new Date()) {
       return NextResponse.json({ error: 'Invalid or expired token' }, { status: 400 });
     }
@@ -76,6 +80,7 @@ export async function PUT(req: Request) {
     await prisma.user.update({
       where: { id: user.id },
       data: {
+        name: name || user.name,
         passwordHash,
         inviteToken: null,
         inviteTokenExpires: null,

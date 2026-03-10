@@ -5,7 +5,7 @@ import { getSession, getEffectiveClubId } from '@/lib/auth';
 import { revalidatePath } from 'next/cache';
 import { sanitizePrimaryColor } from '@/lib/branding';
 import { sendInviteEmail } from '@/lib/email';
-import crypto from 'crypto';
+import { generateInviteToken, hashInviteToken } from '@/lib/inviteTokens';
 
 export async function updateClubBranding(formData: FormData) {
   const session = await getSession();
@@ -83,18 +83,24 @@ export async function resendInvite(userId: string) {
     throw new Error('Gebruiker is al geactiveerd');
   }
 
-  const inviteToken = crypto.randomBytes(32).toString('hex');
+  const inviteToken = generateInviteToken();
+  const inviteTokenHash = hashInviteToken(inviteToken);
   const inviteTokenExpires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
   await prisma.user.update({
     where: { id: user.id },
     data: {
-      inviteToken,
+      inviteToken: inviteTokenHash,
       inviteTokenExpires,
     },
   });
 
-  await sendInviteEmail(user.email, inviteToken, user.role);
+  const club = await prisma.club.findUnique({
+    where: { id: session.user.clubId },
+    select: { name: true },
+  });
+
+  await sendInviteEmail(user.email, inviteToken, user.role, club?.name || null);
 
   revalidatePath('/settings');
 }

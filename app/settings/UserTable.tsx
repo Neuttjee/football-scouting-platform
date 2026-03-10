@@ -17,6 +17,8 @@ type User = {
   isActive: boolean;
   passwordHash: string | null;
   inviteToken: string | null;
+  inviteTokenExpires: string | Date | null;
+  lastLoginAt?: string | Date | null;
 };
 
 export function UserTable({ users, currentUserId }: { users: User[], currentUserId: string }) {
@@ -60,6 +62,20 @@ export function UserTable({ users, currentUserId }: { users: User[], currentUser
     });
   };
 
+  const now = new Date();
+
+  const getStatus = (u: User) => {
+    if (!u.passwordHash && u.inviteToken && u.inviteTokenExpires) {
+      const expires = new Date(u.inviteTokenExpires);
+      if (expires < now) {
+        return { label: "Uitnodiging verlopen", tone: "neutral" as const };
+      }
+      return { label: "Uitgenodigd", tone: "warning" as const };
+    }
+    if (u.isActive) return { label: "Actief", tone: "success" as const };
+    return { label: "Inactief", tone: "danger" as const };
+  };
+
   return (
     <>
       <DataTable.Root>
@@ -82,13 +98,14 @@ export function UserTable({ users, currentUserId }: { users: User[], currentUser
                 <DataTable.Cell>{u.email}</DataTable.Cell>
                 <DataTable.Cell>{u.role}</DataTable.Cell>
                 <DataTable.Cell>
-                  {(!u.passwordHash && u.inviteToken) ? (
-                    <StatusPill tone="warning">Uitgenodigd</StatusPill>
-                  ) : (
-                    <StatusPill tone={u.isActive ? "success" : "danger"}>
-                      {u.isActive ? "Actief" : "Inactief"}
-                    </StatusPill>
-                  )}
+                  {(() => {
+                    const status = getStatus(u);
+                    return (
+                      <StatusPill tone={status.tone}>
+                        {status.label}
+                      </StatusPill>
+                    );
+                  })()}
                 </DataTable.Cell>
                 <DataTable.Cell className="text-right">
                   {u.id !== currentUserId && (

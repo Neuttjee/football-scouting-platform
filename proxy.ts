@@ -12,6 +12,9 @@ export async function proxy(request: NextRequest) {
     pathname.startsWith('/api/invite') && request.method === 'PUT' || // allow accepting invite without auth
     pathname === '/login' ||
     pathname === '/accept-invite' ||
+    pathname === '/forgot-password' ||
+    pathname === '/reset-password' ||
+    pathname.startsWith('/api/password-reset') ||
     pathname.startsWith('/_next') ||
     pathname === '/favicon.ico'
   ) {

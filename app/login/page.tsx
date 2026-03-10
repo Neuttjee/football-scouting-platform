@@ -92,10 +92,17 @@ export default function LoginPage() {
               </div>
             )}
           </CardContent>
-          <CardFooter className="pt-8 pb-6">
+          <CardFooter className="pt-8 pb-6 flex flex-col gap-3">
             <Button type="submit" className="w-full h-11 text-base" disabled={loading}>
               {loading ? 'Bezig met inloggen...' : 'Inloggen'}
             </Button>
+            <button
+              type="button"
+              onClick={() => router.push('/forgot-password')}
+              className="text-xs text-muted-foreground hover:text-text-primary underline-offset-4 hover:underline self-center"
+            >
+              Wachtwoord vergeten?
+            </button>
           </CardFooter>
         </form>
       </Card>
