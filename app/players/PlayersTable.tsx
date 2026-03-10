@@ -12,6 +12,7 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
+  type PaginationState,
 } from "@tanstack/react-table"
 import Link from "next/link"
 import { Input } from "@/components/ui/input"
@@ -355,6 +356,10 @@ export function PlayersTable({ data, clubUsers = [], clubName = null }: { data: 
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = React.useState<Record<string, boolean>>({})
+  const [pagination, setPagination] = React.useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 50,
+  })
 
   const columns = React.useMemo(() => getColumns(clubUsers, clubName), [clubUsers, clubName]);
 
@@ -372,8 +377,10 @@ export function PlayersTable({ data, clubUsers = [], clubName = null }: { data: 
       sorting,
       columnFilters,
       columnVisibility,
+      pagination,
     },
     onColumnVisibilityChange: setColumnVisibility,
+    onPaginationChange: setPagination,
   })
 
   return (
@@ -467,6 +474,36 @@ export function PlayersTable({ data, clubUsers = [], clubName = null }: { data: 
           )}
         </TableBody>
         </Table>
+        <div className="flex items-center justify-between px-3 py-2 border-t border-border-dark text-xs text-text-secondary">
+          <span>
+            Pagina{" "}
+            <span className="font-semibold text-text-primary">
+              {table.getState().pagination.pageIndex + 1}
+            </span>{" "}
+            van{" "}
+            <span className="font-semibold text-text-primary">
+              {table.getPageCount() || 1}
+            </span>
+          </span>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
+              className="px-3 py-1 rounded border border-border-dark bg-bg-secondary text-text-secondary text-xs disabled:opacity-40 disabled:cursor-not-allowed hover:bg-bg-hover transition-colors"
+            >
+              Vorige
+            </button>
+            <button
+              type="button"
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
+              className="px-3 py-1 rounded border border-border-dark bg-bg-secondary text-text-secondary text-xs disabled:opacity-40 disabled:cursor-not-allowed hover:bg-bg-hover transition-colors"
+            >
+              Volgende
+            </button>
+          </div>
+        </div>
       </div>
     </DataTable.Wrapper>
   )
