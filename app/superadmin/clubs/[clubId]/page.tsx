@@ -8,11 +8,14 @@ export const dynamic = 'force-dynamic';
 type PageProps = {
   params: {
     clubId: string;
-  };
+  } | Promise<{
+    clubId: string;
+  }>;
 };
 
 export default async function ClubProfilePage({ params }: PageProps) {
-  const clubId = params?.clubId;
+  const resolvedParams = await Promise.resolve(params as any);
+  const clubId = resolvedParams?.clubId;
 
   if (!clubId || clubId === 'undefined' || clubId === 'null') {
     notFound();
