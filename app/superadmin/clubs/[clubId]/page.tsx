@@ -1,7 +1,9 @@
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import prisma from '@/lib/prisma';
 import { ClubProfileClient } from './ClubProfileClient';
 import { CLUB_FEATURE_DEFINITIONS, normalizeFeatureState } from '@/lib/clubFeatures';
+
+export const dynamic = 'force-dynamic';
 
 type PageProps = {
   params: {
@@ -10,13 +12,14 @@ type PageProps = {
 };
 
 export default async function ClubProfilePage({ params }: PageProps) {
-  if (!params?.clubId) {
-    notFound();
+  const clubId = params?.clubId;
+  if (!clubId || clubId === 'undefined' || clubId === 'null') {
+    redirect('/superadmin');
   }
 
   const club = await prisma.club.findUnique({
     where: {
-      id: params.clubId,
+      id: clubId,
     },
     include: {
       settings: true,

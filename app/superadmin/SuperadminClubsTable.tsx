@@ -137,7 +137,11 @@ export function SuperadminClubsTable({
             <DataTable.Cell className="font-medium">
               <button
                 type="button"
-                onClick={() => router.push(`/superadmin/clubs/${row.id}`)}
+                onClick={() => {
+                  if (!row.id) return;
+                  router.push(`/superadmin/clubs/${encodeURIComponent(row.id)}`);
+                }}
+                disabled={!row.id}
                 className={
                   activeClubId === row.id
                     ? 'text-[#FF6A00] hover:text-[#ff8533] cursor-pointer'
@@ -170,7 +174,10 @@ export function SuperadminClubsTable({
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="bg-bg-card border-border-dark min-w-[200px]">
                       <DropdownMenuItem
-                        onClick={() => router.push(`/superadmin/clubs/${row.id}`)}
+                        onClick={() => {
+                          if (!row.id) return;
+                          router.push(`/superadmin/clubs/${encodeURIComponent(row.id)}`);
+                        }}
                         className="cursor-pointer focus:bg-bg-hover focus:text-accent-primary text-text-primary text-xs"
                       >
                         Clubprofiel
