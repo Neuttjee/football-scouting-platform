@@ -10,16 +10,14 @@ type PageProps = {
 };
 
 export default async function ClubProfilePage({ params }: PageProps) {
-  const where: any = {
-    name: { not: "Platform" },
-  };
-
-  if (params?.clubId) {
-    where.id = params.clubId;
+  if (!params?.clubId) {
+    notFound();
   }
 
-  const club = await prisma.club.findFirst({
-    where,
+  const club = await prisma.club.findUnique({
+    where: {
+      id: params.clubId,
+    },
     include: {
       settings: true,
       features: {
@@ -33,7 +31,7 @@ export default async function ClubProfilePage({ params }: PageProps) {
     },
   });
 
-  if (!club) {
+  if (!club || club.name === 'Platform') {
     notFound();
   }
 
