@@ -12,9 +12,10 @@ type PageProps = {
 };
 
 export default async function ClubProfilePage({ params }: PageProps) {
+  console.log("ClubProfilePage params:", params);
   const clubId = params?.clubId;
-  if (!clubId || clubId === 'undefined' || clubId === 'null') {
-    redirect('/superadmin');
+  if (!clubId || clubId === "undefined" || clubId === "null") {
+    redirect("/superadmin");
   }
 
   const club = await prisma.club.findUnique({
