@@ -57,6 +57,7 @@ model Club {
   players        Player[]
   contacts       ContactMoment[]
   tasks          Task[]
+  squadPlans     SquadPlan[]
 
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
@@ -189,6 +190,7 @@ model User {
   contactsCreated      ContactMoment[] @relation("ContactCreatedBy")
   tasksCreated         Task[]          @relation("TaskCreatedBy")
   tasksAssigned        Task[]          @relation("TaskAssignedTo")
+  squadPlans           SquadPlan[]
 
   loginCount           Int       @default(0)
   lastLoginAt          DateTime?
@@ -254,6 +256,7 @@ model Team {
   isActive     Boolean  @default(true)
   displayOrder Int      @default(0)
   players      Player[]
+  squadPlans   SquadPlan[]
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
