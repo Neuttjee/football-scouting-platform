@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = React.useState("");
@@ -52,6 +53,12 @@ export default function ForgotPasswordPage() {
             <p className="text-xs text-muted-foreground">
               Controleer ook je spamfolder als je niets ziet verschijnen.
             </p>
+            <Link
+              href="/login"
+              className="inline-flex items-center text-xs text-accent-primary hover:text-accent-glow mt-4"
+            >
+              ← Terug naar inloggen
+            </Link>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -83,8 +90,16 @@ export default function ForgotPasswordPage() {
               {isSubmitting ? "Verzenden..." : "Stuur resetlink"}
             </button>
 
-            <div className="pt-2 text-xs text-muted-foreground">
-              Tip: kies straks een sterke wachtzin, bijvoorbeeld een zin van minimaal 4 woorden en 16+ tekens.
+            <div className="pt-2 flex items-center justify-between text-xs text-muted-foreground">
+              <span>
+                Tip: kies straks een sterke wachtzin, bijvoorbeeld een zin van minimaal 4 woorden en 16+ tekens.
+              </span>
+              <Link
+                href="/login"
+                className="ml-4 text-accent-primary hover:text-accent-glow whitespace-nowrap"
+              >
+                ← Terug naar inloggen
+              </Link>
             </div>
           </form>
         )}
