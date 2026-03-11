@@ -29,7 +29,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { DataTable } from "@/components/DataTable"
-import { updatePlayerField } from "./actions"
+import { deletePlayersBulk, updatePlayerField } from "./actions"
 import { targetSteps, targetStatuses, adviesOptions } from "@/lib/statusMapping"
 import { calculateAgeFromDate } from "@/lib/age"
 import { PlayerActionsMenu, PlayerForActions } from "@/components/PlayerActionsMenu";
@@ -101,8 +101,41 @@ function InlineInput({
   )
 }
 
-export function getColumns(clubUsers: any[], clubName: string | null): ColumnDef<Player>[] {
+export function getColumns(
+  clubUsers: any[],
+  clubName: string | null,
+  canBulkDelete: boolean
+): ColumnDef<Player>[] {
+  const selectionColumn: ColumnDef<Player> = {
+    id: "select",
+    header: ({ table }) => (
+      <div className="flex items-center justify-center">
+        <Checkbox
+          checked={table.getIsAllPageRowsSelected()}
+          onCheckedChange={(val) => table.toggleAllPageRowsSelected(Boolean(val))}
+          aria-label="Selecteer alles"
+          className="border-border-dark data-[state=checked]:bg-accent-primary data-[state=checked]:border-accent-primary"
+        />
+      </div>
+    ),
+    cell: ({ row }) => (
+      <div className="flex items-center justify-center">
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(val) => row.toggleSelected(Boolean(val))}
+          aria-label="Selecteer rij"
+          className="border-border-dark data-[state=checked]:bg-accent-primary data-[state=checked]:border-accent-primary"
+        />
+      </div>
+    ),
+    enableSorting: false,
+    enableHiding: false,
+    enableColumnFilter: false,
+    size: 36,
+  };
+
   return [
+    ...(canBulkDelete ? [selectionColumn] : []),
     {
       accessorKey: "name",
       header: "Naam",
@@ -352,16 +385,30 @@ function Filter({
   )
 }
 
-export function PlayersTable({ data, clubUsers = [], clubName = null }: { data: Player[], clubUsers?: any[], clubName?: string | null }) {
+export function PlayersTable({
+  data,
+  clubUsers = [],
+  clubName = null,
+  canBulkDelete = false,
+}: {
+  data: Player[];
+  clubUsers?: any[];
+  clubName?: string | null;
+  canBulkDelete?: boolean;
+}) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = React.useState<Record<string, boolean>>({})
+  const [rowSelection, setRowSelection] = React.useState<Record<string, boolean>>({})
   const [pagination, setPagination] = React.useState<PaginationState>({
     pageIndex: 0,
     pageSize: 50,
   })
 
-  const columns = React.useMemo(() => getColumns(clubUsers, clubName), [clubUsers, clubName]);
+  const columns = React.useMemo(
+    () => getColumns(clubUsers, clubName, canBulkDelete),
+    [clubUsers, clubName, canBulkDelete]
+  );
 
   const table = useReactTable({
     data,
@@ -373,22 +420,50 @@ export function PlayersTable({ data, clubUsers = [], clubName = null }: { data: 
     getFacetedUniqueValues: getFacetedUniqueValues(),
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
+    enableRowSelection: true,
+    onRowSelectionChange: setRowSelection,
     state: {
       sorting,
       columnFilters,
       columnVisibility,
+      rowSelection,
       pagination,
     },
     onColumnVisibilityChange: setColumnVisibility,
     onPaginationChange: setPagination,
   })
 
+  const router = useRouter();
+  const selectedIds = canBulkDelete
+    ? table.getSelectedRowModel().rows.map((r) => (r.original as Player).id)
+    : [];
+
   return (
     <DataTable.Wrapper>
       <div className="relative">
+        {canBulkDelete && selectedIds.length > 0 && (
+          <div className="flex items-center justify-between gap-3 px-3 py-2 border-b border-border-dark bg-bg-secondary/40">
+            <div className="text-xs text-text-secondary">
+              <span className="font-semibold text-text-primary">{selectedIds.length}</span> geselecteerd
+            </div>
+            <button
+              type="button"
+              onClick={async () => {
+                const ok = window.confirm(`Weet je zeker dat je ${selectedIds.length} speler(s) wilt verwijderen?`);
+                if (!ok) return;
+                await deletePlayersBulk(selectedIds);
+                table.resetRowSelection();
+                router.refresh();
+              }}
+              className="px-3 py-1 rounded border border-red-500/40 bg-red-500/10 text-red-400 text-xs hover:bg-red-500/20 transition-colors"
+            >
+              Verwijder geselecteerde spelers
+            </button>
+          </div>
+        )}
         <Popover>
           <PopoverTrigger asChild>
-            <button className="absolute top-2 right-2 h-8 w-8 rounded bg-transparent text-text-muted hover:text-accent-primary flex items-center justify-center">
+            <button className="absolute top-2 right-2 h-8 w-8 rounded border border-border-dark bg-bg-secondary/80 text-text-primary hover:border-accent-primary/60 flex items-center justify-center backdrop-blur-sm z-10">
               <Settings className="h-4 w-4" />
               <span className="sr-only">Kolommen</span>
             </button>
@@ -397,7 +472,7 @@ export function PlayersTable({ data, clubUsers = [], clubName = null }: { data: 
             <div className="space-y-1">
               {table
                 .getAllLeafColumns()
-                .filter((column) => column.id !== "actions" && column.id !== "name")
+                .filter((column) => !["actions", "name", "select"].includes(column.id))
                 .map((column) => (
                   <label key={column.id} className="flex items-center gap-2 text-sm text-text-primary">
                     <Checkbox

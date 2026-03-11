@@ -169,6 +169,27 @@ export async function deletePlayer(playerId: string) {
   revalidatePath("/players");
 }
 
+export async function deletePlayersBulk(playerIds: string[]) {
+  const session = await getSession();
+  if (!session) throw new Error("Unauthorized");
+  if (session.user.role !== "SUPERADMIN") {
+    throw new Error("Forbidden");
+  }
+
+  const clubId = getEffectiveClubId(session);
+  if (!clubId) throw new Error("Geen club geselecteerd");
+  if (!Array.isArray(playerIds) || playerIds.length === 0) return;
+
+  await prisma.player.deleteMany({
+    where: {
+      clubId,
+      id: { in: playerIds },
+    },
+  });
+
+  revalidatePath("/players");
+}
+
 export async function updatePlayerField(
   playerId: string,
   field: string,

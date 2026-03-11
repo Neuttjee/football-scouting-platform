@@ -61,6 +61,7 @@ type Props = {
   agingThreshold: number;
   defaultSeasonYear: number;
   clubName: string | null;
+  canBulkDelete: boolean;
 };
 
 export function PlayersPageClient({
@@ -71,6 +72,7 @@ export function PlayersPageClient({
   agingThreshold,
   defaultSeasonYear,
   clubName,
+  canBulkDelete,
 }: Props) {
   const searchParams = useSearchParams();
   const viewParam = searchParams.get("view");
@@ -110,7 +112,12 @@ export function PlayersPageClient({
       </div>
 
       {view === "EXTERNAL" && (
-        <PlayersTable data={externalPlayers as any} clubUsers={clubUsers} clubName={clubName} />
+        <PlayersTable
+          data={externalPlayers as any}
+          clubUsers={clubUsers}
+          clubName={clubName}
+          canBulkDelete={canBulkDelete}
+        />
       )}
 
       {view === "INTERNAL" && (

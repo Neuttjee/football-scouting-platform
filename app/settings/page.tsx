@@ -17,7 +17,20 @@ export default async function SettingsPage() {
 
   const [club, users] = await Promise.all([
     prisma.club.findUnique({ where: { id: clubId } }),
-    prisma.user.findMany({ where: { clubId } }),
+    prisma.user.findMany({
+      where: { clubId },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        isActive: true,
+        passwordHash: true,
+        inviteToken: true,
+        inviteTokenExpires: true,
+        lastLoginAt: true,
+      },
+    }),
   ]);
 
   const isAdmin = session.user.role === 'ADMIN' || session.user.role === 'SUPERADMIN';
