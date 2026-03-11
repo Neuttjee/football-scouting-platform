@@ -372,12 +372,14 @@ function Filter({
   return (
     <div className="flex items-center gap-1">
       {canBulkDelete && column.id === "name" && table && (
-        <Checkbox
-          checked={table.getIsAllPageRowsSelected()}
-          onCheckedChange={(val) => table.toggleAllPageRowsSelected(Boolean(val))}
-          aria-label="Selecteer alle spelers op deze pagina"
-          className="border-border-dark data-[state=checked]:bg-accent-primary data-[state=checked]:border-accent-primary"
-        />
+        <div className="w-9 flex justify-center">
+          <Checkbox
+            checked={table.getIsAllPageRowsSelected()}
+            onCheckedChange={(val) => table.toggleAllPageRowsSelected(Boolean(val))}
+            aria-label="Selecteer alle spelers op deze pagina"
+            className="border-border-dark data-[state=checked]:bg-accent-primary data-[state=checked]:border-accent-primary"
+          />
+        </div>
       )}
       <Input
         type="text"
@@ -636,21 +638,6 @@ export function PlayersTable({
         </TableBody>
         </Table>
         <div className="flex flex-col items-center gap-2 px-3 py-2 border-t border-border-dark text-xs text-text-secondary">
-          <span>
-            Pagina{" "}
-            <span className="font-semibold text-text-primary">
-              {table.getState().pagination.pageIndex + 1}
-            </span>{" "}
-            van{" "}
-            <span className="font-semibold text-text-primary">
-              {table.getPageCount() || 1}
-            </span>
-            {" • "}
-            <span className="font-semibold text-text-primary">
-              {filteredCount}
-            </span>{" "}
-            spelers
-          </span>
           <div className="flex items-center gap-2">
             <button
               type="button"
@@ -669,6 +656,21 @@ export function PlayersTable({
               Volgende
             </button>
           </div>
+          <span>
+            Pagina{" "}
+            <span className="font-semibold text-text-primary">
+              {table.getState().pagination.pageIndex + 1}
+            </span>{" "}
+            van{" "}
+            <span className="font-semibold text-text-primary">
+              {table.getPageCount() || 1}
+            </span>
+            {" • "}
+            <span className="font-semibold text-text-primary">
+              {filteredCount}
+            </span>{" "}
+            spelers
+          </span>
         </div>
       </div>
     </DataTable.Wrapper>
