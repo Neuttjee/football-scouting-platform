@@ -121,7 +121,7 @@ export function getColumns(
     ),
     enableSorting: false,
     enableHiding: false,
-    enableColumnFilter: true,
+    enableColumnFilter: false,
     size: 36,
   };
 
@@ -369,28 +369,26 @@ function Filter({
     )
   }
 
-  if (column.id === "select" && canBulkDelete && table) {
+  // Speciaal voor de naam-kolom: master-checkbox + zoekveld ernaast
+  if (column.id === "name" && canBulkDelete && table) {
     return (
-      <div className="flex items-center justify-center">
-        <Checkbox
-          checked={table.getIsAllPageRowsSelected()}
-          onCheckedChange={(val) => table.toggleAllPageRowsSelected(Boolean(val))}
-          aria-label="Selecteer alle spelers op deze pagina"
-          className="border-border-dark data-[state=checked]:bg-accent-primary data-[state=checked]:border-accent-primary"
+      <div className="flex items-center gap-1">
+        <div className="w-9 flex justify-center">
+          <Checkbox
+            checked={table.getIsAllPageRowsSelected()}
+            onCheckedChange={(val) => table.toggleAllPageRowsSelected(Boolean(val))}
+            aria-label="Selecteer alle spelers op deze pagina"
+            className="border-border-dark data-[state=checked]:bg-accent-primary data-[state=checked]:border-accent-primary"
+          />
+        </div>
+        <Input
+          type="text"
+          value={(columnFilterValue ?? '') as string}
+          onChange={e => column.setFilterValue(e.target.value)}
+          placeholder={`Zoek...`}
+          className="h-8 text-xs w-full min-w-[80px] bg-bg-primary border-border-dark text-text-primary placeholder:text-text-muted focus-visible:ring-accent-primary"
         />
       </div>
-    )
-  }
-
-  if (column.id === "name") {
-    return (
-      <Input
-        type="text"
-        value={(columnFilterValue ?? '') as string}
-        onChange={e => column.setFilterValue(e.target.value)}
-        placeholder={`Zoek...`}
-        className="h-8 text-xs w-full min-w-[80px] bg-bg-primary border-border-dark text-text-primary placeholder:text-text-muted focus-visible:ring-accent-primary"
-      />
     )
   }
 
