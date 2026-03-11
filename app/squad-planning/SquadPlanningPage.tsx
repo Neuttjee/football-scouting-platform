@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Settings, BarChart3 } from "lucide-react";
+import { Settings, BarChart3, Save } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AnalyticsPanel } from "./AnalyticsPanel";
 import { Field } from "./Field";
@@ -40,10 +40,10 @@ function getSlots(formation: Formation): FieldSlot[] {
   if (formation === "4-4-2_SQUARE") {
     return [
       ...DEF_SLOTS,
-      { id: "RM", label: "Rechtsmidden", x: 68, y: 44, line: "MID" },
-      { id: "CMR", label: "CM rechts", x: 68, y: 54, line: "MID" },
-      { id: "CML", label: "CM links", x: 32, y: 54, line: "MID" },
-      { id: "LM", label: "Linksmidden", x: 32, y: 44, line: "MID" },
+      { id: "RM", label: "Rechtsmidden", x: 68, y: 42, line: "MID" },
+      { id: "CMR", label: "CM rechts", x: 68, y: 60, line: "MID" },
+      { id: "CML", label: "CM links", x: 32, y: 60, line: "MID" },
+      { id: "LM", label: "Linksmidden", x: 32, y: 42, line: "MID" },
       { id: "ST1", label: "Spits 1", x: 35, y: 20, line: "FWD" },
       { id: "ST2", label: "Spits 2", x: 65, y: 20, line: "FWD" },
     ];
@@ -109,6 +109,9 @@ export default function SquadPlanningPage({
   } | null>(null);
   const [settingsOpen, setSettingsOpen] = React.useState(false);
   const [analyticsOpen, setAnalyticsOpen] = React.useState(false);
+  const [isSaving, setIsSaving] = React.useState(false);
+  const [lastSavedAt, setLastSavedAt] = React.useState<Date | null>(null);
+  const [loadError, setLoadError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     setAssignments((prev) => {
@@ -195,6 +198,71 @@ export default function SquadPlanningPage({
     [defaultSeasonYear]
   );
 
+  // Laad bestaande opstelling bij initialisatie / wisselen team of seizoen
+  React.useEffect(() => {
+    const loadPlan = async () => {
+      if (!selectedTeamId) return;
+      try {
+        setLoadError(null);
+        const params = new URLSearchParams({
+          teamId: selectedTeamId,
+          seasonYear: String(seasonYear),
+        });
+        const res = await fetch(`/api/squad-planning/plan?${params.toString()}`);
+        if (!res.ok) {
+          console.error("Failed to load squad plan", await res.text());
+          return;
+        }
+        const data = await res.json();
+        if (data?.plan) {
+          if (data.plan.formation && data.plan.formation !== formation) {
+            setFormation(data.plan.formation as Formation);
+          }
+          if (data.plan.assignments && typeof data.plan.assignments === "object") {
+            setAssignments(data.plan.assignments as Record<string, string[]>);
+          }
+        }
+      } catch (error) {
+        console.error("Error loading squad plan", error);
+        setLoadError("Opstelling kon niet geladen worden.");
+      }
+    };
+
+    loadPlan();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedTeamId, seasonYear]);
+
+  const handleSave = async () => {
+    if (!selectedTeamId) return;
+    try {
+      setIsSaving(true);
+      const res = await fetch("/api/squad-planning/plan", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          teamId: selectedTeamId,
+          seasonYear,
+          formation,
+          assignments,
+          isClubDefault: false,
+        }),
+      });
+
+      if (!res.ok) {
+        console.error("Failed to save squad plan", await res.text());
+        return;
+      }
+
+      setLastSavedAt(new Date());
+    } catch (error) {
+      console.error("Error saving squad plan", error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -254,8 +322,19 @@ export default function SquadPlanningPage({
           </label>
         </div>
 
-        {/* Rechterzijde: analyse + planning instellingen */}
+        {/* Rechterzijde: opslaan + analyse + planning instellingen */}
         <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={isSaving || !selectedTeamId}
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-accent-primary text-xs text-primary-foreground bg-accent-primary hover:bg-accent-primary/90 disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            <Save className="w-4 h-4" />
+            <span className="hidden sm:inline">
+              {isSaving ? "Opslaan..." : "Opstelling opslaan"}
+            </span>
+          </button>
           <Dialog open={analyticsOpen} onOpenChange={setAnalyticsOpen}>
             <DialogTrigger asChild>
               <button
@@ -266,7 +345,7 @@ export default function SquadPlanningPage({
                 <span className="hidden sm:inline">Analyse</span>
               </button>
             </DialogTrigger>
-            <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto bg-bg-card border-accent-primary text-text-primary">
+            <DialogContent className="w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-bg-card border-accent-primary text-text-primary">
               <DialogHeader>
                 <DialogTitle>Selectie-analyse</DialogTitle>
               </DialogHeader>
@@ -289,7 +368,7 @@ export default function SquadPlanningPage({
                 <span className="hidden sm:inline">Instellingen</span>
               </button>
             </DialogTrigger>
-            <DialogContent className="w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-bg-card border-accent-primary text-text-primary">
+            <DialogContent className="w-full max-w-5xl max-h-[90vh] overflow-y-auto bg-bg-card border-accent-primary text-text-primary">
               <DialogHeader>
                 <DialogTitle>Instellingen</DialogTitle>
               </DialogHeader>
@@ -323,6 +402,16 @@ export default function SquadPlanningPage({
             selectedType={selectedType}
             onTypeChange={setSelectedType}
           />
+          {lastSavedAt && (
+            <p className="text-[11px] text-text-muted">
+              Laatst opgeslagen: {lastSavedAt.toLocaleTimeString()}
+            </p>
+          )}
+          {loadError && (
+            <p className="text-[11px] text-destructive">
+              {loadError}
+            </p>
+          )}
         </div>
       </div>
 

@@ -32,8 +32,8 @@ export function Field({
 }) {
   return (
     <div className="card-premium rounded-lg p-0 overflow-hidden border border-accent-primary/50 bg-bg-secondary/40 shadow-inner w-[80%] max-w-[900px] mx-auto">
-      {/* Veldverhouding 68:105 (breedte:lengte) – langer en iets breder */}
-      <div className="relative w-full max-h-[75vh] aspect-[68/105]">
+      {/* Veldverhouding 50:100 (breedte:lengte) – duidelijk langer veld */}
+      <div className="relative w-full max-h-[80vh] aspect-[50/100]">
           {/* Veldlijnen: buitenlijn (iets dunner) */}
           <div className="absolute inset-0 rounded-[6px] border border-accent-primary/80" />
 
