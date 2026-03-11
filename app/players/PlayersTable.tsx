@@ -108,16 +108,7 @@ export function getColumns(
 ): ColumnDef<Player>[] {
   const selectionColumn: ColumnDef<Player> = {
     id: "select",
-    header: ({ table }) => (
-      <div className="flex items-center justify-center">
-        <Checkbox
-          checked={table.getIsAllPageRowsSelected()}
-          onCheckedChange={(val) => table.toggleAllPageRowsSelected(Boolean(val))}
-          aria-label="Selecteer alle spelers op deze pagina"
-          className="border-border-dark data-[state=checked]:bg-accent-primary data-[state=checked]:border-accent-primary"
-        />
-      </div>
-    ),
+    header: () => <div className="w-4" />,
     cell: ({ row }) => (
       <div className="flex items-center justify-center">
         <Checkbox
@@ -307,8 +298,12 @@ export function getColumns(
 // Custom filter input for columns
 function Filter({
   column,
+  table,
+  canBulkDelete,
 }: {
   column: any
+  table?: any
+  canBulkDelete?: boolean
 }) {
   const columnFilterValue = column.getFilterValue()
 
@@ -375,13 +370,23 @@ function Filter({
   }
 
   return (
-    <Input
-      type="text"
-      value={(columnFilterValue ?? '') as string}
-      onChange={e => column.setFilterValue(e.target.value)}
-      placeholder={`Zoek...`}
-      className="h-8 text-xs w-full min-w-[80px] bg-bg-primary border-border-dark text-text-primary placeholder:text-text-muted focus-visible:ring-accent-primary"
-    />
+    <div className="flex items-center gap-1">
+      {canBulkDelete && column.id === "name" && table && (
+        <Checkbox
+          checked={table.getIsAllPageRowsSelected()}
+          onCheckedChange={(val) => table.toggleAllPageRowsSelected(Boolean(val))}
+          aria-label="Selecteer alle spelers op deze pagina"
+          className="border-border-dark data-[state=checked]:bg-accent-primary data-[state=checked]:border-accent-primary"
+        />
+      )}
+      <Input
+        type="text"
+        value={(columnFilterValue ?? '') as string}
+        onChange={e => column.setFilterValue(e.target.value)}
+        placeholder={`Zoek...`}
+        className="h-8 text-xs w-full min-w-[80px] bg-bg-primary border-border-dark text-text-primary placeholder:text-text-muted focus-visible:ring-accent-primary"
+      />
+    </div>
   )
 }
 
@@ -596,7 +601,7 @@ export function PlayersTable({
                       header.column.id !== 'actions' &&
                       header.column.id !== "select" ? (
                         <div>
-                          <Filter column={header.column} />
+                          <Filter column={header.column} table={table} canBulkDelete={canBulkDelete} />
                         </div>
                       ) : <div className="h-8"></div>}
                     </div>
@@ -630,7 +635,7 @@ export function PlayersTable({
           )}
         </TableBody>
         </Table>
-        <div className="flex items-center justify-between px-3 py-2 border-t border-border-dark text-xs text-text-secondary">
+        <div className="flex flex-col items-center gap-2 px-3 py-2 border-t border-border-dark text-xs text-text-secondary">
           <span>
             Pagina{" "}
             <span className="font-semibold text-text-primary">
