@@ -121,7 +121,7 @@ export function getColumns(
     ),
     enableSorting: false,
     enableHiding: false,
-    enableColumnFilter: false,
+    enableColumnFilter: true,
     size: 36,
   };
 
@@ -310,7 +310,7 @@ function Filter({
   const isFaceted = [
     'currentClub',
     'team',
-    'niveau',           // ← deze toevoegen
+    'niveau',
     'position',
     'secondaryPosition',
     'preferredFoot',
@@ -369,18 +369,21 @@ function Filter({
     )
   }
 
-  return (
-    <div className="flex items-center gap-1">
-      {canBulkDelete && column.id === "name" && table && (
-        <div className="w-9 flex justify-center">
-          <Checkbox
-            checked={table.getIsAllPageRowsSelected()}
-            onCheckedChange={(val) => table.toggleAllPageRowsSelected(Boolean(val))}
-            aria-label="Selecteer alle spelers op deze pagina"
-            className="border-border-dark data-[state=checked]:bg-accent-primary data-[state=checked]:border-accent-primary"
-          />
-        </div>
-      )}
+  if (column.id === "select" && canBulkDelete && table) {
+    return (
+      <div className="flex items-center justify-center">
+        <Checkbox
+          checked={table.getIsAllPageRowsSelected()}
+          onCheckedChange={(val) => table.toggleAllPageRowsSelected(Boolean(val))}
+          aria-label="Selecteer alle spelers op deze pagina"
+          className="border-border-dark data-[state=checked]:bg-accent-primary data-[state=checked]:border-accent-primary"
+        />
+      </div>
+    )
+  }
+
+  if (column.id === "name") {
+    return (
       <Input
         type="text"
         value={(columnFilterValue ?? '') as string}
@@ -388,7 +391,17 @@ function Filter({
         placeholder={`Zoek...`}
         className="h-8 text-xs w-full min-w-[80px] bg-bg-primary border-border-dark text-text-primary placeholder:text-text-muted focus-visible:ring-accent-primary"
       />
-    </div>
+    )
+  }
+
+  return (
+    <Input
+      type="text"
+      value={(columnFilterValue ?? '') as string}
+      onChange={e => column.setFilterValue(e.target.value)}
+      placeholder={`Zoek...`}
+      className="h-8 text-xs w-full min-w-[80px] bg-bg-primary border-border-dark text-text-primary placeholder:text-text-muted focus-visible:ring-accent-primary"
+    />
   )
 }
 
@@ -637,7 +650,7 @@ export function PlayersTable({
           )}
         </TableBody>
         </Table>
-        <div className="flex flex-col items-center gap-2 px-3 py-2 border-t border-border-dark text-xs text-text-secondary">
+        <div className="flex flex-col items-center gap-3 px-3 py-2 border-t border-border-dark text-xs text-text-secondary">
           <div className="flex items-center gap-2">
             <button
               type="button"
