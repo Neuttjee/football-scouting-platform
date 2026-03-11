@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Settings, BarChart3, Save } from "lucide-react";
+import { Settings, BarChart3 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AnalyticsPanel } from "./AnalyticsPanel";
 import { Field } from "./Field";
@@ -30,9 +30,9 @@ function getSlots(formation: Formation): FieldSlot[] {
     return [
       ...DEF_SLOTS,
       { id: "RM", label: "Rechtsmidden", x: 74, y: 46, line: "MID" },
-      { id: "DM", label: "Controlerende 6", x: 50, y: 56, line: "MID" },
+      { id: "DM", label: "Controlerende 6", x: 50, y: 60, line: "MID" },
       { id: "LM", label: "Linksmidden", x: 26, y: 46, line: "MID" },
-      { id: "AM", label: "10", x: 50, y: 36, line: "MID" },
+      { id: "AM", label: "10", x: 50, y: 32, line: "MID" },
       { id: "ST1", label: "Spits 1", x: 35, y: 20, line: "FWD" },
       { id: "ST2", label: "Spits 2", x: 65, y: 20, line: "FWD" },
     ];
@@ -41,8 +41,8 @@ function getSlots(formation: Formation): FieldSlot[] {
     return [
       ...DEF_SLOTS,
       { id: "RM", label: "Rechtsmidden", x: 68, y: 42, line: "MID" },
-      { id: "CMR", label: "CM rechts", x: 68, y: 60, line: "MID" },
-      { id: "CML", label: "CM links", x: 32, y: 60, line: "MID" },
+      { id: "CMR", label: "CM rechts", x: 68, y: 54, line: "MID" },
+      { id: "CML", label: "CM links", x: 32, y: 54, line: "MID" },
       { id: "LM", label: "Linksmidden", x: 32, y: 42, line: "MID" },
       { id: "ST1", label: "Spits 1", x: 35, y: 20, line: "FWD" },
       { id: "ST2", label: "Spits 2", x: 65, y: 20, line: "FWD" },
@@ -112,6 +112,59 @@ export default function SquadPlanningPage({
   const [isSaving, setIsSaving] = React.useState(false);
   const [lastSavedAt, setLastSavedAt] = React.useState<Date | null>(null);
   const [loadError, setLoadError] = React.useState<string | null>(null);
+
+  const assignmentsRef = React.useRef<Record<string, string[]>>({});
+  const formationRef = React.useRef<Formation>(formation);
+  const currentKeyRef = React.useRef<{ teamId: string | null; seasonYear: number }>({
+    teamId: selectedTeamId,
+    seasonYear,
+  });
+  const previousKeyRef = React.useRef<{ teamId: string | null; seasonYear: number } | null>(null);
+
+  React.useEffect(() => {
+    assignmentsRef.current = assignments;
+  }, [assignments]);
+
+  React.useEffect(() => {
+    formationRef.current = formation;
+  }, [formation]);
+
+  React.useEffect(() => {
+    currentKeyRef.current = { teamId: selectedTeamId, seasonYear };
+  }, [selectedTeamId, seasonYear]);
+
+  const savePlan = React.useCallback(
+    async (teamId: string, seasonYearToSave: number, formationToSave: Formation, assignmentsToSave: Record<string, string[]>) => {
+      try {
+        setIsSaving(true);
+        const res = await fetch("/api/squad-planning/plan", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            teamId,
+            seasonYear: seasonYearToSave,
+            formation: formationToSave,
+            assignments: assignmentsToSave,
+            isClubDefault: false,
+          }),
+        });
+
+        if (!res.ok) {
+          console.error("Failed to save squad plan", await res.text());
+          return;
+        }
+
+        setLastSavedAt(new Date());
+      } catch (error) {
+        console.error("Error saving squad plan", error);
+      } finally {
+        setIsSaving(false);
+      }
+    },
+    []
+  );
 
   React.useEffect(() => {
     setAssignments((prev) => {
@@ -198,6 +251,33 @@ export default function SquadPlanningPage({
     [defaultSeasonYear]
   );
 
+  // Auto-save bij wisselen van team of seizoen (oude selectie wegschrijven)
+  React.useEffect(() => {
+    const previous = previousKeyRef.current;
+    if (
+      previous &&
+      previous.teamId &&
+      (previous.teamId !== selectedTeamId || previous.seasonYear !== seasonYear)
+    ) {
+      void savePlan(
+        previous.teamId,
+        previous.seasonYear,
+        formationRef.current,
+        assignmentsRef.current
+      );
+    }
+    previousKeyRef.current = { teamId: selectedTeamId, seasonYear };
+  }, [selectedTeamId, seasonYear, savePlan]);
+
+  // Auto-save bij unmounten van de pagina (laatste versie bewaren)
+  React.useEffect(() => {
+    return () => {
+      const { teamId, seasonYear: seasonYearToSave } = currentKeyRef.current;
+      if (!teamId) return;
+      void savePlan(teamId, seasonYearToSave, formationRef.current, assignmentsRef.current);
+    };
+  }, [savePlan]);
+
   // Laad bestaande opstelling bij initialisatie / wisselen team of seizoen
   React.useEffect(() => {
     const loadPlan = async () => {
@@ -231,37 +311,6 @@ export default function SquadPlanningPage({
     loadPlan();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedTeamId, seasonYear]);
-
-  const handleSave = async () => {
-    if (!selectedTeamId) return;
-    try {
-      setIsSaving(true);
-      const res = await fetch("/api/squad-planning/plan", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          teamId: selectedTeamId,
-          seasonYear,
-          formation,
-          assignments,
-          isClubDefault: false,
-        }),
-      });
-
-      if (!res.ok) {
-        console.error("Failed to save squad plan", await res.text());
-        return;
-      }
-
-      setLastSavedAt(new Date());
-    } catch (error) {
-      console.error("Error saving squad plan", error);
-    } finally {
-      setIsSaving(false);
-    }
-  };
 
   return (
     <div className="space-y-6">
@@ -322,19 +371,8 @@ export default function SquadPlanningPage({
           </label>
         </div>
 
-        {/* Rechterzijde: opslaan + analyse + planning instellingen */}
+        {/* Rechterzijde: analyse + planning instellingen */}
         <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={handleSave}
-            disabled={isSaving || !selectedTeamId}
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-accent-primary text-xs text-primary-foreground bg-accent-primary hover:bg-accent-primary/90 disabled:opacity-60 disabled:cursor-not-allowed"
-          >
-            <Save className="w-4 h-4" />
-            <span className="hidden sm:inline">
-              {isSaving ? "Opslaan..." : "Opstelling opslaan"}
-            </span>
-          </button>
           <Dialog open={analyticsOpen} onOpenChange={setAnalyticsOpen}>
             <DialogTrigger asChild>
               <button
