@@ -370,13 +370,13 @@ function Filter({
   }
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-1">
       {canBulkDelete && column.id === "name" && table && (
         <Checkbox
           checked={table.getIsAllPageRowsSelected()}
           onCheckedChange={(val) => table.toggleAllPageRowsSelected(Boolean(val))}
           aria-label="Selecteer alles"
-          className="border-border-dark data-[state=checked]:bg-accent-primary data-[state=checked]:border-accent-primary -ml-1"
+          className="border-border-dark data-[state=checked]:bg-accent-primary data-[state=checked]:border-accent-primary -ml-2"
         />
       )}
       <Input
@@ -384,7 +384,7 @@ function Filter({
         value={(columnFilterValue ?? '') as string}
         onChange={e => column.setFilterValue(e.target.value)}
         placeholder={`Zoek...`}
-        className="h-8 text-xs w-full min-w-[80px] bg-bg-primary border-border-dark text-text-primary placeholder:text-text-muted focus-visible:ring-accent-primary"
+        className="flex-1 h-8 text-xs w-full min-w-[80px] bg-bg-primary border-border-dark text-text-primary placeholder:text-text-muted focus-visible:ring-accent-primary"
       />
     </div>
   )
@@ -442,6 +442,8 @@ export function PlayersTable({
   const selectedIds = canBulkDelete
     ? table.getSelectedRowModel().rows.map((r) => (r.original as Player).id)
     : [];
+
+  const filteredCount = table.getFilteredRowModel().rows.length;
 
   const exportPlayers = (players: Player[]) => {
     const headers = [
@@ -505,8 +507,38 @@ export function PlayersTable({
   return (
     <DataTable.Wrapper>
       <div className="relative">
-        <div className="flex items-center justify-between px-3 py-2 bg-bg-secondary border-b border-border-dark">
-          {canBulkDelete && selectedIds.length > 0 ? (
+        <div className="flex items-center gap-3 px-3 py-2 bg-bg-secondary">
+          <Popover>
+            <PopoverTrigger asChild>
+              <button className="h-8 w-8 rounded bg-transparent text-text-secondary hover:text-accent-primary flex items-center justify-center">
+                <Settings className="h-4 w-4" />
+                <span className="sr-only">Kolommen</span>
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className="w-56 p-2 bg-bg-card border-border-dark shadow-lg" align="end">
+              <div className="space-y-1">
+                {table
+                  .getAllLeafColumns()
+                  .filter((column) => !["actions", "name", "select"].includes(column.id))
+                  .map((column) => (
+                    <label key={column.id} className="flex items-center gap-2 text-sm text-text-primary">
+                      <Checkbox
+                        checked={column.getIsVisible()}
+                        onCheckedChange={(val) => column.toggleVisibility(Boolean(val))}
+                        className="border-border-dark data-[state=checked]:bg-accent-primary data-[state=checked]:border-accent-primary"
+                      />
+                      <span className="truncate">
+                        {typeof column.columnDef.header === "string"
+                          ? column.columnDef.header
+                          : column.id}
+                      </span>
+                    </label>
+                  ))}
+              </div>
+            </PopoverContent>
+          </Popover>
+
+          {canBulkDelete && selectedIds.length > 0 && (
             <div className="flex items-center gap-3 text-xs text-text-secondary">
               <span>
                 <span className="font-semibold text-text-primary">{selectedIds.length}</span> geselecteerd
@@ -542,39 +574,7 @@ export function PlayersTable({
                 </button>
               </div>
             </div>
-          ) : (
-            <div />
           )}
-
-          <Popover>
-            <PopoverTrigger asChild>
-              <button className="h-8 w-8 rounded bg-transparent text-text-secondary hover:text-accent-primary flex items-center justify-center">
-                <Settings className="h-4 w-4" />
-                <span className="sr-only">Kolommen</span>
-              </button>
-            </PopoverTrigger>
-            <PopoverContent className="w-56 p-2 bg-bg-card border-border-dark shadow-lg" align="end">
-              <div className="space-y-1">
-                {table
-                  .getAllLeafColumns()
-                  .filter((column) => !["actions", "name", "select"].includes(column.id))
-                  .map((column) => (
-                    <label key={column.id} className="flex items-center gap-2 text-sm text-text-primary">
-                      <Checkbox
-                        checked={column.getIsVisible()}
-                        onCheckedChange={(val) => column.toggleVisibility(Boolean(val))}
-                        className="border-border-dark data-[state=checked]:bg-accent-primary data-[state=checked]:border-accent-primary"
-                      />
-                      <span className="truncate">
-                        {typeof column.columnDef.header === "string"
-                          ? column.columnDef.header
-                          : column.id}
-                      </span>
-                    </label>
-                  ))}
-              </div>
-            </PopoverContent>
-          </Popover>
         </div>
         <Table className="min-w-max">
         <TableHeader className="bg-bg-secondary">
@@ -647,6 +647,11 @@ export function PlayersTable({
             <span className="font-semibold text-text-primary">
               {table.getPageCount() || 1}
             </span>
+            {" • "}
+            <span className="font-semibold text-text-primary">
+              {filteredCount}
+            </span>{" "}
+            spelers
           </span>
           <div className="flex items-center gap-2">
             <button
