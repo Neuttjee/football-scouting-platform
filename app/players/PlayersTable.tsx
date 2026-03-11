@@ -108,7 +108,16 @@ export function getColumns(
 ): ColumnDef<Player>[] {
   const selectionColumn: ColumnDef<Player> = {
     id: "select",
-    header: () => <div className="w-4" />,
+    header: ({ table }) => (
+      <div className="flex items-center justify-center">
+        <Checkbox
+          checked={table.getIsAllPageRowsSelected()}
+          onCheckedChange={(val) => table.toggleAllPageRowsSelected(Boolean(val))}
+          aria-label="Selecteer alle spelers op deze pagina"
+          className="border-border-dark data-[state=checked]:bg-accent-primary data-[state=checked]:border-accent-primary"
+        />
+      </div>
+    ),
     cell: ({ row }) => (
       <div className="flex items-center justify-center">
         <Checkbox
@@ -298,12 +307,8 @@ export function getColumns(
 // Custom filter input for columns
 function Filter({
   column,
-  table,
-  canBulkDelete,
 }: {
   column: any
-  table?: any
-  canBulkDelete?: boolean
 }) {
   const columnFilterValue = column.getFilterValue()
 
@@ -370,23 +375,13 @@ function Filter({
   }
 
   return (
-    <div className="flex items-center gap-1">
-      {canBulkDelete && column.id === "name" && table && (
-        <Checkbox
-          checked={table.getIsAllPageRowsSelected()}
-          onCheckedChange={(val) => table.toggleAllPageRowsSelected(Boolean(val))}
-          aria-label="Selecteer alles"
-          className="border-border-dark data-[state=checked]:bg-accent-primary data-[state=checked]:border-accent-primary -ml-2"
-        />
-      )}
-      <Input
-        type="text"
-        value={(columnFilterValue ?? '') as string}
-        onChange={e => column.setFilterValue(e.target.value)}
-        placeholder={`Zoek...`}
-        className="flex-1 h-8 text-xs w-full min-w-[80px] bg-bg-primary border-border-dark text-text-primary placeholder:text-text-muted focus-visible:ring-accent-primary"
-      />
-    </div>
+    <Input
+      type="text"
+      value={(columnFilterValue ?? '') as string}
+      onChange={e => column.setFilterValue(e.target.value)}
+      placeholder={`Zoek...`}
+      className="h-8 text-xs w-full min-w-[80px] bg-bg-primary border-border-dark text-text-primary placeholder:text-text-muted focus-visible:ring-accent-primary"
+    />
   )
 }
 
@@ -507,7 +502,43 @@ export function PlayersTable({
   return (
     <DataTable.Wrapper>
       <div className="relative">
-        <div className="flex items-center gap-3 px-3 py-2 bg-bg-secondary">
+        <div className="flex items-center justify-end gap-3 px-3 py-2 bg-bg-secondary">
+          {canBulkDelete && selectedIds.length > 0 && (
+            <div className="flex items-center gap-2 text-xs text-text-secondary">
+              <span>
+                <span className="font-semibold text-text-primary">{selectedIds.length}</span> geselecteerd
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  const selectedPlayers = table
+                    .getSelectedRowModel()
+                    .rows.map((r) => r.original as Player);
+                  exportPlayers(selectedPlayers);
+                }}
+                className="px-3 py-1 rounded border border-border-dark bg-bg-secondary/70 text-text-secondary text-xs hover:bg-bg-hover transition-colors"
+              >
+                Spelers exporteren
+              </button>
+
+              <button
+                type="button"
+                onClick={async () => {
+                  const ok = window.confirm(
+                    `Weet je zeker dat je ${selectedIds.length} speler(s) wilt verwijderen?`
+                  );
+                  if (!ok) return;
+                  await deletePlayersBulk(selectedIds);
+                  table.resetRowSelection();
+                  router.refresh();
+                }}
+                className="px-3 py-1 rounded border border-red-500/40 bg-red-500/10 text-red-400 text-xs hover:bg-red-500/20 transition-colors"
+              >
+                Spelers verwijderen
+              </button>
+            </div>
+          )}
+
           <Popover>
             <PopoverTrigger asChild>
               <button className="h-8 w-8 rounded bg-transparent text-text-secondary hover:text-accent-primary flex items-center justify-center">
@@ -537,44 +568,6 @@ export function PlayersTable({
               </div>
             </PopoverContent>
           </Popover>
-
-          {canBulkDelete && selectedIds.length > 0 && (
-            <div className="flex items-center gap-3 text-xs text-text-secondary">
-              <span>
-                <span className="font-semibold text-text-primary">{selectedIds.length}</span> geselecteerd
-              </span>
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    const selectedPlayers = table
-                      .getSelectedRowModel()
-                      .rows.map((r) => r.original as Player);
-                    exportPlayers(selectedPlayers);
-                  }}
-                  className="px-3 py-1 rounded border border-border-dark bg-bg-secondary/70 text-text-secondary text-xs hover:bg-bg-hover transition-colors"
-                >
-                  Spelers exporteren
-                </button>
-
-                <button
-                  type="button"
-                  onClick={async () => {
-                    const ok = window.confirm(
-                      `Weet je zeker dat je ${selectedIds.length} speler(s) wilt verwijderen?`
-                    );
-                    if (!ok) return;
-                    await deletePlayersBulk(selectedIds);
-                    table.resetRowSelection();
-                    router.refresh();
-                  }}
-                  className="px-3 py-1 rounded border border-red-500/40 bg-red-500/10 text-red-400 text-xs hover:bg-red-500/20 transition-colors"
-                >
-                  Spelers verwijderen
-                </button>
-              </div>
-            </div>
-          )}
         </div>
         <Table className="min-w-max">
         <TableHeader className="bg-bg-secondary">
@@ -603,7 +596,7 @@ export function PlayersTable({
                       header.column.id !== 'actions' &&
                       header.column.id !== "select" ? (
                         <div>
-                          <Filter column={header.column} table={table} canBulkDelete={canBulkDelete} />
+                          <Filter column={header.column} />
                         </div>
                       ) : <div className="h-8"></div>}
                     </div>
