@@ -38,3 +38,46 @@ export async function createContactFromContactsPage(formData: FormData) {
 
   revalidatePath('/contacts');
 }
+
+export async function updateContactFromContactsPage(contactId: string, formData: FormData) {
+  const session = await getSession();
+  if (!session) throw new Error('Unauthorized');
+  const clubId = getEffectiveClubId(session);
+  if (!clubId) throw new Error('Geen club geselecteerd');
+
+  const type = formData.get('type') as string;
+  const channel = formData.get('channel') as string;
+  const outcome = (formData.get('outcome') as string) || null;
+  const reason = (formData.get('reason') as string) || null;
+  const notes = (formData.get('notes') as string) || null;
+
+  if ((outcome === 'Afgehaakt' || outcome === 'Niet haalbaar') && !reason) {
+    throw new Error('Reden is verplicht bij uitkomst Afgehaakt of Niet haalbaar');
+  }
+
+  await prisma.contactMoment.update({
+    where: { id: contactId, clubId },
+    data: {
+      type,
+      channel,
+      outcome,
+      reason,
+      notes,
+    },
+  });
+
+  revalidatePath('/contacts');
+}
+
+export async function deleteContact(contactId: string) {
+  const session = await getSession();
+  if (!session) throw new Error('Unauthorized');
+  const clubId = getEffectiveClubId(session);
+  if (!clubId) throw new Error('Geen club geselecteerd');
+
+  await prisma.contactMoment.delete({
+    where: { id: contactId, clubId },
+  });
+
+  revalidatePath('/contacts');
+}

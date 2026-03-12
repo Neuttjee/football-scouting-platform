@@ -39,6 +39,54 @@ export async function createTask(formData: FormData) {
   revalidatePath('/dashboard');
 }
 
+export async function updateTask(taskId: string, formData: FormData) {
+  const session = await getSession();
+  if (!session) throw new Error('Unauthorized');
+  const clubId = getEffectiveClubId(session);
+  if (!clubId) throw new Error('Geen club geselecteerd');
+
+  const title = formData.get('title') as string;
+  const description = formData.get('description') as string | null;
+  const assignedToId = formData.get('assignedToId') as string;
+  const assignedToExternalName = formData.get('assignedToExternalName') as string;
+  const playerId = formData.get('playerId') as string;
+  const dueDateStr = formData.get('dueDate') as string;
+
+  let dueDate: Date | null = null;
+  if (dueDateStr) {
+    dueDate = new Date(dueDateStr);
+  }
+
+  await prisma.task.update({
+    where: { id: taskId, clubId },
+    data: {
+      title,
+      description,
+      assignedToId: assignedToId || null,
+      assignedToExternalName: assignedToExternalName || null,
+      playerId: playerId || null,
+      dueDate,
+    },
+  });
+
+  revalidatePath('/tasks');
+  revalidatePath('/dashboard');
+}
+
+export async function deleteTask(taskId: string) {
+  const session = await getSession();
+  if (!session) throw new Error('Unauthorized');
+  const clubId = getEffectiveClubId(session);
+  if (!clubId) throw new Error('Geen club geselecteerd');
+
+  await prisma.task.delete({
+    where: { id: taskId, clubId },
+  });
+
+  revalidatePath('/tasks');
+  revalidatePath('/dashboard');
+}
+
 export async function toggleTask(taskId: string, isCompleted: boolean) {
   const session = await getSession();
   if (!session) throw new Error('Unauthorized');

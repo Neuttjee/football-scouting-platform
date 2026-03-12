@@ -17,6 +17,13 @@ type Props = {
   lockPlayer?: boolean;
   onSubmit: (fd: FormData) => Promise<void> | void;
   submitLabel?: string;
+  initialValues?: {
+    type?: string;
+    channel?: string;
+    outcome?: string | null;
+    reason?: string | null;
+    notes?: string | null;
+  };
 };
 
 export function ContactForm({
@@ -24,6 +31,7 @@ export function ContactForm({
   lockPlayer = false,
   onSubmit,
   submitLabel = "Opslaan",
+  initialValues,
 }: Props) {
   const [selectedPlayer, setSelectedPlayer] = React.useState<PlayerOption | null>(
     initialPlayer
@@ -33,7 +41,7 @@ export function ContactForm({
   const [playerLoading, setPlayerLoading] = React.useState(false);
   const [playerResults, setPlayerResults] = React.useState<PlayerOption[]>([]);
 
-  const [outcome, setOutcome] = React.useState("");
+  const [outcome, setOutcome] = React.useState(initialValues?.outcome ?? "");
   const requiresReason = outcome === "Afgehaakt" || outcome === "Niet haalbaar";
 
   React.useEffect(() => {
@@ -175,6 +183,7 @@ export function ContactForm({
           <select
             name="type"
             required
+            defaultValue={initialValues?.type ?? ""}
             className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
           >
             <option value="">Selecteer...</option>
@@ -201,6 +210,7 @@ export function ContactForm({
           <select
             name="channel"
             required
+            defaultValue={initialValues?.channel ?? ""}
             className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
           >
             <option value="">Selecteer...</option>
@@ -256,6 +266,7 @@ export function ContactForm({
             <input
               type="text"
               name="reason"
+              defaultValue={initialValues?.reason ?? ""}
               required={requiresReason}
               className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
             />
@@ -270,6 +281,7 @@ export function ContactForm({
           <textarea
             name="notes"
             rows={3}
+            defaultValue={initialValues?.notes ?? ""}
             className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
           />
         </div>

@@ -35,7 +35,7 @@ export default async function TasksPage() {
       </div>
 
       <div className="bg-transparent">
-        <TaskList tasks={tasks} />
+        <TaskList tasks={tasks} clubUsers={clubUsers} />
       </div>
     </div>
   );

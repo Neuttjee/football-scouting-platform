@@ -19,6 +19,12 @@ type Props = {
   lockPlayer?: boolean;
   onSubmit: (fd: FormData) => Promise<void> | void;
   submitLabel?: string;
+  initialValues?: {
+    title?: string;
+    dueDate?: string | null;
+    assignedToId?: string | null;
+    assignedToExternalName?: string | null;
+  };
 };
 
 export function TaskForm({
@@ -27,6 +33,7 @@ export function TaskForm({
   lockPlayer = false,
   onSubmit,
   submitLabel = "Opslaan",
+  initialValues,
 }: Props) {
   const [playerQuery, setPlayerQuery] = React.useState("");
   const [playerOpen, setPlayerOpen] = React.useState(false);
@@ -36,7 +43,9 @@ export function TaskForm({
     initialPlayer
   );
 
-  const [assignedToId, setAssignedToId] = React.useState("");
+  const [assignedToId, setAssignedToId] = React.useState(
+    initialValues?.assignedToId ?? "",
+  );
 
   const sortedClubUsers = React.useMemo(() => {
     return [...clubUsers].sort((a, b) => a.name.localeCompare(b.name, "nl-NL"));
@@ -97,6 +106,7 @@ export function TaskForm({
             name="title"
             required
             placeholder="Bijv. Video bekijken van speler X"
+            defaultValue={initialValues?.title ?? ""}
             className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-visible:ring-1 focus-visible:ring-accent-primary focus-visible:outline-none"
           />
         </div>
@@ -109,6 +119,11 @@ export function TaskForm({
           <input
             type="date"
             name="dueDate"
+            defaultValue={
+              initialValues?.dueDate
+                ? initialValues.dueDate.slice(0, 10)
+                : ""
+            }
             className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-visible:ring-1 focus-visible:ring-accent-primary focus-visible:outline-none"
           />
         </div>
@@ -237,6 +252,7 @@ export function TaskForm({
             type="text"
             name="assignedToExternalName"
             placeholder="Naam externe persoon"
+            defaultValue={initialValues?.assignedToExternalName ?? ""}
             disabled={externalLocked}
             className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus-visible:ring-1 focus-visible:ring-accent-primary focus-visible:outline-none disabled:opacity-60"
           />

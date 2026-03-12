@@ -29,6 +29,8 @@ export default async function ContactsPage() {
     type: c.type,
     channel: c.channel,
     outcome: c.outcome,
+    reason: c.reason,
+    notes: c.notes,
     playerId: c.player.id,
     playerName: c.player.name,
     createdByName: c.createdBy?.name ?? null,
