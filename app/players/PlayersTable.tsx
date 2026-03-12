@@ -35,10 +35,6 @@ import { calculateAgeFromDate } from "@/lib/age"
 import { PlayerActionsMenu, PlayerForActions } from "@/components/PlayerActionsMenu";
 import { MoreHorizontal, Settings, Star } from "lucide-react";
 
-// Toggle flags om verschillende varianten van de master-checkbox te testen
-const USE_HEADER_MASTER = false;  // Route A: checkbox in de kolom-header (bovenste rij)
-const USE_FILTER_MASTER = true; // Route B: checkbox in de filter-rij (onder de header)
-
 interface Player extends PlayerForActions {
   niveau: string | null;
 }
@@ -112,21 +108,7 @@ export function getColumns(
 ): ColumnDef<Player>[] {
   const selectionColumn: ColumnDef<Player> = {
     id: "select",
-    header: ({ table }) =>
-      USE_HEADER_MASTER ? (
-        <div className="flex items-center justify-center">
-          <Checkbox
-            checked={table.getIsAllPageRowsSelected()}
-            onCheckedChange={(val) =>
-              table.toggleAllPageRowsSelected(Boolean(val))
-            }
-            aria-label="Selecteer alle spelers op deze pagina"
-            className="border-border-dark data-[state=checked]:bg-accent-primary data-[state=checked]:border-accent-primary"
-          />
-        </div>
-      ) : (
-        <div className="w-4" />
-      ),
+    header: () => <div className="w-4" />,
     cell: ({ row }) => (
       <div className="flex items-center justify-center">
         <Checkbox
@@ -139,9 +121,7 @@ export function getColumns(
     ),
     enableSorting: false,
     enableHiding: false,
-    enableColumnFilter: true,
-    // Eenvoudige filterFn zodat TanStack getCanFilter() ook voor deze kolom toestaat (voor Route B)
-    filterFn: "equals",
+    enableColumnFilter: false,
     size: 36,
   };
 
