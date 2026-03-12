@@ -29,7 +29,13 @@ type Task = {
 
 type ClubUser = { id: string; name: string };
 
-export function TaskList({ tasks, clubUsers }: { tasks: Task[]; clubUsers: ClubUser[] }) {
+export function TaskList({
+  tasks,
+  clubUsers = [],
+}: {
+  tasks: Task[];
+  clubUsers?: ClubUser[];
+}) {
   const [isPending, startTransition] = useTransition();
   const [selectedTask, setSelectedTask] = React.useState<Task | null>(null);
   const [isEditing, setIsEditing] = React.useState(false);

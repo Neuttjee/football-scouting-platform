@@ -335,16 +335,19 @@ export default async function PlayerProfilePage({
             </Card>
           )}
 
-          <Card className="border-border-dark border-dashed hover:border-accent-primary/50 shadow-[0_0_30px_rgba(var(--primary-rgb),0.05)]">
-            <CardHeader>
-            <CardTitle className="text-text-muted font-normal uppercase tracking-widest text-xs">
-                Radar Chart (Binnenkort)
-              </CardTitle>
-            </CardHeader>
-          <CardContent className="min-h-80">
-              <PlayerRadarChart />
-            </CardContent>
-          </Card>
+          {/* Radar chart voorlopig verborgen; component en import blijven bestaan voor toekomstige activatie */}
+          {false && (
+            <Card className="border-border-dark border-dashed hover:border-accent-primary/50 shadow-[0_0_30px_rgba(var(--primary-rgb),0.05)]">
+              <CardHeader>
+                <CardTitle className="text-text-muted font-normal uppercase tracking-widest text-xs">
+                  Radar Chart (Binnenkort)
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="min-h-80">
+                <PlayerRadarChart />
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </div>
