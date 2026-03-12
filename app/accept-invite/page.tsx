@@ -5,11 +5,12 @@ import { AcceptInviteForm } from "./AcceptInviteFormClient";
 export const dynamic = "force-dynamic";
 
 type AcceptInvitePageProps = {
-  searchParams: { token?: string };
+  searchParams: { token?: string } | Promise<{ token?: string }>;
 };
 
 export default async function AcceptInvitePage({ searchParams }: AcceptInvitePageProps) {
-  const rawToken = searchParams.token;
+  const resolvedSearchParams = await Promise.resolve(searchParams as any);
+  const rawToken = resolvedSearchParams?.token;
 
   if (!rawToken) {
     return (

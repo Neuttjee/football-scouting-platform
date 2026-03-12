@@ -3,11 +3,12 @@ import { hashInviteToken } from "@/lib/inviteTokens";
 import { ResetPasswordForm } from "./ResetPasswordFormClient";
 
 type ResetPasswordPageProps = {
-  searchParams: { token?: string };
+  searchParams: { token?: string } | Promise<{ token?: string }>;
 };
 
 export default async function ResetPasswordPage({ searchParams }: ResetPasswordPageProps) {
-  const rawToken = searchParams.token;
+  const resolvedSearchParams = await Promise.resolve(searchParams as any);
+  const rawToken = resolvedSearchParams?.token;
 
   if (!rawToken) {
     return (
