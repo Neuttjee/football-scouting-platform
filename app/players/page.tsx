@@ -149,7 +149,7 @@ export default async function PlayersPage() {
       agingThreshold={agingThreshold}
       defaultSeasonYear={new Date().getFullYear()}
       clubName={clubName}
-      canBulkDelete={session.user.role === "SUPERADMIN"}
+      canBulkDelete={session.user.role === "SUPERADMIN" || session.user.role === "ADMIN"}
     />
   );
 }
