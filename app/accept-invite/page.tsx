@@ -2,6 +2,8 @@ import prisma from "@/lib/prisma";
 import { hashInviteToken } from "@/lib/inviteTokens";
 import { AcceptInviteForm } from "./AcceptInviteFormClient";
 
+export const dynamic = "force-dynamic";
+
 type AcceptInvitePageProps = {
   searchParams: { token?: string };
 };
