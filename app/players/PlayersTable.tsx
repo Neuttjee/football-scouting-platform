@@ -605,7 +605,7 @@ export function PlayersTable({
                         }[header.column.getIsSorted() as string] ?? null}
                       </div>
 
-                      <div className="h-8 flex items-center">
+                      <div className="h-8 flex items-end">
                         {headerIndex === 0 && canBulkDelete ? (
                           <div className="w-full flex items-center justify-center">
                             <Checkbox
