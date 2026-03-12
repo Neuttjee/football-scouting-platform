@@ -386,13 +386,25 @@ function Filter({
   // Naam-kolom: alleen zoekveld
   if (column.id === "name") {
     return (
-      <Input
-        type="text"
-        value={(columnFilterValue ?? '') as string}
-        onChange={e => column.setFilterValue(e.target.value)}
-        placeholder={`Zoek...`}
-        className="h-8 text-xs w-full min-w-[80px] bg-bg-primary border-border-dark text-text-primary placeholder:text-text-muted focus-visible:ring-accent-primary"
-      />
+      <div className="relative">
+        {canBulkDelete && table && (
+          <div className="absolute left-2 top-1/2 -translate-y-1/2 z-10">
+            <Checkbox
+              checked={table.getIsAllPageRowsSelected()}
+              onCheckedChange={(val) => table.toggleAllPageRowsSelected(Boolean(val))}
+              aria-label="Selecteer alle spelers op deze pagina"
+              className="border-border-dark data-[state=checked]:bg-accent-primary data-[state=checked]:border-accent-primary"
+            />
+          </div>
+        )}
+        <Input
+          type="text"
+          value={(columnFilterValue ?? '') as string}
+          onChange={e => column.setFilterValue(e.target.value)}
+          placeholder={`Zoek...`}
+          className="h-8 text-xs w-full min-w-[80px] bg-bg-primary border-border-dark text-text-primary placeholder:text-text-muted focus-visible:ring-accent-primary pl-9"
+        />
+      </div>
     )
   }
 
