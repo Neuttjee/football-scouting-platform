@@ -369,20 +369,6 @@ function Filter({
     )
   }
 
-  // Master-checkbox in de select-kolom (eerste kolom)
-  if (USE_FILTER_MASTER && column.id === "select" && canBulkDelete && table) {
-    return (
-      <div className="flex items-center justify-center h-8">
-        <Checkbox
-          checked={table.getIsAllPageRowsSelected()}
-          onCheckedChange={(val) => table.toggleAllPageRowsSelected(Boolean(val))}
-          aria-label="Selecteer alle spelers op deze pagina"
-          className="border-border-dark data-[state=checked]:bg-accent-primary data-[state=checked]:border-accent-primary"
-        />
-      </div>
-    )
-  }
-
   // Naam-kolom: alleen zoekveld
   if (column.id === "name") {
     return (
@@ -595,12 +581,16 @@ export function PlayersTable({
         <TableHeader className="bg-bg-secondary">
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id} className="border-border-dark hover:bg-transparent">
-              {headerGroup.headers.map((header) => {
+              {headerGroup.headers.map((header, headerIndex) => {
                 return (
                   <TableHead key={header.id} className="align-top py-2 px-2 text-text-secondary">
                     <div className="flex flex-col gap-3">
-                      <div 
-                        className={header.column.getCanSort() ? "cursor-pointer select-none font-semibold hover:text-text-primary flex items-center transition-colors uppercase tracking-wider text-xs" : "font-semibold uppercase tracking-wider text-xs"}
+                      <div
+                        className={
+                          header.column.getCanSort()
+                            ? "cursor-pointer select-none font-semibold hover:text-text-primary flex items-center transition-colors uppercase tracking-wider text-xs"
+                            : "font-semibold uppercase tracking-wider text-xs"
+                        }
                         onClick={header.column.getToggleSortingHandler()}
                       >
                         {header.isPlaceholder
@@ -614,12 +604,27 @@ export function PlayersTable({
                           desc: <span className="ml-1 text-accent-primary text-[10px]">▼</span>,
                         }[header.column.getIsSorted() as string] ?? null}
                       </div>
-                      {header.column.getCanFilter() &&
-                      header.column.id !== 'actions' ? (
-                        <div>
-                          <Filter column={header.column} table={table} canBulkDelete={canBulkDelete} />
-                        </div>
-                      ) : <div className="h-8"></div>}
+
+                      <div className="h-8 flex items-center">
+                        {headerIndex === 0 && canBulkDelete ? (
+                          <div className="w-full flex items-center justify-center">
+                            <Checkbox
+                              checked={table.getIsAllPageRowsSelected()}
+                              onCheckedChange={(val) =>
+                                table.toggleAllPageRowsSelected(Boolean(val))
+                              }
+                              aria-label="Selecteer alle spelers op deze pagina"
+                              className="border-border-dark data-[state=checked]:bg-accent-primary data-[state=checked]:border-accent-primary"
+                            />
+                          </div>
+                        ) : header.column.getCanFilter() && header.column.id !== "actions" ? (
+                          <Filter
+                            column={header.column}
+                            table={table}
+                            canBulkDelete={canBulkDelete}
+                          />
+                        ) : null}
+                      </div>
                     </div>
                   </TableHead>
                 )
