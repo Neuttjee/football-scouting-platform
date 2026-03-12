@@ -192,14 +192,23 @@ export function ImportPlayersWizard({ open, onOpenChange }: ImportPlayersWizardP
                     setStep(4);
                   } else if (step === 6) {
                     await handleExecuteImport();
+                  } else if (step === 7) {
+                    close();
+                    if (typeof window !== "undefined") {
+                      window.location.href = "/players";
+                    }
                   } else {
                     setStep((s) => (s < 7 ? ((s + 1) as WizardStep) : s));
                   }
                 }}
-                disabled={!canGoNext() || step >= 7 || isBusy}
+                disabled={!canGoNext() || isBusy}
                 className="px-4 py-2 rounded text-sm btn-premium text-white disabled:opacity-40"
               >
-                {step === 6 ? "Import bevestigen" : "Volgende"}
+                {step === 6
+                  ? "Import bevestigen"
+                  : step === 7
+                  ? "Voltooien en naar spelers"
+                  : "Volgende"}
               </button>
             </div>
           </div>
