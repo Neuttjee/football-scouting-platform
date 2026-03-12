@@ -36,8 +36,8 @@ import { PlayerActionsMenu, PlayerForActions } from "@/components/PlayerActionsM
 import { MoreHorizontal, Settings, Star } from "lucide-react";
 
 // Toggle flags om verschillende varianten van de master-checkbox te testen
-const USE_HEADER_MASTER = true;  // Route A: checkbox in de kolom-header (bovenste rij)
-const USE_FILTER_MASTER = false; // Route B: checkbox in de filter-rij (onder de header)
+const USE_HEADER_MASTER = false;  // Route A: checkbox in de kolom-header (bovenste rij)
+const USE_FILTER_MASTER = true; // Route B: checkbox in de filter-rij (onder de header)
 
 interface Player extends PlayerForActions {
   niveau: string | null;
