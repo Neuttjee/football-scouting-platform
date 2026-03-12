@@ -128,6 +128,7 @@ export function PlayersPageClient({
           defaultSeasonYear={defaultSeasonYear}
           clubUsers={clubUsers}
           clubName={clubName}
+          canBulkDelete={canBulkDelete}
         />
       )}
     </div>

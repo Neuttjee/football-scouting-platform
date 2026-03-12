@@ -15,6 +15,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -30,6 +31,7 @@ import { DataTable } from "@/components/DataTable";
 import { cn } from "@/lib/utils";
 import { Star, Settings } from "lucide-react";
 import { PlayerActionsMenu, PlayerForActions } from "@/components/PlayerActionsMenu";
+import { deletePlayersBulk } from "../players/actions";
 
 type InternalPlayer = {
   id: string;
@@ -62,9 +64,10 @@ type Props = {
   seasonYear: number;
   clubUsers: { id: string; name: string }[];
   clubName: string | null;
+  canBulkDelete: boolean;
 };
 
-const INTERNAL_COLUMNS: ColumnDef<InternalPlayer>[] = [
+const INTERNAL_BASE_COLUMNS: ColumnDef<InternalPlayer>[] = [
   {
     accessorKey: "name",
     header: "Naam",
@@ -336,14 +339,39 @@ export function InternalPlayersTable({
   seasonYear,
   clubUsers,
   clubName,
+  canBulkDelete,
 }: Props) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] =
     React.useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] =
     React.useState<Record<string, boolean>>({});
+  const [rowSelection, setRowSelection] =
+    React.useState<Record<string, boolean>>({});
 
-  const columns = React.useMemo(() => INTERNAL_COLUMNS, []);
+  const columns = React.useMemo(() => {
+    if (!canBulkDelete) return INTERNAL_BASE_COLUMNS;
+    const selectionColumn: ColumnDef<InternalPlayer> = {
+      id: "select",
+      header: () => <div className="w-4" />,
+      cell: ({ row }) => (
+        <div className="flex items-center justify-center">
+          <Checkbox
+            checked={row.getIsSelected()}
+            onCheckedChange={(val) => row.toggleSelected(Boolean(val))}
+            aria-label="Selecteer rij"
+            className="border-border-dark data-[state=checked]:bg-accent-primary data-[state=checked]:border-accent-primary"
+          />
+        </div>
+      ),
+      enableSorting: false,
+      enableHiding: false,
+      enableColumnFilter: false,
+      size: 36,
+    };
+    return [selectionColumn, ...INTERNAL_BASE_COLUMNS];
+  }, [canBulkDelete]);
+
   const table = useReactTable({
     data: players,
     columns,
@@ -354,10 +382,13 @@ export function InternalPlayersTable({
     getFacetedUniqueValues: getFacetedUniqueValues(),
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
+    enableRowSelection: canBulkDelete,
+    onRowSelectionChange: setRowSelection,
     state: {
       sorting,
       columnFilters,
       columnVisibility,
+      rowSelection,
     },
     onColumnVisibilityChange: setColumnVisibility,
     meta: {
@@ -367,38 +398,155 @@ export function InternalPlayersTable({
     },
   });
 
+  const router = useRouter();
+  const selectedIds = canBulkDelete
+    ? table.getSelectedRowModel().rows.map(
+        (r) => (r.original as InternalPlayer).id,
+      )
+    : [];
+
+  const exportInternalPlayers = (playersToExport: InternalPlayer[]) => {
+    const headers = [
+      "Naam",
+      "Team",
+      "Beste positie",
+      "Nevenposities",
+      "Favoriete positie",
+      "Voorkeursbeen",
+      "Leeftijd",
+      "Bij club sinds",
+      "Contract tot",
+      "Afstand tot club (km)",
+    ];
+
+    const esc = (v: unknown) => {
+      const s = v == null ? "" : String(v);
+      const needsQuotes = /[",\n\r]/.test(s);
+      const safe = s.replace(/"/g, '""');
+      return needsQuotes ? `"${safe}"` : safe;
+    };
+
+    const lines = [
+      headers.join(","),
+      ...playersToExport.map((p) =>
+        [
+          p.name,
+          p.teamLabel,
+          p.position,
+          p.secondaryPosition,
+          p.favoritePosition,
+          p.preferredFoot,
+          p.age,
+          p.joinedAt ? new Date(p.joinedAt).toISOString().slice(0, 10) : "",
+          p.contractEndDate
+            ? new Date(p.contractEndDate).toISOString().slice(0, 10)
+            : "",
+          typeof p.distanceFromClubKm === "number"
+            ? p.distanceFromClubKm.toFixed(1)
+            : "",
+        ]
+          .map(esc)
+          .join(","),
+      ),
+    ];
+
+    const csv = lines.join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `interne-spelers-export-${new Date()
+      .toISOString()
+      .slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <DataTable.Wrapper>
       <div className="relative">
-        <Popover>
-          <PopoverTrigger asChild>
-            <button className="absolute top-2 right-2 h-8 w-8 rounded border border-border-dark bg-bg-secondary/80 text-text-primary hover:border-accent-primary/60 flex items-center justify-center backdrop-blur-sm">
-              <Settings className="h-4 w-4" />
-              <span className="sr-only">Kolommen</span>
-            </button>
-          </PopoverTrigger>
-          <PopoverContent className="w-56 p-2 bg-bg-card border-border-dark shadow-lg" align="end">
-            <div className="space-y-1">
-              {table
-                .getAllLeafColumns()
-                .filter((column) => column.id !== "actions" && column.id !== "name")
-                .map((column) => (
-                  <label key={column.id} className="flex items-center gap-2 text-sm text-text-primary">
-                    <Checkbox
-                      checked={column.getIsVisible()}
-                      onCheckedChange={(val) => column.toggleVisibility(Boolean(val))}
-                      className="border-border-dark data-[state=checked]:bg-accent-primary data-[state=checked]:border-accent-primary"
-                    />
-                    <span className="truncate">
-                      {typeof column.columnDef.header === "string"
-                        ? column.columnDef.header
-                        : column.id}
-                    </span>
-                  </label>
-                ))}
+        <div className="flex items-center justify-end gap-3 px-3 py-2 bg-bg-secondary">
+          {canBulkDelete && selectedIds.length > 0 && (
+            <div className="flex items-center gap-2 text-xs text-text-secondary">
+              <span>
+                <span className="font-semibold text-text-primary">
+                  {selectedIds.length}
+                </span>{" "}
+                geselecteerd
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  const selectedPlayers = table
+                    .getSelectedRowModel()
+                    .rows.map((r) => r.original as InternalPlayer);
+                  exportInternalPlayers(selectedPlayers);
+                }}
+                className="px-3 py-1 rounded border border-border-dark bg-bg-secondary/70 text-text-secondary text-xs hover:bg-bg-hover transition-colors"
+              >
+                Spelers exporteren
+              </button>
+
+              <button
+                type="button"
+                onClick={async () => {
+                  const ok = window.confirm(
+                    `Weet je zeker dat je ${selectedIds.length} speler(s) wilt verwijderen?`,
+                  );
+                  if (!ok) return;
+                  await deletePlayersBulk(selectedIds);
+                  table.resetRowSelection();
+                  router.refresh();
+                }}
+                className="px-3 py-1 rounded border border-red-500/40 bg-red-500/10 text-red-400 text-xs hover:bg-red-500/20 transition-colors"
+              >
+                Spelers verwijderen
+              </button>
             </div>
-          </PopoverContent>
-        </Popover>
+          )}
+
+          <Popover>
+            <PopoverTrigger asChild>
+              <button className="h-8 w-8 rounded bg-transparent text-text-secondary hover:text-accent-primary flex items-center justify-center">
+                <Settings className="h-4 w-4" />
+                <span className="sr-only">Kolommen</span>
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className="w-56 p-2 bg-bg-card border-border-dark shadow-lg" align="end">
+              <div className="space-y-1">
+                {table
+                  .getAllLeafColumns()
+                  .filter(
+                    (column) =>
+                      column.id !== "actions" &&
+                      column.id !== "name" &&
+                      column.id !== "select",
+                  )
+                  .map((column) => (
+                    <label
+                      key={column.id}
+                      className="flex items-center gap-2 text-sm text-text-primary"
+                    >
+                      <Checkbox
+                        checked={column.getIsVisible()}
+                        onCheckedChange={(val) =>
+                          column.toggleVisibility(Boolean(val))
+                        }
+                        className="border-border-dark data-[state=checked]:bg-accent-primary data-[state=checked]:border-accent-primary"
+                      />
+                      <span className="truncate">
+                        {typeof column.columnDef.header === "string"
+                          ? column.columnDef.header
+                          : column.id}
+                      </span>
+                    </label>
+                  ))}
+              </div>
+            </PopoverContent>
+          </Popover>
+        </div>
         <Table className="min-w-max">
         <TableHeader className="bg-bg-secondary">
             {table.getHeaderGroups().map((headerGroup) => (
@@ -406,7 +554,7 @@ export function InternalPlayersTable({
                 key={headerGroup.id}
                 className="border-border-dark hover:bg-transparent"
               >
-                {headerGroup.headers.map((header) => (
+                {headerGroup.headers.map((header, headerIndex) => (
                   <TableHead
                     key={header.id}
                     className="align-top py-2 px-2 text-text-secondary"
@@ -439,14 +587,27 @@ export function InternalPlayersTable({
                           ),
                         }[header.column.getIsSorted() as string] ?? null}
                       </div>
-                      {header.column.getCanFilter() &&
-                      header.column.id !== "actions" ? (
-                        <div>
-                          <Filter column={header.column} />
-                        </div>
-                      ) : (
-                        <div className="h-8" />
-                      )}
+                      <div className="h-8 flex items-end">
+                        {headerIndex === 0 && canBulkDelete ? (
+                          <div className="w-full flex items-center justify-center">
+                            <Checkbox
+                              checked={table.getIsAllPageRowsSelected()}
+                              onCheckedChange={(val) =>
+                                table.toggleAllPageRowsSelected(Boolean(val))
+                              }
+                              aria-label="Selecteer alle spelers op deze pagina"
+                              className="border-border-dark data-[state=checked]:bg-accent-primary data-[state=checked]:border-accent-primary"
+                            />
+                          </div>
+                        ) : header.column.getCanFilter() &&
+                          header.column.id !== "actions" ? (
+                          <div>
+                            <Filter column={header.column} />
+                          </div>
+                        ) : (
+                          <div className="h-8" />
+                        )}
+                      </div>
                     </div>
                   </TableHead>
                 ))}

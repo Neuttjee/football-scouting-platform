@@ -35,6 +35,7 @@ type Props = {
   defaultSeasonYear: number;
   clubUsers: { id: string; name: string }[];
   clubName: string | null;
+  canBulkDelete: boolean;
 };
 
 export default function InternalPlayersPage({
@@ -44,6 +45,7 @@ export default function InternalPlayersPage({
   defaultSeasonYear,
   clubUsers,
   clubName,
+  canBulkDelete,
 }: Props) {
   return (
     <div className="space-y-6">
@@ -54,6 +56,7 @@ export default function InternalPlayersPage({
         seasonYear={defaultSeasonYear}
         clubUsers={clubUsers}
         clubName={clubName}
+        canBulkDelete={canBulkDelete}
       />
     </div>
   );
