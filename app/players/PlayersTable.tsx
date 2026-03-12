@@ -607,7 +607,7 @@ export function PlayersTable({
 
                       <div className="h-8 flex items-end">
                         {headerIndex === 0 && canBulkDelete ? (
-                          <div className="w-full flex items-center justify-center">
+                          <div className="w-full flex items-center justify-center pb-0.5">
                             <Checkbox
                               checked={table.getIsAllPageRowsSelected()}
                               onCheckedChange={(val) =>
