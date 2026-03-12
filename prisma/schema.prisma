@@ -184,6 +184,7 @@ model User {
   twoFactorSecret      String?
   twoFactorBackupCodes String?
   twoFactorVerifiedAt  DateTime?
+  twoFactorResetAt     DateTime?
 
   // Audit Relations
   playersCreated       Player[]        @relation("PlayerCreatedBy")

@@ -1,8 +1,8 @@
 'use client';
 
 import * as React from "react";
-import { toggleUserStatus } from './actions';
-import { updateUserRole, resendInvite, deleteUser } from './actions';
+import { toggleUserStatus } from "./actions";
+import { updateUserRole, resendInvite, deleteUser, setUserTwoFactorRequired, resetUserTwoFactor } from "./actions";
 import { useTransition } from 'react';
 import { Plus } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
@@ -21,7 +21,23 @@ type User = {
   lastLoginAt?: string | Date | null;
 };
 
-export function UserTable({ users, currentUserId }: { users: User[], currentUserId: string }) {
+type UserTableProps = {
+  users: (User & {
+    twoFactorEnabled: boolean;
+    twoFactorVerifiedAt: string | Date | null;
+    twoFactorResetAt: string | Date | null;
+  })[];
+  currentUserId: string;
+  hasTwoFactorModule: boolean;
+  canManageTwoFactor: boolean;
+};
+
+export function UserTable({
+  users,
+  currentUserId,
+  hasTwoFactorModule,
+  canManageTwoFactor,
+}: UserTableProps) {
   const [isPending, startTransition] = useTransition();
 
   const [roleModalOpen, setRoleModalOpen] = React.useState(false);
@@ -76,6 +92,16 @@ export function UserTable({ users, currentUserId }: { users: User[], currentUser
     return { label: "Inactief", tone: "danger" as const };
   };
 
+  const getTwoFactorStatus = (u: UserTableProps["users"][number]) => {
+    if (!u.twoFactorEnabled) {
+      return { label: "Uit", tone: "neutral" as const };
+    }
+    if (u.twoFactorEnabled && !u.twoFactorVerifiedAt) {
+      return { label: "Vereist – nog niet ingesteld", tone: "warning" as const };
+    }
+    return { label: "Actief", tone: "success" as const };
+  };
+
   return (
     <>
       <DataTable.Root>
@@ -85,12 +111,17 @@ export function UserTable({ users, currentUserId }: { users: User[], currentUser
             <DataTable.HeaderCell>Email</DataTable.HeaderCell>
             <DataTable.HeaderCell>Rol</DataTable.HeaderCell>
             <DataTable.HeaderCell>Status</DataTable.HeaderCell>
+            {hasTwoFactorModule && (
+              <DataTable.HeaderCell>2FA</DataTable.HeaderCell>
+            )}
             <DataTable.HeaderCell className="text-right">Acties</DataTable.HeaderCell>
           </DataTable.HeaderRow>
         </DataTable.Header>
         <DataTable.Body>
           {users.length === 0 ? (
-            <DataTable.Empty colSpan={5}>Geen gebruikers gevonden.</DataTable.Empty>
+            <DataTable.Empty colSpan={hasTwoFactorModule ? 6 : 5}>
+              Geen gebruikers gevonden.
+            </DataTable.Empty>
           ) : (
             users.map((u) => (
               <DataTable.Row key={u.id}>
@@ -107,6 +138,18 @@ export function UserTable({ users, currentUserId }: { users: User[], currentUser
                     );
                   })()}
                 </DataTable.Cell>
+              {hasTwoFactorModule && (
+                <DataTable.Cell>
+                  {(() => {
+                    const status = getTwoFactorStatus(u);
+                    return (
+                      <StatusPill tone={status.tone}>
+                        {status.label}
+                      </StatusPill>
+                    );
+                  })()}
+                </DataTable.Cell>
+              )}
                 <DataTable.Cell className="text-right">
                   {u.id !== currentUserId && (
                     <div className="flex justify-end pr-2">
@@ -133,6 +176,30 @@ export function UserTable({ users, currentUserId }: { users: User[], currentUser
                           >
                             Uitnodiging opnieuw versturen
                           </DropdownMenuItem>
+                        {hasTwoFactorModule && canManageTwoFactor && (
+                          <>
+                            <DropdownMenuItem
+                              onClick={() =>
+                                startTransition(() =>
+                                  setUserTwoFactorRequired(u.id, !u.twoFactorEnabled),
+                                )
+                              }
+                              className="cursor-pointer focus:bg-bg-hover focus:text-accent-primary text-text-primary text-xs"
+                            >
+                              {u.twoFactorEnabled ? "2FA niet meer verplichten" : "2FA verplichten"}
+                            </DropdownMenuItem>
+                            {u.twoFactorEnabled && (
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  startTransition(() => resetUserTwoFactor(u.id))
+                                }
+                                className="cursor-pointer focus:bg-bg-hover focus:text-accent-primary text-text-primary text-xs"
+                              >
+                                2FA resetten
+                              </DropdownMenuItem>
+                            )}
+                          </>
+                        )}
                           <DropdownMenuItem
                             onClick={() => handleDeleteUser(u.id)}
                             className="cursor-pointer focus:bg-bg-hover focus:text-accent-primary text-text-primary text-xs text-destructive"

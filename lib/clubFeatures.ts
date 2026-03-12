@@ -71,6 +71,12 @@ export const CLUB_FEATURE_DEFINITIONS = [
     description: 'E-mail- en in-app notificaties.',
     defaultEnabled: false,
   },
+  {
+    key: 'two_factor_auth',
+    label: 'Tweefactor authenticatie',
+    description: 'Extra beveiliging via Google Authenticator (TOTP).',
+    defaultEnabled: false,
+  },
 ] as const;
 
 export type ClubFeatureKey = (typeof CLUB_FEATURE_DEFINITIONS)[number]['key'];

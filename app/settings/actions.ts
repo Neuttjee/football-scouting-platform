@@ -191,6 +191,42 @@ export async function updateTeamNiveau(teamId: string, niveau: string | null) {
   revalidatePath('/squad-planning');
 }
 
+export async function setUserTwoFactorRequired(userId: string, required: boolean) {
+  const session = await getSession();
+  if (!session || (session.user.role !== 'ADMIN' && session.user.role !== 'SUPERADMIN')) throw new Error('Unauthorized');
+  const clubId = getEffectiveClubId(session);
+  if (!clubId) throw new Error('Geen club geselecteerd');
+
+  await prisma.user.update({
+    where: { id: userId, clubId },
+    data: {
+      twoFactorEnabled: required,
+    },
+  });
+
+  revalidatePath('/settings');
+}
+
+export async function resetUserTwoFactor(userId: string) {
+  const session = await getSession();
+  if (!session || (session.user.role !== 'ADMIN' && session.user.role !== 'SUPERADMIN')) throw new Error('Unauthorized');
+  const clubId = getEffectiveClubId(session);
+  if (!clubId) throw new Error('Geen club geselecteerd');
+
+  await prisma.user.update({
+    where: { id: userId, clubId },
+    data: {
+      twoFactorSecret: null,
+      twoFactorBackupCodes: null,
+      twoFactorVerifiedAt: null,
+      twoFactorResetAt: new Date(),
+    },
+  });
+
+  revalidatePath('/settings');
+}
+
+
 export async function setTeamActive(teamId: string, isActive: boolean) {
   const session = await getSession();
   if (!session || (session.user.role !== 'ADMIN' && session.user.role !== 'SUPERADMIN')) throw new Error('Unauthorized');

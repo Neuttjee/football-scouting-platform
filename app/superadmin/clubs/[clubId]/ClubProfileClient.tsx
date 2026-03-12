@@ -270,7 +270,17 @@ export function ClubProfileClient({
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {CLUB_FEATURE_DEFINITIONS.filter((feature) =>
-                    ["dashboard", "external_players", "internal_players", "tasks", "contact_logs", "shortlists", "contracts", "match_reports"].includes(feature.key)
+                    [
+                      "dashboard",
+                      "external_players",
+                      "internal_players",
+                      "tasks",
+                      "contact_logs",
+                      "shortlists",
+                      "contracts",
+                      "match_reports",
+                      "two_factor_auth",
+                    ].includes(feature.key)
                   ).map((feature) => (
                     <label
                       key={feature.key}
