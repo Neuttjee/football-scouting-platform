@@ -3,6 +3,7 @@
 import { getSession, getEffectiveClubId } from '@/lib/auth';
 import { parseCsv, parseXlsx } from '@/lib/import/parsers';
 import prisma from '@/lib/prisma';
+import { logAuditEvent } from '@/lib/audit';
 import type { FieldMapping, ParsedFile } from '@/lib/import/types';
 import { buildPlayerImportPreview, type PlayerImportPreviewResult } from '@/lib/import/validation';
 
@@ -114,6 +115,19 @@ export async function executePlayerImport(
   const importedCount = rowsToInsert.length;
   const skippedInvalidCount = preview.invalidCount;
   const skippedDuplicateCount = preview.duplicateCount - (options.importDuplicates ? preview.duplicateCount : 0);
+
+  await logAuditEvent({
+    session,
+    action: 'PLAYER_IMPORTED',
+    entityType: 'Player',
+    entityId: null,
+    metadata: {
+      clubId,
+      importedCount,
+      skippedInvalidCount,
+      skippedDuplicateCount,
+    },
+  });
 
   return {
     importedCount,

@@ -2,6 +2,7 @@
 
 import { getSession, getEffectiveClubId } from '@/lib/auth';
 import prisma from '@/lib/prisma';
+import { logAuditEvent } from '@/lib/audit';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
@@ -162,8 +163,16 @@ export async function deletePlayer(playerId: string) {
   const clubId = getEffectiveClubId(session);
   if (!clubId) throw new Error('Geen club geselecteerd');
 
-  await prisma.player.delete({
+  const player = await prisma.player.delete({
     where: { id: playerId, clubId },
+  });
+
+  await logAuditEvent({
+    session,
+    action: 'PLAYER_DELETED',
+    entityType: 'Player',
+    entityId: playerId,
+    metadata: { clubId, name: player.name },
   });
 
   revalidatePath("/players");
@@ -180,11 +189,19 @@ export async function deletePlayersBulk(playerIds: string[]) {
   if (!clubId) throw new Error("Geen club geselecteerd");
   if (!Array.isArray(playerIds) || playerIds.length === 0) return;
 
-  await prisma.player.deleteMany({
+  const result = await prisma.player.deleteMany({
     where: {
       clubId,
       id: { in: playerIds },
     },
+  });
+
+  await logAuditEvent({
+    session,
+    action: 'PLAYER_DELETED_BULK',
+    entityType: 'Player',
+    entityId: null,
+    metadata: { clubId, count: result.count, ids: playerIds },
   });
 
   revalidatePath("/players");

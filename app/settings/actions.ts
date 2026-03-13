@@ -2,6 +2,7 @@
 
 import prisma from '@/lib/prisma';
 import { getSession, getEffectiveClubId } from '@/lib/auth';
+import { logAuditEvent } from '@/lib/audit';
 import { revalidatePath } from 'next/cache';
 import { sanitizePrimaryColor } from '@/lib/branding';
 import { sendInviteEmail } from '@/lib/email';
@@ -65,6 +66,14 @@ export async function updateUserRole(userId: string, role: string) {
     data: { role },
   });
 
+  await logAuditEvent({
+    session,
+    action: 'USER_ROLE_UPDATED',
+    entityType: 'User',
+    entityId: userId,
+    metadata: { newRole: role },
+  });
+
   revalidatePath('/settings');
 }
 
@@ -102,6 +111,14 @@ export async function resendInvite(userId: string) {
 
   await sendInviteEmail(user.email, inviteToken, user.role, club?.name || null);
 
+  await logAuditEvent({
+    session,
+    action: 'INVITE_RESENT',
+    entityType: 'User',
+    entityId: user.id,
+    metadata: { email: user.email, role: user.role, clubId: session.user.clubId },
+  });
+
   revalidatePath('/settings');
 }
 
@@ -117,6 +134,14 @@ export async function deleteUser(userId: string) {
 
   await prisma.user.delete({
     where: { id: userId, clubId },
+  });
+
+  await logAuditEvent({
+    session,
+    action: 'USER_DELETED',
+    entityType: 'User',
+    entityId: userId,
+    metadata: { clubId },
   });
 
   revalidatePath('/settings');
@@ -204,6 +229,14 @@ export async function setUserTwoFactorRequired(userId: string, required: boolean
     },
   });
 
+  await logAuditEvent({
+    session,
+    action: required ? 'TWOFA_REQUIRED_ENABLED' : 'TWOFA_REQUIRED_DISABLED',
+    entityType: 'User',
+    entityId: userId,
+    metadata: { clubId, required },
+  });
+
   revalidatePath('/settings');
 }
 
@@ -221,6 +254,14 @@ export async function resetUserTwoFactor(userId: string) {
       twoFactorVerifiedAt: null,
       twoFactorResetAt: new Date(),
     },
+  });
+
+  await logAuditEvent({
+    session,
+    action: 'TWOFA_RESET',
+    entityType: 'User',
+    entityId: userId,
+    metadata: { clubId },
   });
 
   revalidatePath('/settings');

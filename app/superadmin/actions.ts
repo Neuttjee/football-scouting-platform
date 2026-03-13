@@ -5,6 +5,7 @@ import prisma from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { setActiveClubId } from '@/lib/auth';
 import { sanitizePrimaryColor } from '@/lib/branding';
+import { logAuditEvent } from '@/lib/audit';
 
 export type ClubStatus = 'ACTIEF' | 'INACTIEF' | 'PROEFPERIODE' | 'GESCHORST';
 
@@ -24,12 +25,20 @@ export async function createClub(formData: FormData) {
   const primaryColor = sanitizePrimaryColor((formData.get('primaryColor') as string) || undefined);
   const logo = (formData.get('logo') as string) || null;
 
-  await prisma.club.create({
+  const club = await prisma.club.create({
     data: {
       name,
       primaryColor,
       logo: logo === '' ? null : logo,
     },
+  });
+
+  await logAuditEvent({
+    session,
+    action: 'CLUB_CREATED',
+    entityType: 'Club',
+    entityId: club.id,
+    metadata: { name, primaryColor },
   });
 
   revalidatePath('/superadmin');
@@ -137,6 +146,14 @@ export async function updateClubStatusInteractive(clubId: string, payload: ClubS
   revalidatePath('/contacts');
   revalidatePath('/squad-planning');
   revalidatePath('/settings');
+
+  await logAuditEvent({
+    session,
+    action: 'CLUB_STATUS_CHANGED',
+    entityType: 'Club',
+    entityId: clubId,
+    metadata: payload as any,
+  });
 }
 
 export async function deleteClub(clubId: string) {
@@ -184,4 +201,19 @@ export async function deleteClub(clubId: string) {
   revalidatePath('/contacts');
   revalidatePath('/squad-planning');
   revalidatePath('/settings');
+
+  await logAuditEvent({
+    session,
+    action: 'CLUB_DELETED',
+    entityType: 'Club',
+    entityId: clubId,
+    metadata: {
+      name: club.name,
+      users,
+      players,
+      teams,
+      tasks,
+      contacts,
+    },
+  });
 }

@@ -7,7 +7,13 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
-    "postinstall": "prisma generate"
+    "typecheck": "tsc --noEmit",
+    "postinstall": "prisma generate",
+    "prisma:migrate:dev": "prisma migrate dev",
+    "prisma:migrate:deploy": "prisma migrate deploy",
+    "seed:dev": "cross-env NODE_ENV=development SEED_TARGET=dev prisma db seed",
+    "seed:test": "cross-env NODE_ENV=development SEED_TARGET=test prisma db seed",
+    "reset:test": "cross-env NODE_ENV=development SEED_TARGET=test prisma migrate reset --force && npm run seed:test"
   },
   "dependencies": {
     "@fontsource/jetbrains-mono": "^5.2.8",
@@ -64,6 +70,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "prisma": "^5.15.0",
+    "cross-env": "^7.0.3",
     "tailwindcss": "^4",
     "ts-node": "^10.9.2",
     "tsx": "^4.21.0",
