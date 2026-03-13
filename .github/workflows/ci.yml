@@ -17,6 +17,10 @@ on:
 jobs:
   build-and-check:
     runs-on: ubuntu-latest
+    env:
+      # Dummy value so Prisma can load the schema in CI.
+      # validate/get-config only require the variable to exist; they don't connect.
+      DATABASE_URL: postgresql://user:password@localhost:5432/db
 
     steps:
       - name: Checkout repository
