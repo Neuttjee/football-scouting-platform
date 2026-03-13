@@ -4,14 +4,18 @@ export async function seedTest(prisma: PrismaClient) {
   console.log('Seeding test data (fictieve clubs en spelers)...');
 
   // Fictieve testclub
-  const club = await prisma.club.upsert({
+  let club = await prisma.club.findFirst({
     where: { name: 'Testclub Noord' },
-    update: {},
-    create: {
-      name: 'Testclub Noord',
-      primaryColor: '#22c55e',
-    },
   });
+
+  if (!club) {
+    club = await prisma.club.create({
+      data: {
+        name: 'Testclub Noord',
+        primaryColor: '#22c55e',
+      },
+    });
+  }
 
   // Zorg voor een eenvoudige testgebruiker (SCOUT) in de testclub
   const scoutEmail = 'scout@testclub-noord.example';

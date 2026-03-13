@@ -12,6 +12,7 @@ import { ClubConfigProvider } from '@/components/club/ClubConfigProvider';
 import { getClubConfigByClubId } from '@/lib/clubConfig';
 import { RootClientLayout } from './RootClientLayout';
 import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 const jetbrainsMono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono' });
@@ -97,6 +98,7 @@ export default async function RootLayout({
           )}
         </ThemeProvider>
         <Analytics />
+        <SpeedInsights />
       </body>
     </RootClientLayout>
   );
