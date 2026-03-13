@@ -1,5 +1,5 @@
-import prisma from '@/lib/prisma';
-import { normalizeFeatureState } from '@/lib/clubFeatures';
+import prisma from "@/lib/prisma";
+import { normalizeFeatureState } from "@/lib/clubFeatures";
 
 type SessionLike = {
   user?: {
@@ -60,6 +60,25 @@ export async function getClubConfigByClubId(clubId: string): Promise<ClubConfig 
         }
       : null,
   };
+}
+
+export async function getClubFeaturesByClubId(
+  clubId: string,
+): Promise<ReturnType<typeof normalizeFeatureState> | null> {
+  if (!clubId) return null;
+
+  const club = await prisma.club.findUnique({
+    where: { id: clubId },
+    include: {
+      features: {
+        select: { key: true, enabled: true },
+      },
+    },
+  });
+
+  if (!club) return null;
+
+  return normalizeFeatureState(club.features);
 }
 
 export async function getClubConfigFromSession(

@@ -1,13 +1,24 @@
-'use client';
+\"use client\";
 
 import * as React from "react";
-import { toggleUserStatus } from "./actions";
-import { updateUserRole, resendInvite, deleteUser, setUserTwoFactorRequired, resetUserTwoFactor } from "./actions";
-import { useTransition } from 'react';
-import { Plus } from 'lucide-react';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { DataTable } from "@/components/DataTable"
+import { useTransition } from "react";
+import { Plus } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { DataTable } from "@/components/DataTable";
 import { StatusPill } from "@/components/StatusPill";
+import {
+  toggleUserStatus,
+  updateUserRole,
+  resendInvite,
+  deleteUser,
+  setUserTwoFactorRequired,
+  resetUserTwoFactor,
+} from "./actions";
 
 type User = {
   id: string;
@@ -19,17 +30,17 @@ type User = {
   inviteToken: string | null;
   inviteTokenExpires: string | Date | null;
   lastLoginAt?: string | Date | null;
+  twoFactorEnabled: boolean;
+  twoFactorVerifiedAt: string | Date | null;
+  twoFactorResetAt: string | Date | null;
 };
 
 type UserTableProps = {
-  users: (User & {
-    twoFactorEnabled: boolean;
-    twoFactorVerifiedAt: string | Date | null;
-    twoFactorResetAt: string | Date | null;
-  })[];
+  users: User[];
   currentUserId: string;
   hasTwoFactorModule: boolean;
   canManageTwoFactor: boolean;
+  onAfterChange?: () => Promise<void> | void;
 };
 
 export function UserTable({
@@ -37,6 +48,7 @@ export function UserTable({
   currentUserId,
   hasTwoFactorModule,
   canManageTwoFactor,
+  onAfterChange,
 }: UserTableProps) {
   const [isPending, startTransition] = useTransition();
 
@@ -49,33 +61,34 @@ export function UserTable({
     setRoleValue(currentRole || "SCOUT");
     setRoleModalOpen(true);
   };
-    
+
+  const withRefresh = (action: () => Promise<void>) => {
+    startTransition(async () => {
+      await action();
+      if (onAfterChange) {
+        await onAfterChange();
+      }
+    });
+  };
+
   const handleSubmitRole = () => {
     if (!roleUserId) return;
-    startTransition(() => {
-      updateUserRole(roleUserId, roleValue);
-    });
+    withRefresh(() => updateUserRole(roleUserId, roleValue));
     setRoleModalOpen(false);
   };
 
   const handleToggle = (userId: string, isActive: boolean) => {
-    startTransition(() => {
-      toggleUserStatus(userId, !isActive);
-    });
+    withRefresh(() => toggleUserStatus(userId, !isActive));
   };
 
   const handleResendInvite = (userId: string) => {
-    startTransition(() => {
-      resendInvite(userId);
-    });
+    withRefresh(() => resendInvite(userId));
   };
 
   const handleDeleteUser = (userId: string) => {
     const ok = window.confirm("Weet je zeker dat je deze gebruiker wilt verwijderen?");
     if (!ok) return;
-    startTransition(() => {
-      deleteUser(userId);
-    });
+    withRefresh(() => deleteUser(userId));
   };
 
   const now = new Date();
@@ -92,7 +105,7 @@ export function UserTable({
     return { label: "Inactief", tone: "danger" as const };
   };
 
-  const getTwoFactorStatus = (u: UserTableProps["users"][number]) => {
+  const getTwoFactorStatus = (u: User) => {
     if (!u.twoFactorEnabled) {
       return { label: "Uit", tone: "neutral" as const };
     }
@@ -111,9 +124,7 @@ export function UserTable({
             <DataTable.HeaderCell>Email</DataTable.HeaderCell>
             <DataTable.HeaderCell>Rol</DataTable.HeaderCell>
             <DataTable.HeaderCell>Status</DataTable.HeaderCell>
-            {hasTwoFactorModule && (
-              <DataTable.HeaderCell>2FA</DataTable.HeaderCell>
-            )}
+            {hasTwoFactorModule && <DataTable.HeaderCell>2FA</DataTable.HeaderCell>}
             <DataTable.HeaderCell className="text-right">Acties</DataTable.HeaderCell>
           </DataTable.HeaderRow>
         </DataTable.Header>
@@ -131,25 +142,17 @@ export function UserTable({
                 <DataTable.Cell>
                   {(() => {
                     const status = getStatus(u);
-                    return (
-                      <StatusPill tone={status.tone}>
-                        {status.label}
-                      </StatusPill>
-                    );
+                    return <StatusPill tone={status.tone}>{status.label}</StatusPill>;
                   })()}
                 </DataTable.Cell>
-              {hasTwoFactorModule && (
-                <DataTable.Cell>
-                  {(() => {
-                    const status = getTwoFactorStatus(u);
-                    return (
-                      <StatusPill tone={status.tone}>
-                        {status.label}
-                      </StatusPill>
-                    );
-                  })()}
-                </DataTable.Cell>
-              )}
+                {hasTwoFactorModule && (
+                  <DataTable.Cell>
+                    {(() => {
+                      const status = getTwoFactorStatus(u);
+                      return <StatusPill tone={status.tone}>{status.label}</StatusPill>;
+                    })()}
+                  </DataTable.Cell>
+                )}
                 <DataTable.Cell className="text-right">
                   {u.id !== currentUserId && (
                     <div className="flex justify-end pr-2">
@@ -157,7 +160,10 @@ export function UserTable({
                         <DropdownMenuTrigger className="p-1.5 bg-accent-primary/10 text-accent-primary hover:bg-accent-primary/20 rounded-md transition-colors outline-none">
                           <Plus className="h-4 w-4" />
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="bg-bg-card border-border-dark min-w-[180px]">
+                        <DropdownMenuContent
+                          align="end"
+                          className="bg-bg-card border-border-dark min-w-[180px]"
+                        >
                           <DropdownMenuItem
                             onClick={() => handleToggle(u.id, u.isActive)}
                             className="cursor-pointer focus:bg-bg-hover focus:text-accent-primary text-text-primary text-xs"
@@ -176,30 +182,30 @@ export function UserTable({
                           >
                             Uitnodiging opnieuw versturen
                           </DropdownMenuItem>
-                        {hasTwoFactorModule && canManageTwoFactor && (
-                          <>
-                            <DropdownMenuItem
-                              onClick={() =>
-                                startTransition(() =>
-                                  setUserTwoFactorRequired(u.id, !u.twoFactorEnabled),
-                                )
-                              }
-                              className="cursor-pointer focus:bg-bg-hover focus:text-accent-primary text-text-primary text-xs"
-                            >
-                              {u.twoFactorEnabled ? "2FA niet meer verplichten" : "2FA verplichten"}
-                            </DropdownMenuItem>
-                            {u.twoFactorEnabled && (
+                          {hasTwoFactorModule && canManageTwoFactor && (
+                            <>
                               <DropdownMenuItem
                                 onClick={() =>
-                                  startTransition(() => resetUserTwoFactor(u.id))
+                                  withRefresh(() =>
+                                    setUserTwoFactorRequired(u.id, !u.twoFactorEnabled),
+                                  )
                                 }
                                 className="cursor-pointer focus:bg-bg-hover focus:text-accent-primary text-text-primary text-xs"
                               >
-                                2FA resetten
+                                {u.twoFactorEnabled
+                                  ? "2FA niet meer verplichten"
+                                  : "2FA verplichten"}
                               </DropdownMenuItem>
-                            )}
-                          </>
-                        )}
+                              {u.twoFactorEnabled && (
+                                <DropdownMenuItem
+                                  onClick={() => withRefresh(() => resetUserTwoFactor(u.id))}
+                                  className="cursor-pointer focus:bg-bg-hover focus:text-accent-primary text-text-primary text-xs"
+                                >
+                                  2FA resetten
+                                </DropdownMenuItem>
+                              )}
+                            </>
+                          )}
                           <DropdownMenuItem
                             onClick={() => handleDeleteUser(u.id)}
                             className="cursor-pointer focus:bg-bg-hover focus:text-accent-primary text-text-primary text-xs text-destructive"
@@ -217,46 +223,46 @@ export function UserTable({
         </DataTable.Body>
       </DataTable.Root>
 
-    {/* Rol wijzigen modal */}
-    {roleModalOpen && (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-        <div className="bg-bg-card border border-accent-primary rounded-lg shadow-lg p-6 w-full max-w-sm">
-          <h3 className="text-lg font-semibold mb-4 text-text-primary">Rol wijzigen</h3>
-          <div className="space-y-2">
-            <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
-              Rol
-            </label>
-            <select
-              value={roleValue}
-              onChange={(e) => setRoleValue(e.target.value)}
-              className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
-            >
-              <option value="SCOUT">Scout</option>
-              <option value="TC_LID">TC Lid</option>
-              <option value="ADMIN">Beheerder (Admin)</option>
-              <option value="LEZER">Lezer</option>
-            </select>
-          </div>
-          <div className="pt-4 flex justify-end gap-2">
-            <button
-              type="button"
-              onClick={() => setRoleModalOpen(false)}
-              className="px-3 py-1.5 text-sm text-text-secondary hover:text-text-primary"
-            >
-              Annuleren
-            </button>
-            <button
-              type="button"
-              onClick={handleSubmitRole}
-              disabled={isPending}
-              className="px-3 py-1.5 text-sm bg-accent-primary text-white rounded hover:bg-accent-glow disabled:opacity-50"
-            >
-              Opslaan
-            </button>
+      {roleModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div className="bg-bg-card border border-accent-primary rounded-lg shadow-lg p-6 w-full max-w-sm">
+            <h3 className="text-lg font-semibold mb-4 text-text-primary">Rol wijzigen</h3>
+            <div className="space-y-2">
+              <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
+                Rol
+              </label>
+              <select
+                value={roleValue}
+                onChange={(e) => setRoleValue(e.target.value)}
+                className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
+              >
+                <option value="SCOUT">Scout</option>
+                <option value="TC_LID">TC Lid</option>
+                <option value="ADMIN">Beheerder (Admin)</option>
+                <option value="LEZER">Lezer</option>
+              </select>
+            </div>
+            <div className="pt-4 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setRoleModalOpen(false)}
+                className="px-3 py-1.5 text-sm text-text-secondary hover:text-text-primary"
+              >
+                Annuleren
+              </button>
+              <button
+                type="button"
+                onClick={handleSubmitRole}
+                disabled={isPending}
+                className="px-3 py-1.5 text-sm bg-accent-primary text-white rounded hover:bg-accent-glow disabled:opacity-50"
+              >
+                Opslaan
+              </button>
+            </div>
           </div>
         </div>
-      </div>
-    )}
-  </>
-);
+      )}
+    </>
+  );
 }
+

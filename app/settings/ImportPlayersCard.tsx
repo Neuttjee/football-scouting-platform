@@ -1,8 +1,16 @@
-'use client';
+\"use client\";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import { Lock } from "lucide-react";
-import { ImportPlayersWizard } from "./ImportPlayersWizard";
+
+const ImportPlayersWizard = dynamic(
+  () => import("./ImportPlayersWizard").then((m) => m.ImportPlayersWizard),
+  {
+    ssr: false,
+    loading: () => null,
+  },
+);
 
 type ImportPlayersCardProps = {
   canImport: boolean;
@@ -55,7 +63,7 @@ export function ImportPlayersCard({ canImport }: ImportPlayersCardProps) {
         </div>
       </section>
 
-      {canImport && (
+      {canImport && open && (
         <ImportPlayersWizard open={open} onOpenChange={setOpen} />
       )}
     </>
