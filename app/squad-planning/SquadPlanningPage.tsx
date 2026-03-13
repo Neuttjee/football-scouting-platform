@@ -383,7 +383,7 @@ export default function SquadPlanningPage({
                 <span className="hidden sm:inline">Analyse</span>
               </button>
             </DialogTrigger>
-            <DialogContent className="w-full max-w-6xl max-h-[90vh] overflow-y-auto bg-bg-card border-accent-primary text-text-primary">
+            <DialogContent className="w-full max-w-[min(1400px,100vw-4rem)] max-h-[90vh] overflow-y-auto bg-bg-card border-accent-primary text-text-primary">
               <DialogHeader>
                 <DialogTitle>Selectie-analyse</DialogTitle>
               </DialogHeader>
@@ -406,7 +406,7 @@ export default function SquadPlanningPage({
                 <span className="hidden sm:inline">Instellingen</span>
               </button>
             </DialogTrigger>
-            <DialogContent className="w-full max-w-6xl max-h-[90vh] overflow-y-auto bg-bg-card border-accent-primary text-text-primary">
+            <DialogContent className="w-full max-w-[min(1400px,100vw-4rem)] max-h-[90vh] overflow-y-auto bg-bg-card border-accent-primary text-text-primary">
               <DialogHeader>
                 <DialogTitle>Instellingen</DialogTitle>
               </DialogHeader>

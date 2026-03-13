@@ -32,6 +32,7 @@ import { cn } from "@/lib/utils";
 import { Star, Settings } from "lucide-react";
 import { PlayerActionsMenu, PlayerForActions } from "@/components/PlayerActionsMenu";
 import { deletePlayersBulk } from "../players/actions";
+import { saveInternalPlayersTablePreference } from "./preferencesActions";
 
 type InternalPlayer = {
   id: string;
@@ -397,6 +398,20 @@ export function InternalPlayersTable({
       teams,
     },
   });
+
+  React.useEffect(() => {
+    let timeout: NodeJS.Timeout | null = setTimeout(() => {
+      void saveInternalPlayersTablePreference({
+        sorting,
+        columnVisibility,
+      });
+    }, 500);
+
+    return () => {
+      if (timeout) clearTimeout(timeout);
+      timeout = null;
+    };
+  }, [sorting, columnVisibility]);
 
   const router = useRouter();
   const selectedIds = canBulkDelete

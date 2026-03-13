@@ -60,6 +60,7 @@ model Club {
   squadPlans     SquadPlan[]
 
   auditLogs      AuditLog[]      @relation("ClubAuditLogs")
+  tablePreferences UserTablePreference[]
 
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
@@ -195,6 +196,7 @@ model User {
   tasksAssigned        Task[]          @relation("TaskAssignedTo")
   squadPlans           SquadPlan[]
   auditLogs            AuditLog[]      @relation("UserAuditLogs")
+  tablePreferences     UserTablePreference[]
 
   loginCount           Int       @default(0)
   lastLoginAt          DateTime?
@@ -333,6 +335,34 @@ model SquadPlan {
   updatedAt      DateTime @updatedAt
 
   @@index([clubId, teamId, seasonYear, userId, isClubDefault])
+}
+
+model UserTablePreference {
+  id              String   @id @default(uuid())
+
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  clubId          String
+  club            Club     @relation(fields: [clubId], references: [id], onDelete: Cascade)
+
+  /// Logical key identifying the table, e.g. "players" or "internalPlayers".
+  tableKey        String
+
+  /// Column visibility per column id.
+  columnVisibility Json
+
+  /// Sorting state as TanStack SortingState.
+  sorting         Json
+
+  /// Optional column order for future drag & drop reordering.
+  columnOrder     Json?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([userId, clubId, tableKey])
+  @@index([userId, clubId])
 }
 
 model AuditLog {

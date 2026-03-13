@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma";
 import { calculateAgeFromDate } from "@/lib/age";
 import { redirect } from "next/navigation";
 import { PlayersPageClient } from "./PlayersPageClient";
+import { getUserTablePreference, TABLE_KEY_PLAYERS } from "@/lib/tablePreferences";
 
 type PlayerWithRelations = {
   id: string;
@@ -101,6 +102,11 @@ export default async function PlayersPage() {
   const agingThreshold = club?.agingThreshold ?? 30;
   const clubName = club?.name ?? session.user.clubName ?? null;
 
+  const tablePreference = await getUserTablePreference({
+    session,
+    tableKey: TABLE_KEY_PLAYERS,
+  });
+
   const externalPlayers = players
     .filter((p) => p.type === "EXTERNAL")
     .map((p) => ({
@@ -150,6 +156,8 @@ export default async function PlayersPage() {
       defaultSeasonYear={new Date().getFullYear()}
       clubName={clubName}
       canBulkDelete={session.user.role === "SUPERADMIN" || session.user.role === "ADMIN"}
+      initialPlayersSorting={(tablePreference?.sorting as any) ?? []}
+      initialPlayersColumnVisibility={(tablePreference?.columnVisibility as any) ?? {}}
     />
   );
 }

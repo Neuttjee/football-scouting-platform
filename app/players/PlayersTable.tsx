@@ -34,6 +34,7 @@ import { targetSteps, targetStatuses, adviesOptions } from "@/lib/statusMapping"
 import { calculateAgeFromDate } from "@/lib/age"
 import { PlayerActionsMenu, PlayerForActions } from "@/components/PlayerActionsMenu";
 import { MoreHorizontal, Settings, Star } from "lucide-react";
+import { savePlayersTablePreference } from "./preferencesActions";
 
 interface Player extends PlayerForActions {
   niveau: string | null;
@@ -398,15 +399,19 @@ export function PlayersTable({
   clubUsers = [],
   clubName = null,
   canBulkDelete = false,
+  initialSorting = [],
+  initialColumnVisibility = {},
 }: {
   data: Player[];
   clubUsers?: any[];
   clubName?: string | null;
   canBulkDelete?: boolean;
+  initialSorting?: SortingState;
+  initialColumnVisibility?: Record<string, boolean>;
 }) {
-  const [sorting, setSorting] = React.useState<SortingState>([])
+  const [sorting, setSorting] = React.useState<SortingState>(initialSorting)
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
-  const [columnVisibility, setColumnVisibility] = React.useState<Record<string, boolean>>({})
+  const [columnVisibility, setColumnVisibility] = React.useState<Record<string, boolean>>(initialColumnVisibility)
   const [rowSelection, setRowSelection] = React.useState<Record<string, boolean>>({})
   const [pagination, setPagination] = React.useState<PaginationState>({
     pageIndex: 0,
@@ -440,6 +445,21 @@ export function PlayersTable({
     onColumnVisibilityChange: setColumnVisibility,
     onPaginationChange: setPagination,
   })
+
+  // Persist sorting and column visibility with a small debounce to avoid excessive writes.
+  React.useEffect(() => {
+    let timeout: NodeJS.Timeout | null = setTimeout(() => {
+      void savePlayersTablePreference({
+        sorting,
+        columnVisibility,
+      });
+    }, 500);
+
+    return () => {
+      if (timeout) clearTimeout(timeout);
+      timeout = null;
+    };
+  }, [sorting, columnVisibility]);
 
   const router = useRouter();
   const selectedIds = canBulkDelete
