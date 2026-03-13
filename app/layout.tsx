@@ -11,6 +11,7 @@ import { hexToRgb, sanitizePrimaryColor, DEFAULT_PRIMARY_COLOR } from '@/lib/bra
 import { ClubConfigProvider } from '@/components/club/ClubConfigProvider';
 import { getClubConfigByClubId } from '@/lib/clubConfig';
 import { RootClientLayout } from './RootClientLayout';
+import { Analytics } from '@vercel/analytics/react';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 const jetbrainsMono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono' });
@@ -95,6 +96,7 @@ export default async function RootLayout({
             children
           )}
         </ThemeProvider>
+        <Analytics />
       </body>
     </RootClientLayout>
   );

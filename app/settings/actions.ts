@@ -79,10 +79,17 @@ export async function updateUserRole(userId: string, role: string) {
 
 export async function resendInvite(userId: string) {
   const session = await getSession();
-  if (!session || session.user.role !== 'ADMIN') throw new Error('Unauthorized');
+  if (!session || (session.user.role !== 'ADMIN' && session.user.role !== 'SUPERADMIN')) {
+    throw new Error('Unauthorized');
+  }
+
+  const clubId = getEffectiveClubId(session);
+  if (!clubId) {
+    throw new Error('Geen club geselecteerd');
+  }
 
   const user = await prisma.user.findUnique({
-    where: { id: userId, clubId: session.user.clubId },
+    where: { id: userId, clubId },
   });
 
   if (!user) throw new Error('User not found');
@@ -105,7 +112,7 @@ export async function resendInvite(userId: string) {
   });
 
   const club = await prisma.club.findUnique({
-    where: { id: session.user.clubId },
+    where: { id: clubId },
     select: { name: true },
   });
 
@@ -116,7 +123,7 @@ export async function resendInvite(userId: string) {
     action: 'INVITE_RESENT',
     entityType: 'User',
     entityId: user.id,
-    metadata: { email: user.email, role: user.role, clubId: session.user.clubId },
+    metadata: { email: user.email, role: user.role, clubId },
   });
 
   revalidatePath('/settings');
