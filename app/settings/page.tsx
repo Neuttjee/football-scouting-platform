@@ -17,7 +17,6 @@ const UserManagementSection = dynamic(
         <p className="text-sm text-text-muted">Gebruikers laden...</p>
       </section>
     ),
-    ssr: false,
   },
 );
 
