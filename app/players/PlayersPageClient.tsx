@@ -64,6 +64,8 @@ type Props = {
   canBulkDelete: boolean;
   initialPlayersSorting: any[];
   initialPlayersColumnVisibility: Record<string, boolean>;
+  initialInternalPlayersSorting: any[];
+  initialInternalPlayersColumnVisibility: Record<string, boolean>;
 };
 
 export function PlayersPageClient({
@@ -77,6 +79,8 @@ export function PlayersPageClient({
   canBulkDelete,
   initialPlayersSorting,
   initialPlayersColumnVisibility,
+  initialInternalPlayersSorting,
+  initialInternalPlayersColumnVisibility,
 }: Props) {
   const searchParams = useSearchParams();
   const viewParam = searchParams.get("view");
@@ -135,6 +139,10 @@ export function PlayersPageClient({
           clubUsers={clubUsers}
           clubName={clubName}
           canBulkDelete={canBulkDelete}
+          initialInternalPlayersSorting={initialInternalPlayersSorting}
+          initialInternalPlayersColumnVisibility={
+            initialInternalPlayersColumnVisibility
+          }
         />
       )}
     </div>

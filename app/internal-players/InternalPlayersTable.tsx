@@ -66,6 +66,8 @@ type Props = {
   clubUsers: { id: string; name: string }[];
   clubName: string | null;
   canBulkDelete: boolean;
+  initialSorting: SortingState;
+  initialColumnVisibility: Record<string, boolean>;
 };
 
 const INTERNAL_BASE_COLUMNS: ColumnDef<InternalPlayer>[] = [
@@ -341,12 +343,16 @@ export function InternalPlayersTable({
   clubUsers,
   clubName,
   canBulkDelete,
+  initialSorting,
+  initialColumnVisibility,
 }: Props) {
-  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [sorting, setSorting] = React.useState<SortingState>(
+    initialSorting ?? [],
+  );
   const [columnFilters, setColumnFilters] =
     React.useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] =
-    React.useState<Record<string, boolean>>({});
+    React.useState<Record<string, boolean>>(initialColumnVisibility ?? {});
   const [rowSelection, setRowSelection] =
     React.useState<Record<string, boolean>>({});
 
