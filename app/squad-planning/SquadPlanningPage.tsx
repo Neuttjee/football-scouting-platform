@@ -19,10 +19,10 @@ import { TeamSettingsForm } from "../settings/TeamSettingsForm";
 
 const DEF_SLOTS: FieldSlot[] = [
   { id: "GK", label: "Keeper", x: 50, y: 92, line: "GK" },
-  { id: "RB", label: "Rechtsback", x: 86, y: 62, line: "DEF" },
-  { id: "RCB", label: "Rechter CV", x: 64, y: 76, line: "DEF" },
-  { id: "LCB", label: "Linker CV", x: 36, y: 76, line: "DEF" },
-  { id: "LB", label: "Linksback", x: 14, y: 62, line: "DEF" },
+  { id: "RB", label: "Rechtsback", x: 82, y: 60, line: "DEF" },
+  { id: "RCB", label: "Rechter CV", x: 66, y: 76, line: "DEF" },
+  { id: "LCB", label: "Linker CV", x: 34, y: 76, line: "DEF" },
+  { id: "LB", label: "Linksback", x: 18, y: 60, line: "DEF" },
 ];
 
 function getSlots(formation: Formation): FieldSlot[] {
@@ -53,21 +53,21 @@ function getSlots(formation: Formation): FieldSlot[] {
       ...DEF_SLOTS,
       { id: "DMR", label: "6 rechts", x: 64, y: 50, line: "MID" },
       { id: "DML", label: "6 links", x: 36, y: 50, line: "MID" },
-      { id: "AM", label: "10", x: 50, y: 34, line: "MID" },
-      { id: "RW", label: "Rechtsbuiten", x: 88, y: 18, line: "FWD" },
+      { id: "AM", label: "10", x: 50, y: 32, line: "MID" },
+      { id: "RW", label: "Rechtsbuiten", x: 84, y: 18, line: "FWD" },
       { id: "ST", label: "Spits", x: 50, y: 12, line: "FWD" },
-      { id: "LW", label: "Linksbuiten", x: 12, y: 18, line: "FWD" },
+      { id: "LW", label: "Linksbuiten", x: 16, y: 18, line: "FWD" },
     ];
   }
   // 4-3-3_POINT_BACK
   return [
     ...DEF_SLOTS,
     { id: "DM", label: "Controlerende 6", x: 50, y: 52, line: "MID" },
-    { id: "AMR", label: "8/10 rechts", x: 64, y: 38, line: "MID" },
-    { id: "AML", label: "8/10 links", x: 36, y: 38, line: "MID" },
-    { id: "RW", label: "Rechtsbuiten", x: 88, y: 18, line: "FWD" },
+    { id: "AMR", label: "8/10 rechts", x: 66, y: 35, line: "MID" },
+    { id: "AML", label: "8/10 links", x: 34, y: 35, line: "MID" },
+    { id: "RW", label: "Rechtsbuiten", x: 84, y: 18, line: "FWD" },
     { id: "ST", label: "Spits", x: 50, y: 12, line: "FWD" },
-    { id: "LW", label: "Linksbuiten", x: 12, y: 18, line: "FWD" },
+    { id: "LW", label: "Linksbuiten", x: 16, y: 18, line: "FWD" },
   ];
 }
 

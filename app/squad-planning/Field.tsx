@@ -77,7 +77,7 @@ export function Field({
             return (
               <div
                 key={slot.id}
-                className="absolute -translate-x-1/2 -translate-y-1/2 w-52 md:w-64"
+                className="absolute -translate-x-1/2 -translate-y-1/2 w-48 md:w-60"
                 style={{ left: `${slot.x}%`, top: `${slot.y}%` }}
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={(e) => {
