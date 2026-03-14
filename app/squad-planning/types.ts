@@ -35,4 +35,6 @@ export type FieldSlot = {
   x: number;
   y: number;
   line: SlotLine;
+  /** Max players in this slot (default 2). Use 3+ for extra capacity. */
+  maxPlayers?: number;
 };

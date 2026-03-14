@@ -32,6 +32,7 @@ export function AnalyticsPanel({
   const secondChoiceIds = slots
     .map((slot) => assignments[slot.id]?.[1])
     .filter((id): id is string => !!id);
+  const maxPerSlot = (slot: FieldSlot) => slot.maxPlayers ?? 2;
   const firstAndSecond = [...firstChoiceIds, ...secondChoiceIds]
     .map((id) => playersById[id])
     .filter(Boolean);
@@ -44,7 +45,7 @@ export function AnalyticsPanel({
   const lineAverage = (line: FieldSlot["line"]) => {
     const ids = slots
       .filter((slot) => slot.line === line)
-      .flatMap((slot) => [assignments[slot.id]?.[0], assignments[slot.id]?.[1]])
+      .flatMap((slot) => assignments[slot.id] ?? [])
       .filter((id): id is string => !!id);
     const ages = ids
       .map((id) => playersById[id]?.age)
@@ -55,7 +56,8 @@ export function AnalyticsPanel({
   const tekortPosities = slots
     .filter((slot) => {
       const filled = assignments[slot.id] || [];
-      return !filled[0] || !filled[1];
+      const max = maxPerSlot(slot);
+      return filled.length < max;
     })
     .map((slot) => slot.label);
 

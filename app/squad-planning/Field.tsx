@@ -72,7 +72,7 @@ export function Field({
               >
                 <div className="rounded-md border border-white/40 bg-bg-secondary/90 p-2 shadow-md backdrop-blur-sm">
                   <div className="space-y-1.5">
-                    {Array.from({ length: 2 }, (_, idx) => {
+                    {Array.from({ length: slot.maxPlayers ?? 2 }, (_, idx) => {
                       const player = playerIds[idx] ? playersById[playerIds[idx]] : null;
                       if (!player) {
                         return (

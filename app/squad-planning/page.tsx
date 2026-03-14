@@ -62,12 +62,17 @@ export default async function SquadPlanningServerPage() {
     isTopTalent: player.isTopTalent,
   }));
 
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth();
+  const currentSeasonStartYear = currentMonth >= 6 ? currentYear : currentYear - 1;
+
   return (
     <SquadPlanningPage
       players={preparedPlayers}
       teams={teams}
       agingThreshold={clubWithAging?.agingThreshold ?? 30}
-      defaultSeasonYear={new Date().getFullYear()}
+      defaultSeasonYear={currentSeasonStartYear}
     />
   );
 }
