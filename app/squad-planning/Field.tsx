@@ -9,6 +9,8 @@ function isContractExpired(player: PlanningPlayer, seasonYear: number) {
   return new Date(player.contractEndDate) < seasonStart;
 }
 
+const MAX_SLOT_CAP = 5;
+
 export function Field({
   slots,
   assignments,
@@ -17,8 +19,12 @@ export function Field({
   agingThreshold,
   selectedTeamOrder,
   duplicatePlayerIds,
+  slotMaxOverrides,
+  effectiveMaxBySlotId,
   onDropPlayer,
   onRemoveFromSlot,
+  onSlotMaxIncrease,
+  onSlotMaxDecrease,
 }: {
   slots: FieldSlot[];
   assignments: Record<string, string[]>;
@@ -27,8 +33,12 @@ export function Field({
   agingThreshold: number;
   selectedTeamOrder: number;
   duplicatePlayerIds: Set<string>;
+  slotMaxOverrides: Record<string, number>;
+  effectiveMaxBySlotId: Record<string, number>;
   onDropPlayer: (slotId: string, playerId: string) => void;
   onRemoveFromSlot: (slotId: string, playerId: string) => void;
+  onSlotMaxIncrease: (slotId: string) => void;
+  onSlotMaxDecrease: (slotId: string) => void;
 }) {
   return (
     <div className="card-premium rounded-lg p-0 overflow-hidden border border-accent-primary/50 bg-bg-secondary/40 shadow-inner w-[80%] max-w-[900px] mx-auto">
@@ -58,6 +68,12 @@ export function Field({
 
           {slots.map((slot) => {
             const playerIds = assignments[slot.id] ?? [];
+            const baseMax = slot.maxPlayers ?? 2;
+            const effectiveMax = effectiveMaxBySlotId[slot.id] ?? baseMax;
+            const canIncrease = effectiveMax < MAX_SLOT_CAP;
+            const canDecrease = effectiveMax > baseMax;
+            const assignedCount = playerIds.length;
+            const decreaseBlocked = canDecrease && assignedCount > effectiveMax - 1;
             return (
               <div
                 key={slot.id}
@@ -72,7 +88,7 @@ export function Field({
               >
                 <div className="rounded-md border border-white/40 bg-bg-secondary/90 p-2 shadow-md backdrop-blur-sm">
                   <div className="space-y-1.5">
-                    {Array.from({ length: slot.maxPlayers ?? 2 }, (_, idx) => {
+                    {Array.from({ length: effectiveMax }, (_, idx) => {
                       const player = playerIds[idx] ? playersById[playerIds[idx]] : null;
                       if (!player) {
                         return (
@@ -133,6 +149,38 @@ export function Field({
                         </div>
                       );
                     })}
+                  </div>
+                  <div className="flex items-center justify-end gap-0.5 mt-1.5">
+                    <button
+                      type="button"
+                      onClick={() => onSlotMaxDecrease(slot.id)}
+                      disabled={!canDecrease || decreaseBlocked}
+                      className={cn(
+                        "w-6 h-6 rounded border text-xs flex items-center justify-center shrink-0",
+                        canDecrease && !decreaseBlocked
+                          ? "border-border-dark text-text-secondary hover:text-text-primary hover:bg-bg-primary/70"
+                          : "border-border-dark/50 text-text-muted/50 cursor-not-allowed"
+                      )}
+                      aria-label="Extra slot verwijderen"
+                      title={decreaseBlocked ? "Verwijder eerst spelers uit dit slot" : "Extra slot verwijderen"}
+                    >
+                      −
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onSlotMaxIncrease(slot.id)}
+                      disabled={!canIncrease}
+                      className={cn(
+                        "w-6 h-6 rounded border text-xs flex items-center justify-center shrink-0",
+                        canIncrease
+                          ? "border-border-dark text-text-secondary hover:text-text-primary hover:bg-bg-primary/70"
+                          : "border-border-dark/50 text-text-muted/50 cursor-not-allowed"
+                      )}
+                      aria-label="Extra slot toevoegen"
+                      title="Extra slot toevoegen"
+                    >
+                      +
+                    </button>
                   </div>
                 </div>
               </div>

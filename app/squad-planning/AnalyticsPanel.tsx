@@ -19,12 +19,14 @@ export function AnalyticsPanel({
   playersById,
   seasonYear,
   agingThreshold,
+  effectiveMaxBySlotId,
 }: {
   slots: FieldSlot[];
   assignments: Record<string, string[]>;
   playersById: Record<string, PlanningPlayer>;
   seasonYear: number;
   agingThreshold: number;
+  effectiveMaxBySlotId: Record<string, number>;
 }) {
   const firstChoiceIds = slots
     .map((slot) => assignments[slot.id]?.[0])
@@ -32,7 +34,7 @@ export function AnalyticsPanel({
   const secondChoiceIds = slots
     .map((slot) => assignments[slot.id]?.[1])
     .filter((id): id is string => !!id);
-  const maxPerSlot = (slot: FieldSlot) => slot.maxPlayers ?? 2;
+  const effectiveMax = (slot: FieldSlot) => effectiveMaxBySlotId[slot.id] ?? slot.maxPlayers ?? 2;
   const firstAndSecond = [...firstChoiceIds, ...secondChoiceIds]
     .map((id) => playersById[id])
     .filter(Boolean);
@@ -56,7 +58,7 @@ export function AnalyticsPanel({
   const tekortPosities = slots
     .filter((slot) => {
       const filled = assignments[slot.id] || [];
-      const max = maxPerSlot(slot);
+      const max = effectiveMax(slot);
       return filled.length < max;
     })
     .map((slot) => slot.label);

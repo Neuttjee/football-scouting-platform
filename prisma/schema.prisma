@@ -329,6 +329,7 @@ model SquadPlan {
   seasonYear     Int
   formation      String
   assignmentsJson Json
+  slotMaxOverridesJson Json?
   isClubDefault  Boolean  @default(false)
 
   createdAt      DateTime @default(now())

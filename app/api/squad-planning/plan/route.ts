@@ -2,11 +2,14 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getSession, getEffectiveClubId } from "@/lib/auth";
 
+const SLOT_MAX_OVERRIDES_MAX_VALUE = 5;
+
 type SquadPlanPayload = {
   teamId: string;
   seasonYear: number;
   formation: string;
   assignments: Record<string, string[]>;
+  slotMaxOverrides?: Record<string, number>;
   isClubDefault?: boolean;
 };
 
@@ -74,6 +77,7 @@ export async function GET(request: Request) {
     plan: {
       formation: plan.formation,
       assignments: plan.assignmentsJson ?? {},
+      slotMaxOverrides: (plan.slotMaxOverridesJson as Record<string, number>) ?? {},
       isClubDefault: plan.isClubDefault,
     },
   });
@@ -99,7 +103,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const { teamId, seasonYear, formation, assignments, isClubDefault } = body;
+  const { teamId, seasonYear, formation, assignments, slotMaxOverrides, isClubDefault } = body;
 
   if (!teamId || typeof teamId !== "string") {
     return NextResponse.json({ error: "teamId is required" }, { status: 400 });
@@ -124,6 +128,26 @@ export async function POST(request: Request) {
       { error: "assignments must be an object" },
       { status: 400 }
     );
+  }
+
+  let slotMaxOverridesJson: Record<string, number> | null = null;
+  if (slotMaxOverrides !== undefined) {
+    if (typeof slotMaxOverrides !== "object" || slotMaxOverrides === null || Array.isArray(slotMaxOverrides)) {
+      return NextResponse.json(
+        { error: "slotMaxOverrides must be an object" },
+        { status: 400 }
+      );
+    }
+    const invalid = Object.entries(slotMaxOverrides).find(
+      ([, v]) => !Number.isInteger(v) || v < 2 || v > SLOT_MAX_OVERRIDES_MAX_VALUE
+    );
+    if (invalid) {
+      return NextResponse.json(
+        { error: `slotMaxOverrides values must be integers between 2 and ${SLOT_MAX_OVERRIDES_MAX_VALUE}` },
+        { status: 400 }
+      );
+    }
+    slotMaxOverridesJson = slotMaxOverrides as Record<string, number>;
   }
 
   // Verifiëer dat het team bij de club hoort
@@ -177,6 +201,7 @@ export async function POST(request: Request) {
     userId: saveAsClubDefault ? null : userId,
     formation,
     assignmentsJson: assignments,
+    ...(slotMaxOverridesJson !== null && { slotMaxOverridesJson: slotMaxOverridesJson }),
     isClubDefault: saveAsClubDefault,
   };
 

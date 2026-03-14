@@ -74,6 +74,7 @@ function getSlots(formation: Formation): FieldSlot[] {
 }
 
 const DEFAULT_MAX_PLAYERS_PER_SLOT = 2;
+const MAX_SLOT_CAP = 5;
 
 function addToSlot(
   assignments: Record<string, string[]>,
@@ -119,9 +120,11 @@ export default function SquadPlanningPage({
   const [isSaving, setIsSaving] = React.useState(false);
   const [lastSavedAt, setLastSavedAt] = React.useState<Date | null>(null);
   const [loadError, setLoadError] = React.useState<string | null>(null);
+  const [slotMaxOverrides, setSlotMaxOverrides] = React.useState<Record<string, number>>({});
 
   const assignmentsRef = React.useRef<Record<string, string[]>>({});
   const formationRef = React.useRef<Formation>(formation);
+  const slotMaxOverridesRef = React.useRef<Record<string, number>>({});
   const currentKeyRef = React.useRef<{ teamId: string | null; seasonYear: number }>({
     teamId: selectedTeamId,
     seasonYear,
@@ -133,6 +136,10 @@ export default function SquadPlanningPage({
   }, [assignments]);
 
   React.useEffect(() => {
+    slotMaxOverridesRef.current = slotMaxOverrides;
+  }, [slotMaxOverrides]);
+
+  React.useEffect(() => {
     formationRef.current = formation;
   }, [formation]);
 
@@ -141,7 +148,13 @@ export default function SquadPlanningPage({
   }, [selectedTeamId, seasonYear]);
 
   const savePlan = React.useCallback(
-    async (teamId: string, seasonYearToSave: number, formationToSave: Formation, assignmentsToSave: Record<string, string[]>) => {
+    async (
+      teamId: string,
+      seasonYearToSave: number,
+      formationToSave: Formation,
+      assignmentsToSave: Record<string, string[]>,
+      slotMaxOverridesToSave: Record<string, number>
+    ) => {
       try {
         setIsSaving(true);
         const res = await fetch("/api/squad-planning/plan", {
@@ -154,6 +167,7 @@ export default function SquadPlanningPage({
             seasonYear: seasonYearToSave,
             formation: formationToSave,
             assignments: assignmentsToSave,
+            slotMaxOverrides: slotMaxOverridesToSave,
             isClubDefault: false,
           }),
         });
@@ -203,6 +217,14 @@ export default function SquadPlanningPage({
     [filteredPlayers]
   );
 
+  const effectiveMaxBySlotId = React.useMemo(() => {
+    const map: Record<string, number> = {};
+    slots.forEach((slot) => {
+      map[slot.id] = slotMaxOverrides[slot.id] ?? slot.maxPlayers ?? DEFAULT_MAX_PLAYERS_PER_SLOT;
+    });
+    return map;
+  }, [slots, slotMaxOverrides]);
+
   const assignedEntries = Object.entries(assignments).flatMap(([slotId, ids]) =>
     ids.map((id) => ({ slotId, id }))
   );
@@ -228,12 +250,7 @@ export default function SquadPlanningPage({
     }
 
     setAssignments((prev) =>
-        addToSlot(
-          prev,
-          slotId,
-          playerId,
-          slots.find((s) => s.id === slotId)?.maxPlayers ?? DEFAULT_MAX_PLAYERS_PER_SLOT
-        )
+        addToSlot(prev, slotId, playerId, effectiveMaxBySlotId[slotId] ?? DEFAULT_MAX_PLAYERS_PER_SLOT)
       );
   };
 
@@ -251,7 +268,7 @@ export default function SquadPlanningPage({
         next,
         targetSlotId,
         playerId,
-        slots.find((s) => s.id === targetSlotId)?.maxPlayers ?? DEFAULT_MAX_PLAYERS_PER_SLOT
+        effectiveMaxBySlotId[targetSlotId] ?? DEFAULT_MAX_PLAYERS_PER_SLOT
       );
       return next;
     });
@@ -263,6 +280,39 @@ export default function SquadPlanningPage({
       ...prev,
       [slotId]: (prev[slotId] || []).filter((id) => id !== playerId),
     }));
+  };
+
+  const getBaseMaxForSlot = (slotId: string) =>
+    slots.find((s) => s.id === slotId)?.maxPlayers ?? DEFAULT_MAX_PLAYERS_PER_SLOT;
+
+  const handleSlotMaxIncrease = (slotId: string) => {
+    const base = getBaseMaxForSlot(slotId);
+    setSlotMaxOverrides((prev) => {
+      const current = prev[slotId] ?? base;
+      if (current >= MAX_SLOT_CAP) return prev;
+      const next = { ...prev, [slotId]: current + 1 };
+      if (selectedTeamId) {
+        void savePlan(selectedTeamId, seasonYear, formationRef.current, assignmentsRef.current, next);
+      }
+      return next;
+    });
+  };
+
+  const handleSlotMaxDecrease = (slotId: string) => {
+    const base = getBaseMaxForSlot(slotId);
+    setSlotMaxOverrides((prev) => {
+      const current = prev[slotId] ?? base;
+      if (current <= base) return prev;
+      const assigned = assignments[slotId]?.length ?? 0;
+      const nextMax = current - 1;
+      if (assigned > nextMax) return prev;
+      const next = { ...prev, [slotId]: nextMax };
+      const nextOverrides = nextMax === base ? (() => { const { [slotId]: _, ...rest } = next; return rest; })() : next;
+      if (selectedTeamId) {
+        void savePlan(selectedTeamId, seasonYear, formationRef.current, assignmentsRef.current, nextOverrides);
+      }
+      return nextOverrides;
+    });
   };
 
   const seasonOptions = React.useMemo(
@@ -282,7 +332,8 @@ export default function SquadPlanningPage({
         previous.teamId,
         previous.seasonYear,
         formationRef.current,
-        assignmentsRef.current
+        assignmentsRef.current,
+        slotMaxOverridesRef.current
       );
     }
     previousKeyRef.current = { teamId: selectedTeamId, seasonYear };
@@ -293,7 +344,13 @@ export default function SquadPlanningPage({
     return () => {
       const { teamId, seasonYear: seasonYearToSave } = currentKeyRef.current;
       if (!teamId) return;
-      void savePlan(teamId, seasonYearToSave, formationRef.current, assignmentsRef.current);
+      void savePlan(
+        teamId,
+        seasonYearToSave,
+        formationRef.current,
+        assignmentsRef.current,
+        slotMaxOverridesRef.current
+      );
     };
   }, [savePlan]);
 
@@ -320,6 +377,13 @@ export default function SquadPlanningPage({
           if (data.plan.assignments && typeof data.plan.assignments === "object") {
             setAssignments(data.plan.assignments as Record<string, string[]>);
           }
+          if (data.plan.slotMaxOverrides && typeof data.plan.slotMaxOverrides === "object") {
+            setSlotMaxOverrides(data.plan.slotMaxOverrides as Record<string, number>);
+          } else {
+            setSlotMaxOverrides({});
+          }
+        } else {
+          setSlotMaxOverrides({});
         }
       } catch (error) {
         console.error("Error loading squad plan", error);
@@ -415,6 +479,7 @@ export default function SquadPlanningPage({
                 playersById={playersById}
                 seasonYear={seasonYear}
                 agingThreshold={agingThreshold}
+                effectiveMaxBySlotId={effectiveMaxBySlotId}
               />
             </DialogContent>
           </Dialog>
@@ -450,8 +515,12 @@ export default function SquadPlanningPage({
           agingThreshold={agingThreshold}
           selectedTeamOrder={selectedTeamOrder}
           duplicatePlayerIds={duplicatePlayerIds}
+          slotMaxOverrides={slotMaxOverrides}
+          effectiveMaxBySlotId={effectiveMaxBySlotId}
           onDropPlayer={handleDrop}
           onRemoveFromSlot={removeFromSlot}
+          onSlotMaxIncrease={handleSlotMaxIncrease}
+          onSlotMaxDecrease={handleSlotMaxDecrease}
         />
 
         <div className="space-y-3">
