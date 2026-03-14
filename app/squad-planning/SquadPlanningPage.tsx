@@ -33,8 +33,8 @@ function getSlots(formation: Formation): FieldSlot[] {
       { id: "DM", label: "Controlerende 6", x: 50, y: 56, line: "MID" },
       { id: "LM", label: "Linksmidden", x: 22, y: 44, line: "MID" },
       { id: "AM", label: "10", x: 50, y: 30, line: "MID" },
-      { id: "ST1", label: "Spits 1", x: 34, y: 16, line: "FWD" },
-      { id: "ST2", label: "Spits 2", x: 66, y: 16, line: "FWD" },
+      { id: "ST1", label: "Spits 1", x: 34, y: 12, line: "FWD" },
+      { id: "ST2", label: "Spits 2", x: 66, y: 12, line: "FWD" },
     ];
   }
   if (formation === "4-4-2_SQUARE") {
@@ -44,8 +44,8 @@ function getSlots(formation: Formation): FieldSlot[] {
       { id: "CMR", label: "CM rechts", x: 62, y: 52, line: "MID" },
       { id: "CML", label: "CM links", x: 38, y: 52, line: "MID" },
       { id: "LM", label: "Linksmidden", x: 24, y: 40, line: "MID" },
-      { id: "ST1", label: "Spits 1", x: 34, y: 16, line: "FWD" },
-      { id: "ST2", label: "Spits 2", x: 66, y: 16, line: "FWD" },
+      { id: "ST1", label: "Spits 1", x: 34, y: 12, line: "FWD" },
+      { id: "ST2", label: "Spits 2", x: 66, y: 12, line: "FWD" },
     ];
   }
   if (formation === "4-3-3_POINT_FORWARD") {
@@ -54,20 +54,20 @@ function getSlots(formation: Formation): FieldSlot[] {
       { id: "DMR", label: "6 rechts", x: 64, y: 46, line: "MID" },
       { id: "DML", label: "6 links", x: 36, y: 46, line: "MID" },
       { id: "AM", label: "10", x: 50, y: 30, line: "MID" },
-      { id: "RW", label: "Rechtsbuiten", x: 84, y: 18, line: "FWD" },
-      { id: "ST", label: "Spits", x: 50, y: 12, line: "FWD" },
-      { id: "LW", label: "Linksbuiten", x: 16, y: 18, line: "FWD" },
+      { id: "RW", label: "Rechtsbuiten", x: 84, y: 16, line: "FWD" },
+      { id: "ST", label: "Spits", x: 50, y: 10, line: "FWD" },
+      { id: "LW", label: "Linksbuiten", x: 16, y: 16, line: "FWD" },
     ];
   }
   // 4-3-3_POINT_BACK
   return [
     ...DEF_SLOTS,
-    { id: "DM", label: "Controlerende 6", x: 50, y: 52, line: "MID" },
-    { id: "AMR", label: "8/10 rechts", x: 66, y: 35, line: "MID" },
-    { id: "AML", label: "8/10 links", x: 34, y: 35, line: "MID" },
-    { id: "RW", label: "Rechtsbuiten", x: 84, y: 18, line: "FWD" },
-    { id: "ST", label: "Spits", x: 50, y: 12, line: "FWD" },
-    { id: "LW", label: "Linksbuiten", x: 16, y: 18, line: "FWD" },
+    { id: "DM", label: "Controlerende 6", x: 50, y: 50, line: "MID" },
+    { id: "AMR", label: "8/10 rechts", x: 66, y: 32, line: "MID" },
+    { id: "AML", label: "8/10 links", x: 34, y: 32, line: "MID" },
+    { id: "RW", label: "Rechtsbuiten", x: 84, y: 16, line: "FWD" },
+    { id: "ST", label: "Spits", x: 50, y: 10, line: "FWD" },
+    { id: "LW", label: "Linksbuiten", x: 16, y: 16, line: "FWD" },
   ];
 }
 
