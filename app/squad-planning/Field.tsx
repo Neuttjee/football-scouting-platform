@@ -77,7 +77,7 @@ export function Field({
             return (
               <div
                 key={slot.id}
-                className="absolute -translate-x-1/2 -translate-y-1/2 w-44 md:w-56"
+                className="absolute -translate-x-1/2 -translate-y-1/2 w-52 md:w-64"
                 style={{ left: `${slot.x}%`, top: `${slot.y}%` }}
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={(e) => {
@@ -87,100 +87,97 @@ export function Field({
                 }}
               >
                 <div className="rounded-md border border-white/40 bg-bg-secondary/90 p-2 shadow-md backdrop-blur-sm">
-                  <div className="space-y-1.5">
+                  <div className="flex flex-col gap-1.5">
                     {Array.from({ length: effectiveMax }, (_, idx) => {
+                      const isLastRow = idx === effectiveMax - 1;
+                      const showPlus = isLastRow && !canDecrease && canIncrease;
+                      const showMinus = isLastRow && canDecrease;
                       const player = playerIds[idx] ? playersById[playerIds[idx]] : null;
-                      if (!player) {
-                        return (
-                          <div
-                            key={idx}
-                            className="h-8 rounded border border-dashed border-border-dark/80 bg-bg-primary/40"
-                          />
-                        );
-                      }
-
-                      const expired = isContractExpired(player, seasonYear);
-                      const isAging = player.age !== null && player.age >= agingThreshold;
-                      const isExternal = player.type === "EXTERNAL";
-                      const isDouble = duplicatePlayerIds.has(player.id);
-                      const fromFeederTeam =
-                        player.type === "INTERNAL" && player.teamOrder > selectedTeamOrder;
-
                       return (
-                        <div
-                          key={idx}
-                          className={cn(
-                            "h-8 rounded border border-border-dark px-2 flex items-center justify-between text-sm",
-                            expired ? "text-text-muted" : "text-text-primary",
-                            "bg-bg-primary/70"
-                          )}
-                        >
-                          <span className="truncate font-medium">{player.name}</span>
-                          <div className="flex items-center gap-0.5 pl-1 shrink-0">
-                            {fromFeederTeam && (
-                              <span className="text-[10px] px-1.5 rounded border border-border-dark text-text-muted">
-                                {player.teamLabel}
-                              </span>
+                        <div key={idx} className="flex items-center gap-1.5">
+                          <div
+                            className={cn(
+                              "flex-1 min-w-0 h-8 rounded flex items-center justify-between px-2 text-sm",
+                              !player
+                                ? "border border-dashed border-border-dark/80 bg-bg-primary/40"
+                                : "border border-border-dark bg-bg-primary/70"
                             )}
-                            {isExternal && (
-                              <span className="text-[10px] px-1.5 rounded border border-border-dark text-text-muted">
-                                EXT
-                              </span>
+                          >
+                            {!player ? null : (
+                              <>
+                                <span
+                                  className={cn(
+                                    "truncate font-medium",
+                                    isContractExpired(player, seasonYear)
+                                      ? "text-text-muted"
+                                      : "text-text-primary"
+                                  )}
+                                >
+                                  {player.name}
+                                </span>
+                                <div className="flex items-center gap-0.5 pl-1 shrink-0">
+                                  {player.type === "INTERNAL" && player.teamOrder > selectedTeamOrder && (
+                                    <span className="text-[10px] px-1.5 rounded border border-border-dark text-text-muted">
+                                      {player.teamLabel}
+                                    </span>
+                                  )}
+                                  {player.type === "EXTERNAL" && (
+                                    <span className="text-[10px] px-1.5 rounded border border-border-dark text-text-muted">
+                                      EXT
+                                    </span>
+                                  )}
+                                  {player.age !== null && player.age >= agingThreshold && (
+                                    <span className="text-[10px] px-1.5 rounded border border-accent-primary/40 text-text-muted">
+                                      +
+                                    </span>
+                                  )}
+                                  {duplicatePlayerIds.has(player.id) && (
+                                    <span className="text-[10px] px-1.5 rounded border border-accent-primary/40 text-text-muted">
+                                      2×
+                                    </span>
+                                  )}
+                                  <button
+                                    type="button"
+                                    onClick={() => onRemoveFromSlot(slot.id, player.id)}
+                                    className="text-text-muted hover:text-text-primary leading-none"
+                                    aria-label="Verwijderen"
+                                  >
+                                    ×
+                                  </button>
+                                </div>
+                              </>
                             )}
-                            {isAging && (
-                              <span className="text-[10px] px-1.5 rounded border border-accent-primary/40 text-text-muted">
-                                +
-                              </span>
-                            )}
-                            {isDouble && (
-                              <span className="text-[10px] px-1.5 rounded border border-accent-primary/40 text-text-muted">
-                                2×
-                              </span>
-                            )}
+                          </div>
+                          {isLastRow && (showMinus ? (
                             <button
                               type="button"
-                              onClick={() => onRemoveFromSlot(slot.id, player.id)}
-                              className="text-text-muted hover:text-text-primary leading-none"
-                              aria-label="Verwijderen"
+                              onClick={() => onSlotMaxDecrease(slot.id)}
+                              disabled={decreaseBlocked}
+                              className={cn(
+                                "w-7 h-8 rounded border text-xs flex items-center justify-center shrink-0 flex-shrink-0",
+                                !decreaseBlocked
+                                  ? "border-border-dark text-text-secondary hover:text-text-primary hover:bg-bg-primary/70"
+                                  : "border-border-dark/50 text-text-muted/50 cursor-not-allowed"
+                              )}
+                              aria-label="Extra slot verwijderen"
+                              title={decreaseBlocked ? "Verwijder eerst spelers uit dit slot" : "Extra slot verwijderen"}
                             >
-                              ×
+                              −
                             </button>
-                          </div>
+                          ) : showPlus ? (
+                            <button
+                              type="button"
+                              onClick={() => onSlotMaxIncrease(slot.id)}
+                              className="w-7 h-8 rounded border border-border-dark text-text-secondary hover:text-text-primary hover:bg-bg-primary/70 text-xs flex items-center justify-center shrink-0 flex-shrink-0"
+                              aria-label="Extra slot toevoegen"
+                              title="Extra slot toevoegen"
+                            >
+                              +
+                            </button>
+                          ) : null)}
                         </div>
                       );
                     })}
-                  </div>
-                  <div className="flex items-center justify-end gap-0.5 mt-1.5">
-                    <button
-                      type="button"
-                      onClick={() => onSlotMaxDecrease(slot.id)}
-                      disabled={!canDecrease || decreaseBlocked}
-                      className={cn(
-                        "w-6 h-6 rounded border text-xs flex items-center justify-center shrink-0",
-                        canDecrease && !decreaseBlocked
-                          ? "border-border-dark text-text-secondary hover:text-text-primary hover:bg-bg-primary/70"
-                          : "border-border-dark/50 text-text-muted/50 cursor-not-allowed"
-                      )}
-                      aria-label="Extra slot verwijderen"
-                      title={decreaseBlocked ? "Verwijder eerst spelers uit dit slot" : "Extra slot verwijderen"}
-                    >
-                      −
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => onSlotMaxIncrease(slot.id)}
-                      disabled={!canIncrease}
-                      className={cn(
-                        "w-6 h-6 rounded border text-xs flex items-center justify-center shrink-0",
-                        canIncrease
-                          ? "border-border-dark text-text-secondary hover:text-text-primary hover:bg-bg-primary/70"
-                          : "border-border-dark/50 text-text-muted/50 cursor-not-allowed"
-                      )}
-                      aria-label="Extra slot toevoegen"
-                      title="Extra slot toevoegen"
-                    >
-                      +
-                    </button>
                   </div>
                 </div>
               </div>

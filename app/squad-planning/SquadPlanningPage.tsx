@@ -25,8 +25,6 @@ const DEF_SLOTS: FieldSlot[] = [
   { id: "LB", label: "Linksback", x: 20, y: 66, line: "DEF" },
 ];
 
-const FWD_EXTRA_SLOTS = 3;
-
 function getSlots(formation: Formation): FieldSlot[] {
   if (formation === "4-4-2_DIAMOND") {
     return [
@@ -35,8 +33,8 @@ function getSlots(formation: Formation): FieldSlot[] {
       { id: "DM", label: "Controlerende 6", x: 50, y: 60, line: "MID" },
       { id: "LM", label: "Linksmidden", x: 26, y: 46, line: "MID" },
       { id: "AM", label: "10", x: 50, y: 32, line: "MID" },
-      { id: "ST1", label: "Spits 1", x: 35, y: 20, line: "FWD", maxPlayers: FWD_EXTRA_SLOTS },
-      { id: "ST2", label: "Spits 2", x: 65, y: 20, line: "FWD", maxPlayers: FWD_EXTRA_SLOTS },
+      { id: "ST1", label: "Spits 1", x: 35, y: 20, line: "FWD" },
+      { id: "ST2", label: "Spits 2", x: 65, y: 20, line: "FWD" },
     ];
   }
   if (formation === "4-4-2_SQUARE") {
@@ -46,8 +44,8 @@ function getSlots(formation: Formation): FieldSlot[] {
       { id: "CMR", label: "CM rechts", x: 68, y: 54, line: "MID" },
       { id: "CML", label: "CM links", x: 32, y: 54, line: "MID" },
       { id: "LM", label: "Linksmidden", x: 32, y: 42, line: "MID" },
-      { id: "ST1", label: "Spits 1", x: 35, y: 20, line: "FWD", maxPlayers: FWD_EXTRA_SLOTS },
-      { id: "ST2", label: "Spits 2", x: 65, y: 20, line: "FWD", maxPlayers: FWD_EXTRA_SLOTS },
+      { id: "ST1", label: "Spits 1", x: 35, y: 20, line: "FWD" },
+      { id: "ST2", label: "Spits 2", x: 65, y: 20, line: "FWD" },
     ];
   }
   if (formation === "4-3-3_POINT_FORWARD") {
@@ -56,9 +54,9 @@ function getSlots(formation: Formation): FieldSlot[] {
       { id: "DMR", label: "6 rechts", x: 65, y: 54, line: "MID" },
       { id: "DML", label: "6 links", x: 35, y: 54, line: "MID" },
       { id: "AM", label: "10", x: 50, y: 40, line: "MID" },
-      { id: "RW", label: "Rechtsbuiten", x: 78, y: 18, line: "FWD", maxPlayers: FWD_EXTRA_SLOTS },
-      { id: "ST", label: "Spits", x: 50, y: 14, line: "FWD", maxPlayers: FWD_EXTRA_SLOTS },
-      { id: "LW", label: "Linksbuiten", x: 22, y: 18, line: "FWD", maxPlayers: FWD_EXTRA_SLOTS },
+      { id: "RW", label: "Rechtsbuiten", x: 78, y: 18, line: "FWD" },
+      { id: "ST", label: "Spits", x: 50, y: 14, line: "FWD" },
+      { id: "LW", label: "Linksbuiten", x: 22, y: 18, line: "FWD" },
     ];
   }
   // 4-3-3_POINT_BACK
@@ -67,9 +65,9 @@ function getSlots(formation: Formation): FieldSlot[] {
     { id: "DM", label: "Controlerende 6", x: 50, y: 56, line: "MID" },
     { id: "AMR", label: "8/10 rechts", x: 65, y: 43, line: "MID" },
     { id: "AML", label: "8/10 links", x: 35, y: 43, line: "MID" },
-    { id: "RW", label: "Rechtsbuiten", x: 78, y: 18, line: "FWD", maxPlayers: FWD_EXTRA_SLOTS },
-    { id: "ST", label: "Spits", x: 50, y: 14, line: "FWD", maxPlayers: FWD_EXTRA_SLOTS },
-    { id: "LW", label: "Linksbuiten", x: 22, y: 18, line: "FWD", maxPlayers: FWD_EXTRA_SLOTS },
+    { id: "RW", label: "Rechtsbuiten", x: 78, y: 18, line: "FWD" },
+    { id: "ST", label: "Spits", x: 50, y: 14, line: "FWD" },
+    { id: "LW", label: "Linksbuiten", x: 22, y: 18, line: "FWD" },
   ];
 }
 
