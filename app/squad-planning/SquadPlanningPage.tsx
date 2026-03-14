@@ -51,9 +51,9 @@ function getSlots(formation: Formation): FieldSlot[] {
   if (formation === "4-3-3_POINT_FORWARD") {
     return [
       ...DEF_SLOTS,
-      { id: "DMR", label: "6 rechts", x: 64, y: 50, line: "MID" },
-      { id: "DML", label: "6 links", x: 36, y: 50, line: "MID" },
-      { id: "AM", label: "10", x: 50, y: 32, line: "MID" },
+      { id: "DMR", label: "6 rechts", x: 64, y: 46, line: "MID" },
+      { id: "DML", label: "6 links", x: 36, y: 46, line: "MID" },
+      { id: "AM", label: "10", x: 50, y: 30, line: "MID" },
       { id: "RW", label: "Rechtsbuiten", x: 84, y: 18, line: "FWD" },
       { id: "ST", label: "Spits", x: 50, y: 12, line: "FWD" },
       { id: "LW", label: "Linksbuiten", x: 16, y: 18, line: "FWD" },
@@ -436,8 +436,8 @@ export default function SquadPlanningPage({
             onChange={(e) => setFormation(e.target.value as Formation)}
             className="border border-border-dark rounded px-2 py-1 text-xs bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
           >
-            <option value="4-3-3_POINT_BACK">4-3-3 p.n.v.</option>
-            <option value="4-3-3_POINT_FORWARD">4-3-3 p.n.a.</option>
+            <option value="4-3-3_POINT_BACK">4-3-3 p.n.a.</option>
+            <option value="4-3-3_POINT_FORWARD">4-3-3 p.n.v.</option>
             <option value="4-4-2_DIAMOND">4-4-2 ruit</option>
             <option value="4-4-2_SQUARE">4-4-2 vierkant</option>
           </select>
