@@ -27,10 +27,11 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const teamId = searchParams.get("teamId");
   const seasonYearParam = searchParams.get("seasonYear");
+  const formation = searchParams.get("formation");
 
-  if (!teamId || !seasonYearParam) {
+  if (!teamId || !seasonYearParam || !formation) {
     return NextResponse.json(
-      { error: "teamId and seasonYear are required" },
+      { error: "teamId, seasonYear and formation are required" },
       { status: 400 }
     );
   }
@@ -52,6 +53,7 @@ export async function GET(request: Request) {
           clubId,
           teamId,
           seasonYear,
+          formation,
           userId,
         },
       })
@@ -63,6 +65,7 @@ export async function GET(request: Request) {
       clubId,
       teamId,
       seasonYear,
+      formation,
       isClubDefault: true,
     },
   });
@@ -180,12 +183,14 @@ export async function POST(request: Request) {
         clubId,
         teamId,
         seasonYear,
+        formation,
         isClubDefault: true,
       }
     : {
         clubId,
         teamId,
         seasonYear,
+        formation,
         userId: userId!,
       };
 

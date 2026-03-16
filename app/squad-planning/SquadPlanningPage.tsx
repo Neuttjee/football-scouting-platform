@@ -40,10 +40,10 @@ function getSlots(formation: Formation): FieldSlot[] {
   if (formation === "4-4-2_SQUARE") {
     return [
       ...DEF_SLOTS,
-      { id: "RM", label: "Rechtsmidden", x: 66, y: 28, line: "MID" },
+      { id: "RM", label: "Rechtsmidden", x: 66, y: 29, line: "MID" },
       { id: "CMR", label: "CM rechts", x: 66, y: 44, line: "MID" },
       { id: "CML", label: "CM links", x: 34, y: 44, line: "MID" },
-      { id: "LM", label: "Linksmidden", x: 34, y: 28, line: "MID" },
+      { id: "LM", label: "Linksmidden", x: 34, y: 29, line: "MID" },
       { id: "ST1", label: "Spits 1", x: 34, y: 14, line: "FWD" },
       { id: "ST2", label: "Spits 2", x: 66, y: 14, line: "FWD" },
     ];
@@ -119,6 +119,7 @@ export default function SquadPlanningPage({
   const [lastSavedAt, setLastSavedAt] = React.useState<Date | null>(null);
   const [loadError, setLoadError] = React.useState<string | null>(null);
   const [slotMaxOverrides, setSlotMaxOverrides] = React.useState<Record<string, number>>({});
+  const [isLoadingPlan, setIsLoadingPlan] = React.useState(false);
 
   const assignmentsRef = React.useRef<Record<string, string[]>>({});
   const formationRef = React.useRef<Formation>(formation);
@@ -358,9 +359,11 @@ export default function SquadPlanningPage({
       if (!selectedTeamId) return;
       try {
         setLoadError(null);
+        setIsLoadingPlan(true);
         const params = new URLSearchParams({
           teamId: selectedTeamId,
           seasonYear: String(seasonYear),
+          formation,
         });
         const res = await fetch(`/api/squad-planning/plan?${params.toString()}`);
         if (!res.ok) {
@@ -369,9 +372,6 @@ export default function SquadPlanningPage({
         }
         const data = await res.json();
         if (data?.plan) {
-          if (data.plan.formation && data.plan.formation !== formation) {
-            setFormation(data.plan.formation as Formation);
-          }
           if (data.plan.assignments && typeof data.plan.assignments === "object") {
             setAssignments(data.plan.assignments as Record<string, string[]>);
           }
@@ -386,12 +386,14 @@ export default function SquadPlanningPage({
       } catch (error) {
         console.error("Error loading squad plan", error);
         setLoadError("Opstelling kon niet geladen worden.");
+      } finally {
+        setIsLoadingPlan(false);
       }
     };
 
     loadPlan();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedTeamId, seasonYear]);
+  }, [selectedTeamId, seasonYear, formation]);
 
   return (
     <div className="space-y-4">
@@ -463,8 +465,11 @@ export default function SquadPlanningPage({
             </label>
           </div>
 
-          {/* Veld */}
-          <div className="flex-1 min-w-0">
+        {/* Veld */}
+        <div className="flex-1 min-w-0">
+          {isLoadingPlan ? (
+            <div className="card-premium rounded-lg border border-border-dark/60 bg-bg-secondary/40 shadow-inner h-[min(80vh,640px)] animate-pulse" />
+          ) : (
             <Field
               slots={slots}
               assignments={assignments}
@@ -480,7 +485,8 @@ export default function SquadPlanningPage({
               onSlotMaxIncrease={handleSlotMaxIncrease}
               onSlotMaxDecrease={handleSlotMaxDecrease}
             />
-          </div>
+          )}
+        </div>
         </div>
 
         <div className="space-y-8">
@@ -533,16 +539,27 @@ export default function SquadPlanningPage({
               </DialogContent>
             </Dialog>
           </div>
-          <PlayerTypeToggle
-            value={selectedType}
-            onChange={setSelectedType}
-            size="sm"
-          />
-          <PlayerPicker
-            players={filteredPlayers}
-            selectedType={selectedType}
-            onTypeChange={setSelectedType}
-          />
+          {isLoadingPlan ? (
+            <div className="space-y-3">
+              <div className="h-8 rounded-md bg-bg-secondary/60 animate-pulse" />
+              <div className="h-10 rounded-md bg-bg-secondary/60 animate-pulse" />
+              <div className="h-10 rounded-md bg-bg-secondary/60 animate-pulse" />
+              <div className="h-10 rounded-md bg-bg-secondary/60 animate-pulse" />
+            </div>
+          ) : (
+            <>
+              <PlayerTypeToggle
+                value={selectedType}
+                onChange={setSelectedType}
+                size="sm"
+              />
+              <PlayerPicker
+                players={filteredPlayers}
+                selectedType={selectedType}
+                onTypeChange={setSelectedType}
+              />
+            </>
+          )}
           {lastSavedAt && (
             <p className="text-[11px] text-text-muted">
               Laatst opgeslagen: {lastSavedAt.toLocaleTimeString()}

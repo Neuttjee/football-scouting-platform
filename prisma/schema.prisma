@@ -336,6 +336,8 @@ model SquadPlan {
   updatedAt      DateTime @updatedAt
 
   @@index([clubId, teamId, seasonYear, userId, isClubDefault])
+  @@unique([clubId, teamId, seasonYear, formation, userId])
+  @@unique([clubId, teamId, seasonYear, formation, isClubDefault])
 }
 
 model UserTablePreference {
