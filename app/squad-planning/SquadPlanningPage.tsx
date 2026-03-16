@@ -394,64 +394,8 @@ export default function SquadPlanningPage({
   }, [selectedTeamId, seasonYear]);
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        {/* Linkerzijde: teamselectie + filters */}
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="inline-flex items-center gap-1 rounded-md bg-bg-secondary/80 border border-border-dark shadow-sm p-0.5">
-            {teams.map((team) => {
-              const active = team.id === selectedTeamId;
-              return (
-                <button
-                  key={team.id}
-                  type="button"
-                  onClick={() => setSelectedTeamId(team.id)}
-                  className={cn(
-                    "px-3 py-1 text-xs font-medium rounded-md transition-colors",
-                    active
-                      ? "bg-accent-primary text-primary-foreground shadow-[0_0_8px_rgba(var(--primary-rgb,255,106,0),0.5)]"
-                      : "text-text-muted hover:text-text-primary hover:bg-bg-primary/70"
-                  )}
-                >
-                  {team.code || team.name}
-                </button>
-              );
-            })}
-          </div>
-
-          <select
-            value={seasonYear}
-            onChange={(e) => setSeasonYear(parseInt(e.target.value, 10))}
-            className="border border-border-dark rounded px-2 py-1 text-xs bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
-          >
-            {seasonOptions.map((year) => (
-              <option key={year} value={year}>
-                {year}-{year + 1}
-              </option>
-            ))}
-          </select>
-
-          <select
-            value={formation}
-            onChange={(e) => setFormation(e.target.value as Formation)}
-            className="border border-border-dark rounded px-2 py-1 text-xs bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
-          >
-            <option value="4-3-3_POINT_BACK">4-3-3 p.n.a.</option>
-            <option value="4-3-3_POINT_FORWARD">4-3-3 p.n.v.</option>
-            <option value="4-4-2_DIAMOND">4-4-2 ruit</option>
-            <option value="4-4-2_SQUARE">4-4-2 vierkant</option>
-          </select>
-
-          <label className="text-xs text-text-muted flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={includeFeederTeams}
-              onChange={(e) => setIncludeFeederTeams(e.target.checked)}
-            />
-            Onderliggende teams meenemen
-          </label>
-        </div>
-
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center justify-end gap-2">
         {/* Rechterzijde: analyse + planning instellingen */}
         <div className="flex items-center gap-2">
           <Dialog open={analyticsOpen} onOpenChange={setAnalyticsOpen}>
@@ -504,22 +448,93 @@ export default function SquadPlanningPage({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-[1fr_390px] gap-6">
-        <Field
-          slots={slots}
-          assignments={assignments}
-          playersById={playersById}
-          seasonYear={seasonYear}
-          agingThreshold={agingThreshold}
-          selectedTeamOrder={selectedTeamOrder}
-          duplicatePlayerIds={duplicatePlayerIds}
-          slotMaxOverrides={slotMaxOverrides}
-          effectiveMaxBySlotId={effectiveMaxBySlotId}
-          onDropPlayer={handleDrop}
-          onRemoveFromSlot={removeFromSlot}
-          onSlotMaxIncrease={handleSlotMaxIncrease}
-          onSlotMaxDecrease={handleSlotMaxDecrease}
-        />
+      <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1.6fr)_390px] gap-6 items-start">
+        <div className="flex flex-col md:flex-row gap-4 items-start">
+          {/* Linkerkolom: teamselectie + filters onder elkaar */}
+          <div className="w-full md:w-60 max-w-xs space-y-3">
+            <div className="inline-flex flex-wrap items-center gap-1 rounded-md bg-bg-secondary/80 border border-border-dark shadow-sm p-0.5">
+              {teams.map((team) => {
+                const active = team.id === selectedTeamId;
+                return (
+                  <button
+                    key={team.id}
+                    type="button"
+                    onClick={() => setSelectedTeamId(team.id)}
+                    className={cn(
+                      "px-3 py-1 text-xs font-medium rounded-md transition-colors",
+                      active
+                        ? "bg-accent-primary text-primary-foreground shadow-[0_0_8px_rgba(var(--primary-rgb,255,106,0),0.5)]"
+                        : "text-text-muted hover:text-text-primary hover:bg-bg-primary/70"
+                    )}
+                  >
+                    {team.code || team.name}
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label className="text-[11px] uppercase tracking-wide text-text-muted">
+                Seizoen
+              </label>
+              <select
+                value={seasonYear}
+                onChange={(e) => setSeasonYear(parseInt(e.target.value, 10))}
+                className="border border-border-dark rounded px-2 py-1.5 text-xs bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
+              >
+                {seasonOptions.map((year) => (
+                  <option key={year} value={year}>
+                    {year}-{year + 1}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <label className="text-[11px] uppercase tracking-wide text-text-muted">
+                Opstelling
+              </label>
+              <select
+                value={formation}
+                onChange={(e) => setFormation(e.target.value as Formation)}
+                className="border border-border-dark rounded px-2 py-1.5 text-xs bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
+              >
+                <option value="4-3-3_POINT_BACK">4-3-3 p.n.a.</option>
+                <option value="4-3-3_POINT_FORWARD">4-3-3 p.n.v.</option>
+                <option value="4-4-2_DIAMOND">4-4-2 ruit</option>
+                <option value="4-4-2_SQUARE">4-4-2 vierkant</option>
+              </select>
+            </div>
+
+            <label className="text-xs text-text-muted flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={includeFeederTeams}
+                onChange={(e) => setIncludeFeederTeams(e.target.checked)}
+              />
+              Onderliggende teams meenemen
+            </label>
+          </div>
+
+          {/* Veld */}
+          <div className="flex-1 min-w-0">
+            <Field
+              slots={slots}
+              assignments={assignments}
+              playersById={playersById}
+              seasonYear={seasonYear}
+              agingThreshold={agingThreshold}
+              selectedTeamOrder={selectedTeamOrder}
+              duplicatePlayerIds={duplicatePlayerIds}
+              slotMaxOverrides={slotMaxOverrides}
+              effectiveMaxBySlotId={effectiveMaxBySlotId}
+              onDropPlayer={handleDrop}
+              onRemoveFromSlot={removeFromSlot}
+              onSlotMaxIncrease={handleSlotMaxIncrease}
+              onSlotMaxDecrease={handleSlotMaxDecrease}
+            />
+          </div>
+        </div>
 
         <div className="space-y-3">
           <PlayerTypeToggle

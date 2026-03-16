@@ -41,9 +41,9 @@ export function Field({
   onSlotMaxDecrease: (slotId: string) => void;
 }) {
   return (
-    <div className="card-premium rounded-lg p-0 overflow-hidden border border-accent-primary/50 bg-bg-secondary/40 shadow-inner w-[80%] max-w-[900px] mx-auto">
-      {/* Veldverhouding 50:100 (breedte:lengte) – duidelijk langer veld */}
-      <div className="relative w-full max-h-[80vh] aspect-[50/100]">
+    <div className="card-premium rounded-lg p-0 overflow-hidden border border-accent-primary/50 bg-bg-secondary/40 shadow-inner w-full max-w-[980px] mx-auto">
+      {/* Veldverhouding 45:100 (breedte:lengte) – extra lang veld dat dichter naar de topbar doorloopt */}
+      <div className="relative w-full max-h-[92vh] aspect-[45/100]">
           {/* Veldlijnen: buitenlijn (iets dunner) */}
           <div className="absolute inset-0 rounded-[6px] border border-accent-primary/80" />
 
