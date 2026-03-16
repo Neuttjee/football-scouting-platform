@@ -40,10 +40,10 @@ function getSlots(formation: Formation): FieldSlot[] {
   if (formation === "4-4-2_SQUARE") {
     return [
       ...DEF_SLOTS,
-      { id: "RM", label: "Rechtsmidden", x: 66, y: 32, line: "MID" },
-      { id: "CMR", label: "CM rechts", x: 66, y: 48, line: "MID" },
-      { id: "CML", label: "CM links", x: 34, y: 48, line: "MID" },
-      { id: "LM", label: "Linksmidden", x: 34, y: 32, line: "MID" },
+      { id: "RM", label: "Rechtsmidden", x: 66, y: 28, line: "MID" },
+      { id: "CMR", label: "CM rechts", x: 66, y: 44, line: "MID" },
+      { id: "CML", label: "CM links", x: 34, y: 44, line: "MID" },
+      { id: "LM", label: "Linksmidden", x: 34, y: 28, line: "MID" },
       { id: "ST1", label: "Spits 1", x: 34, y: 14, line: "FWD" },
       { id: "ST2", label: "Spits 2", x: 66, y: 14, line: "FWD" },
     ];
@@ -51,8 +51,8 @@ function getSlots(formation: Formation): FieldSlot[] {
   if (formation === "4-3-3_POINT_FORWARD") {
     return [
       ...DEF_SLOTS,
-      { id: "DMR", label: "6 rechts", x: 64, y: 46, line: "MID" },
-      { id: "DML", label: "6 links", x: 36, y: 46, line: "MID" },
+      { id: "DMR", label: "6 rechts", x: 68, y: 46, line: "MID" },
+      { id: "DML", label: "6 links", x: 32, y: 46, line: "MID" },
       { id: "AM", label: "10", x: 50, y: 30, line: "MID" },
       { id: "RW", label: "Rechtsbuiten", x: 84, y: 16, line: "FWD" },
       { id: "ST", label: "Spits", x: 50, y: 10, line: "FWD" },
@@ -483,7 +483,7 @@ export default function SquadPlanningPage({
           </div>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-8">
           <div className="flex justify-end gap-2">
             <Dialog open={analyticsOpen} onOpenChange={setAnalyticsOpen}>
               <DialogTrigger asChild>
