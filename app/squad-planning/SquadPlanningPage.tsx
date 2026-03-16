@@ -29,10 +29,10 @@ function getSlots(formation: Formation): FieldSlot[] {
   if (formation === "4-4-2_DIAMOND") {
     return [
       ...DEF_SLOTS,
-      { id: "RM", label: "Rechtsmidden", x: 78, y: 44, line: "MID" },
+      { id: "RM", label: "Rechtsmidden", x: 78, y: 40, line: "MID" },
       { id: "DM", label: "Controlerende 6", x: 50, y: 56, line: "MID" },
-      { id: "LM", label: "Linksmidden", x: 22, y: 44, line: "MID" },
-      { id: "AM", label: "10", x: 50, y: 30, line: "MID" },
+      { id: "LM", label: "Linksmidden", x: 22, y: 40, line: "MID" },
+      { id: "AM", label: "10", x: 50, y: 26, line: "MID" },
       { id: "ST1", label: "Spits 1", x: 34, y: 12, line: "FWD" },
       { id: "ST2", label: "Spits 2", x: 66, y: 12, line: "FWD" },
     ];
@@ -40,12 +40,12 @@ function getSlots(formation: Formation): FieldSlot[] {
   if (formation === "4-4-2_SQUARE") {
     return [
       ...DEF_SLOTS,
-      { id: "RM", label: "Rechtsmidden", x: 76, y: 40, line: "MID" },
-      { id: "CMR", label: "CM rechts", x: 62, y: 52, line: "MID" },
-      { id: "CML", label: "CM links", x: 38, y: 52, line: "MID" },
-      { id: "LM", label: "Linksmidden", x: 24, y: 40, line: "MID" },
-      { id: "ST1", label: "Spits 1", x: 34, y: 12, line: "FWD" },
-      { id: "ST2", label: "Spits 2", x: 66, y: 12, line: "FWD" },
+      { id: "RM", label: "Rechtsmidden", x: 78, y: 40, line: "MID" },
+      { id: "CMR", label: "CM rechts", x: 66, y: 48, line: "MID" },
+      { id: "CML", label: "CM links", x: 34, y: 48, line: "MID" },
+      { id: "LM", label: "Linksmidden", x: 22, y: 40, line: "MID" },
+      { id: "ST1", label: "Spits 1", x: 34, y: 14, line: "FWD" },
+      { id: "ST2", label: "Spits 2", x: 66, y: 14, line: "FWD" },
     ];
   }
   if (formation === "4-3-3_POINT_FORWARD") {
@@ -483,7 +483,7 @@ export default function SquadPlanningPage({
           </div>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-4">
           <div className="flex justify-end gap-2">
             <Dialog open={analyticsOpen} onOpenChange={setAnalyticsOpen}>
               <DialogTrigger asChild>
