@@ -394,9 +394,9 @@ export default function SquadPlanningPage({
   }, [selectedTeamId, seasonYear]);
 
   return (
-    <div className="space-y-4 max-w-[1400px] mx-auto px-4 md:px-6 2xl:px-10">
-      <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1.6fr)_390px] gap-6 xl:gap-8 2xl:gap-10 items-start">
-        <div className="flex flex-col md:flex-row gap-4 xl:gap-6 items-start xl:pr-6">
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1.6fr)_390px] gap-6 items-start">
+        <div className="flex flex-col md:flex-row gap-4 items-start">
           {/* Linkerkolom: teamselectie + filters onder elkaar */}
           <div className="w-full md:w-60 max-w-xs space-y-3">
             <div className="inline-flex flex-wrap items-center gap-1 rounded-md bg-bg-secondary/80 border border-border-dark shadow-sm p-0.5">
@@ -483,7 +483,7 @@ export default function SquadPlanningPage({
           </div>
         </div>
 
-        <div className="space-y-3 xl:pl-6 xl:border-l xl:border-border-dark/60">
+        <div className="space-y-3">
           <div className="flex justify-end gap-2">
             <Dialog open={analyticsOpen} onOpenChange={setAnalyticsOpen}>
               <DialogTrigger asChild>
