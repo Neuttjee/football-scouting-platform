@@ -394,62 +394,9 @@ export default function SquadPlanningPage({
   }, [selectedTeamId, seasonYear]);
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-end gap-2">
-        {/* Rechterzijde: analyse + planning instellingen */}
-        <div className="flex items-center gap-2">
-          <Dialog open={analyticsOpen} onOpenChange={setAnalyticsOpen}>
-            <DialogTrigger asChild>
-              <button
-                type="button"
-                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-border-dark text-xs text-text-secondary hover:text-text-primary hover:bg-bg-primary/60"
-              >
-                <BarChart3 className="w-4 h-4" />
-                <span className="hidden sm:inline">Analyse</span>
-              </button>
-            </DialogTrigger>
-            <DialogContent
-              size="wide"
-              className="max-h-[90vh] overflow-y-auto bg-bg-card border-accent-primary text-text-primary"
-            >
-              <DialogHeader>
-                <DialogTitle>Selectie-analyse</DialogTitle>
-              </DialogHeader>
-              <AnalyticsPanel
-                slots={slots}
-                assignments={assignments}
-                playersById={playersById}
-                seasonYear={seasonYear}
-                agingThreshold={agingThreshold}
-                effectiveMaxBySlotId={effectiveMaxBySlotId}
-              />
-            </DialogContent>
-          </Dialog>
-          <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
-            <DialogTrigger asChild>
-              <button
-                type="button"
-                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-border-dark text-xs text-text-secondary hover:text-text-primary hover:bg-bg-primary/60"
-              >
-                <Settings className="w-4 h-4" />
-                <span className="hidden sm:inline">Instellingen</span>
-              </button>
-            </DialogTrigger>
-            <DialogContent
-              size="wide"
-              className="max-h-[90vh] overflow-y-auto bg-bg-card border-accent-primary text-text-primary"
-            >
-              <DialogHeader>
-                <DialogTitle>Instellingen</DialogTitle>
-              </DialogHeader>
-              <TeamSettingsForm teams={teams} agingThreshold={agingThreshold} />
-            </DialogContent>
-          </Dialog>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1.6fr)_390px] gap-6 items-start">
-        <div className="flex flex-col md:flex-row gap-4 items-start">
+    <div className="space-y-4 max-w-[1400px] mx-auto px-4 md:px-6 2xl:px-10">
+      <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1.6fr)_390px] gap-6 xl:gap-8 2xl:gap-10 items-start">
+        <div className="flex flex-col md:flex-row gap-4 xl:gap-6 items-start xl:pr-6">
           {/* Linkerkolom: teamselectie + filters onder elkaar */}
           <div className="w-full md:w-60 max-w-xs space-y-3">
             <div className="inline-flex flex-wrap items-center gap-1 rounded-md bg-bg-secondary/80 border border-border-dark shadow-sm p-0.5">
@@ -536,7 +483,56 @@ export default function SquadPlanningPage({
           </div>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-3 xl:pl-6 xl:border-l xl:border-border-dark/60">
+          <div className="flex justify-end gap-2">
+            <Dialog open={analyticsOpen} onOpenChange={setAnalyticsOpen}>
+              <DialogTrigger asChild>
+                <button
+                  type="button"
+                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-border-dark text-xs text-text-secondary hover:text-text-primary hover:bg-bg-primary/60"
+                >
+                  <BarChart3 className="w-4 h-4" />
+                  <span className="hidden sm:inline">Analyse</span>
+                </button>
+              </DialogTrigger>
+              <DialogContent
+                size="wide"
+                className="max-h-[90vh] overflow-y-auto bg-bg-card border-accent-primary text-text-primary"
+              >
+                <DialogHeader>
+                  <DialogTitle>Selectie-analyse</DialogTitle>
+                </DialogHeader>
+                <AnalyticsPanel
+                  slots={slots}
+                  assignments={assignments}
+                  playersById={playersById}
+                  seasonYear={seasonYear}
+                  agingThreshold={agingThreshold}
+                  effectiveMaxBySlotId={effectiveMaxBySlotId}
+                />
+              </DialogContent>
+            </Dialog>
+            <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
+              <DialogTrigger asChild>
+                <button
+                  type="button"
+                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-border-dark text-xs text-text-secondary hover:text-text-primary hover:bg-bg-primary/60"
+                >
+                  <Settings className="w-4 h-4" />
+                  <span className="hidden sm:inline">Instellingen</span>
+                </button>
+              </DialogTrigger>
+              <DialogContent
+                size="wide"
+                className="max-h-[90vh] overflow-y-auto bg-bg-card border-accent-primary text-text-primary"
+              >
+                <DialogHeader>
+                  <DialogTitle>Instellingen</DialogTitle>
+                </DialogHeader>
+                <TeamSettingsForm teams={teams} agingThreshold={agingThreshold} />
+              </DialogContent>
+            </Dialog>
+          </div>
           <PlayerTypeToggle
             value={selectedType}
             onChange={setSelectedType}
