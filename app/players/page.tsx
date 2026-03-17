@@ -165,6 +165,7 @@ export default async function PlayersPage() {
       defaultSeasonYear={new Date().getFullYear()}
       clubName={clubName}
       canBulkDelete={session.user.role === "SUPERADMIN" || session.user.role === "ADMIN"}
+      canDeletePlayers={session.user.role === "SUPERADMIN" || session.user.role === "ADMIN"}
       initialPlayersSorting={(externalTablePreference?.sorting as any) ?? []}
       initialPlayersColumnVisibility={(externalTablePreference?.columnVisibility as any) ?? {}}
       initialInternalPlayersSorting={(internalTablePreference?.sorting as any) ?? []}

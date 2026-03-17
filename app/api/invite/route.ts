@@ -3,6 +3,7 @@ import prisma from '@/lib/prisma';
 import { getSession, getEffectiveClubId } from '@/lib/auth';
 import { sendInviteEmail } from '@/lib/email';
 import { generateInviteToken, hashInviteToken } from '@/lib/inviteTokens';
+import { isAllowedRole } from '@/lib/roles';
 import bcrypt from 'bcrypt';
 
 export async function POST(req: Request) {
@@ -17,6 +18,9 @@ export async function POST(req: Request) {
     }
 
     const { email, name, role } = await req.json();
+    if (!isAllowedRole(role) || role === 'SUPERADMIN') {
+      return NextResponse.json({ error: 'Ongeldige rol' }, { status: 400 });
+    }
     
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) {

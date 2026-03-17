@@ -36,6 +36,7 @@ type Props = {
   clubUsers: { id: string; name: string }[];
   clubName: string | null;
   canBulkDelete: boolean;
+  canDeletePlayers: boolean;
   initialInternalPlayersSorting: any[];
   initialInternalPlayersColumnVisibility: Record<string, boolean>;
 };
@@ -48,6 +49,7 @@ export default function InternalPlayersPage({
   clubUsers,
   clubName,
   canBulkDelete,
+  canDeletePlayers,
   initialInternalPlayersSorting,
   initialInternalPlayersColumnVisibility,
 }: Props) {
@@ -61,6 +63,7 @@ export default function InternalPlayersPage({
         clubUsers={clubUsers}
         clubName={clubName}
         canBulkDelete={canBulkDelete}
+        canDeletePlayers={canDeletePlayers}
         initialSorting={initialInternalPlayersSorting}
         initialColumnVisibility={initialInternalPlayersColumnVisibility}
       />

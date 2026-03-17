@@ -62,6 +62,7 @@ type Props = {
   defaultSeasonYear: number;
   clubName: string | null;
   canBulkDelete: boolean;
+  canDeletePlayers: boolean;
   initialPlayersSorting: any[];
   initialPlayersColumnVisibility: Record<string, boolean>;
   initialInternalPlayersSorting: any[];
@@ -77,6 +78,7 @@ export function PlayersPageClient({
   defaultSeasonYear,
   clubName,
   canBulkDelete,
+  canDeletePlayers,
   initialPlayersSorting,
   initialPlayersColumnVisibility,
   initialInternalPlayersSorting,
@@ -125,6 +127,7 @@ export function PlayersPageClient({
           clubUsers={clubUsers}
           clubName={clubName}
           canBulkDelete={canBulkDelete}
+          canDeletePlayers={canDeletePlayers}
           initialSorting={initialPlayersSorting}
           initialColumnVisibility={initialPlayersColumnVisibility}
         />
@@ -139,6 +142,7 @@ export function PlayersPageClient({
           clubUsers={clubUsers}
           clubName={clubName}
           canBulkDelete={canBulkDelete}
+          canDeletePlayers={canDeletePlayers}
           initialInternalPlayersSorting={initialInternalPlayersSorting}
           initialInternalPlayersColumnVisibility={
             initialInternalPlayersColumnVisibility

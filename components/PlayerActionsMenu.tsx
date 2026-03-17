@@ -53,11 +53,13 @@ export function PlayerActionsMenu({
   clubUsers,
   clubName,
   teams,
+  canDelete = true,
 }: {
   player: PlayerForActions;
   clubUsers: { id: string; name: string }[];
   clubName?: string | null;
   teams?: { id: string; name: string; code: string | null; niveau?: string | null }[];
+  canDelete?: boolean;
 }) {
   const router = useRouter();
   const [openEdit, setOpenEdit] = React.useState(false);
@@ -121,12 +123,14 @@ export function PlayerActionsMenu({
           >
             Nieuw contactmoment
           </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => setOpenDelete(true)}
-            className="cursor-pointer focus:bg-red-500/20 focus:text-red-500 text-red-500 text-xs"
-          >
-            Verwijderen
-          </DropdownMenuItem>
+          {canDelete && (
+            <DropdownMenuItem
+              onClick={() => setOpenDelete(true)}
+              className="cursor-pointer focus:bg-red-500/20 focus:text-red-500 text-red-500 text-xs"
+            >
+              Verwijderen
+            </DropdownMenuItem>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
 
@@ -218,27 +222,29 @@ export function PlayerActionsMenu({
       </Dialog>
 
       {/* Verwijder speler */}
-      <Dialog open={openDelete} onOpenChange={setOpenDelete}>
-        <DialogContent className="max-w-md bg-bg-card border-accent-primary text-text-primary shadow-[0_0_15px_rgba(var(--primary-rgb),0.3)]">
-          <DialogHeader>
-            <DialogTitle>Speler verwijderen</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 pt-4">
-            <p className="text-sm text-text-secondary">
-              Weet je zeker dat je <strong>{player.name}</strong> wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
-            </p>
-            <div className="flex justify-end pt-2">
-              <Button
-                variant="destructive"
-                className="btn-premium bg-red-600 hover:bg-red-700 text-white"
-                onClick={handleDelete}
-              >
-                Verwijderen
-              </Button>
+      {canDelete && (
+        <Dialog open={openDelete} onOpenChange={setOpenDelete}>
+          <DialogContent className="max-w-md bg-bg-card border-accent-primary text-text-primary shadow-[0_0_15px_rgba(var(--primary-rgb),0.3)]">
+            <DialogHeader>
+              <DialogTitle>Speler verwijderen</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 pt-4">
+              <p className="text-sm text-text-secondary">
+                Weet je zeker dat je <strong>{player.name}</strong> wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.
+              </p>
+              <div className="flex justify-end pt-2">
+                <Button
+                  variant="destructive"
+                  className="btn-premium bg-red-600 hover:bg-red-700 text-white"
+                  onClick={handleDelete}
+                >
+                  Verwijderen
+                </Button>
+              </div>
             </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }

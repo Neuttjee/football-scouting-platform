@@ -5,6 +5,7 @@ import { Settings, BarChart3 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AnalyticsPanel } from "./AnalyticsPanel";
 import { Field } from "./Field";
+import { FieldSkeleton } from "./FieldSkeleton";
 import { PlayerPicker } from "./PlayerPicker";
 import { FieldSlot, Formation, PlanningPlayer, TeamOption } from "./types";
 import { PlayerTypeToggle, PlayerTypeValue } from "@/components/PlayerTypeToggle";
@@ -16,6 +17,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { TeamSettingsForm } from "../settings/TeamSettingsForm";
+import { useDelayedLoading } from "./useDelayedLoading";
 
 const DEF_SLOTS: FieldSlot[] = [
   { id: "GK", label: "Keeper", x: 50, y: 92, line: "GK" },
@@ -120,6 +122,8 @@ export default function SquadPlanningPage({
   const [loadError, setLoadError] = React.useState<string | null>(null);
   const [slotMaxOverrides, setSlotMaxOverrides] = React.useState<Record<string, number>>({});
   const [isLoadingPlan, setIsLoadingPlan] = React.useState(false);
+
+  const showPlanSkeleton = useDelayedLoading(isLoadingPlan, { showDelayMs: 200, minShowMs: 300 });
 
   const assignmentsRef = React.useRef<Record<string, string[]>>({});
   const formationRef = React.useRef<Formation>(formation);
@@ -467,8 +471,8 @@ export default function SquadPlanningPage({
 
         {/* Veld */}
         <div className="flex-1 min-w-0">
-          {isLoadingPlan ? (
-            <div className="card-premium rounded-lg border border-border-dark/60 bg-bg-secondary/40 shadow-inner h-[min(80vh,640px)] animate-pulse" />
+          {showPlanSkeleton ? (
+            <FieldSkeleton slots={slots} />
           ) : (
             <Field
               slots={slots}
@@ -539,27 +543,8 @@ export default function SquadPlanningPage({
               </DialogContent>
             </Dialog>
           </div>
-          {isLoadingPlan ? (
-            <div className="space-y-3">
-              <div className="h-8 rounded-md bg-bg-secondary/60 animate-pulse" />
-              <div className="h-10 rounded-md bg-bg-secondary/60 animate-pulse" />
-              <div className="h-10 rounded-md bg-bg-secondary/60 animate-pulse" />
-              <div className="h-10 rounded-md bg-bg-secondary/60 animate-pulse" />
-            </div>
-          ) : (
-            <>
-              <PlayerTypeToggle
-                value={selectedType}
-                onChange={setSelectedType}
-                size="sm"
-              />
-              <PlayerPicker
-                players={filteredPlayers}
-                selectedType={selectedType}
-                onTypeChange={setSelectedType}
-              />
-            </>
-          )}
+          <PlayerTypeToggle value={selectedType} onChange={setSelectedType} size="sm" />
+          <PlayerPicker players={filteredPlayers} selectedType={selectedType} onTypeChange={setSelectedType} />
           {lastSavedAt && (
             <p className="text-[11px] text-text-muted">
               Laatst opgeslagen: {lastSavedAt.toLocaleTimeString()}

@@ -237,6 +237,7 @@ export function UserTable({
                 className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
               >
                 <option value="SCOUT">Scout</option>
+                <option value="TRAINER">Trainer</option>
                 <option value="TC_LID">TC Lid</option>
                 <option value="ADMIN">Beheerder (Admin)</option>
                 <option value="LEZER">Lezer</option>

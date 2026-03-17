@@ -105,7 +105,8 @@ function InlineInput({
 export function getColumns(
   clubUsers: any[],
   clubName: string | null,
-  canBulkDelete: boolean
+  canBulkDelete: boolean,
+  canDeletePlayers: boolean
 ): ColumnDef<Player>[] {
   const selectionColumn: ColumnDef<Player> = {
     id: "select",
@@ -290,6 +291,7 @@ export function getColumns(
           player={row.original}
           clubUsers={clubUsers}
           clubName={clubName}
+          canDelete={canDeletePlayers}
         />
       ),
     },
@@ -394,21 +396,25 @@ function Filter({
   )
 }
 
+export type PlayersTableProps = {
+  data: Player[];
+  clubUsers?: any[];
+  clubName?: string | null;
+  canBulkDelete?: boolean;
+  canDeletePlayers?: boolean;
+  initialSorting?: SortingState;
+  initialColumnVisibility?: Record<string, boolean>;
+}
+
 export function PlayersTable({
   data,
   clubUsers = [],
   clubName = null,
   canBulkDelete = false,
+  canDeletePlayers = false,
   initialSorting = [],
   initialColumnVisibility = {},
-}: {
-  data: Player[];
-  clubUsers?: any[];
-  clubName?: string | null;
-  canBulkDelete?: boolean;
-  initialSorting?: SortingState;
-  initialColumnVisibility?: Record<string, boolean>;
-}) {
+}: PlayersTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>(initialSorting)
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = React.useState<Record<string, boolean>>(initialColumnVisibility)
@@ -419,8 +425,8 @@ export function PlayersTable({
   })
 
   const columns = React.useMemo(
-    () => getColumns(clubUsers, clubName, canBulkDelete),
-    [clubUsers, clubName, canBulkDelete]
+    () => getColumns(clubUsers, clubName, canBulkDelete, canDeletePlayers),
+    [clubUsers, clubName, canBulkDelete, canDeletePlayers]
   );
 
   const table = useReactTable({
@@ -549,21 +555,23 @@ export function PlayersTable({
                 Spelers exporteren
               </button>
 
-              <button
-                type="button"
-                onClick={async () => {
-                  const ok = window.confirm(
-                    `Weet je zeker dat je ${selectedIds.length} speler(s) wilt verwijderen?`
-                  );
-                  if (!ok) return;
-                  await deletePlayersBulk(selectedIds);
-                  table.resetRowSelection();
-                  router.refresh();
-                }}
-                className="px-3 py-1 rounded border border-red-500/40 bg-red-500/10 text-red-400 text-xs hover:bg-red-500/20 transition-colors"
-              >
-                Spelers verwijderen
-              </button>
+              {canDeletePlayers && (
+                <button
+                  type="button"
+                  onClick={async () => {
+                    const ok = window.confirm(
+                      `Weet je zeker dat je ${selectedIds.length} speler(s) wilt verwijderen?`
+                    );
+                    if (!ok) return;
+                    await deletePlayersBulk(selectedIds);
+                    table.resetRowSelection();
+                    router.refresh();
+                  }}
+                  className="px-3 py-1 rounded border border-red-500/40 bg-red-500/10 text-red-400 text-xs hover:bg-red-500/20 transition-colors"
+                >
+                  Spelers verwijderen
+                </button>
+              )}
             </div>
           )}
 
