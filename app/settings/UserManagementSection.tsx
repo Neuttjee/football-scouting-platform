@@ -3,6 +3,7 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { UserTable } from "./UserTable";
+import { InviteUserModal } from "./InviteUserModal";
 
 type User = {
   id: string;
@@ -74,6 +75,7 @@ export function UserManagementSection({
     <section className="card-premium p-6 rounded-lg shadow">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold">Gebruikersbeheer</h2>
+        <InviteUserModal />
       </div>
 
       {isLoading && users.length === 0 ? (
