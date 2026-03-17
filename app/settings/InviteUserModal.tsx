@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog"
 import { useRouter } from "next/navigation"
 
-export function InviteUserModal() {
+export function InviteUserModal({ onAfterInvite }: { onAfterInvite?: () => Promise<void> | void }) {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
@@ -41,6 +41,7 @@ export function InviteUserModal() {
       }
 
       setOpen(false)
+      await onAfterInvite?.()
       router.refresh()
     } catch (err: any) {
       setError(err.message)
