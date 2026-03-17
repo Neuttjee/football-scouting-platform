@@ -66,6 +66,7 @@ type Props = {
   clubUsers: { id: string; name: string }[];
   clubName: string | null;
   canBulkDelete: boolean;
+  canDeletePlayers: boolean;
   initialSorting: SortingState;
   initialColumnVisibility: Record<string, boolean>;
 };
@@ -237,6 +238,7 @@ const INTERNAL_BASE_COLUMNS: ColumnDef<InternalPlayer>[] = [
           clubUsers={clubUsers}
           clubName={clubName}
           teams={teams}
+          canDelete={canDeletePlayers}
         />
       );
     },
@@ -343,6 +345,7 @@ export function InternalPlayersTable({
   clubUsers,
   clubName,
   canBulkDelete,
+  canDeletePlayers,
   initialSorting,
   initialColumnVisibility,
 }: Props) {
@@ -510,21 +513,23 @@ export function InternalPlayersTable({
                 Spelers exporteren
               </button>
 
-              <button
-                type="button"
-                onClick={async () => {
-                  const ok = window.confirm(
-                    `Weet je zeker dat je ${selectedIds.length} speler(s) wilt verwijderen?`,
-                  );
-                  if (!ok) return;
-                  await deletePlayersBulk(selectedIds);
-                  table.resetRowSelection();
-                  router.refresh();
-                }}
-                className="px-3 py-1 rounded border border-red-500/40 bg-red-500/10 text-red-400 text-xs hover:bg-red-500/20 transition-colors"
-              >
-                Spelers verwijderen
-              </button>
+              {canDeletePlayers && (
+                <button
+                  type="button"
+                  onClick={async () => {
+                    const ok = window.confirm(
+                      `Weet je zeker dat je ${selectedIds.length} speler(s) wilt verwijderen?`,
+                    );
+                    if (!ok) return;
+                    await deletePlayersBulk(selectedIds);
+                    table.resetRowSelection();
+                    router.refresh();
+                  }}
+                  className="px-3 py-1 rounded border border-red-500/40 bg-red-500/10 text-red-400 text-xs hover:bg-red-500/20 transition-colors"
+                >
+                  Spelers verwijderen
+                </button>
+              )}
             </div>
           )}
 
