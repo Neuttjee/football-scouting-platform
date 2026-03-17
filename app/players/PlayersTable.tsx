@@ -396,6 +396,16 @@ function Filter({
   )
 }
 
+export type PlayersTableProps = {
+  data: Player[];
+  clubUsers?: any[];
+  clubName?: string | null;
+  canBulkDelete?: boolean;
+  canDeletePlayers?: boolean;
+  initialSorting?: SortingState;
+  initialColumnVisibility?: Record<string, boolean>;
+}
+
 export function PlayersTable({
   data,
   clubUsers = [],
@@ -404,15 +414,7 @@ export function PlayersTable({
   canDeletePlayers = false,
   initialSorting = [],
   initialColumnVisibility = {},
-}: {
-  data: Player[];
-  clubUsers?: any[];
-  clubName?: string | null;
-  canBulkDelete?: boolean;
-  canDeletePlayers?: boolean;
-  initialSorting?: SortingState;
-  initialColumnVisibility?: Record<string, boolean>;
-}) {
+}: PlayersTableProps) {
   const [sorting, setSorting] = React.useState<SortingState>(initialSorting)
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = React.useState<Record<string, boolean>>(initialColumnVisibility)
