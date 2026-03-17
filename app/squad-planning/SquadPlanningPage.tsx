@@ -7,7 +7,6 @@ import { AnalyticsPanel } from "./AnalyticsPanel";
 import { Field } from "./Field";
 import { FieldSkeleton } from "./FieldSkeleton";
 import { PlayerPicker } from "./PlayerPicker";
-import { PlayerPickerSkeleton } from "./PlayerPickerSkeleton";
 import { FieldSlot, Formation, PlanningPlayer, TeamOption } from "./types";
 import { PlayerTypeToggle, PlayerTypeValue } from "@/components/PlayerTypeToggle";
 import {
@@ -544,14 +543,8 @@ export default function SquadPlanningPage({
               </DialogContent>
             </Dialog>
           </div>
-          {showPlanSkeleton ? (
-            <PlayerPickerSkeleton selectedType={selectedType} />
-          ) : (
-            <>
-              <PlayerTypeToggle value={selectedType} onChange={setSelectedType} size="sm" />
-              <PlayerPicker players={filteredPlayers} selectedType={selectedType} onTypeChange={setSelectedType} />
-            </>
-          )}
+          <PlayerTypeToggle value={selectedType} onChange={setSelectedType} size="sm" />
+          <PlayerPicker players={filteredPlayers} selectedType={selectedType} onTypeChange={setSelectedType} />
           {lastSavedAt && (
             <p className="text-[11px] text-text-muted">
               Laatst opgeslagen: {lastSavedAt.toLocaleTimeString()}

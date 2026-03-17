@@ -5,8 +5,6 @@ import { Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PlanningPlayer } from "./types";
 import type { PlayerTypeValue } from "@/components/PlayerTypeToggle";
-import { PlayerPickerSkeleton } from "./PlayerPickerSkeleton";
-import { useDelayedLoading } from "./useDelayedLoading";
 
 export function PlayerPicker({
   players,
@@ -21,11 +19,6 @@ export function PlayerPicker({
   const [positionFilter, setPositionFilter] = React.useState("");
   const [maxAge, setMaxAge] = React.useState<number | "">("");
   const [statusFilter, setStatusFilter] = React.useState("");
-
-  const deferredQuery = React.useDeferredValue(query);
-  const deferredPositionFilter = React.useDeferredValue(positionFilter);
-  const deferredMaxAge = React.useDeferredValue(maxAge);
-  const deferredStatusFilter = React.useDeferredValue(statusFilter);
 
   const positions = React.useMemo(() => {
     return Array.from(
@@ -43,24 +36,16 @@ export function PlayerPicker({
     ).sort();
   }, [players]);
 
-  const isPickerBusy =
-    query !== deferredQuery ||
-    positionFilter !== deferredPositionFilter ||
-    maxAge !== deferredMaxAge ||
-    statusFilter !== deferredStatusFilter;
-
-  const showBusySkeleton = useDelayedLoading(isPickerBusy, { showDelayMs: 200, minShowMs: 300 });
-
   const filtered = players.filter((p) => {
     if (p.type !== selectedType) return false;
-    if (deferredQuery && !p.name.toLowerCase().includes(deferredQuery.toLowerCase())) return false;
-    if (deferredPositionFilter) {
+    if (query && !p.name.toLowerCase().includes(query.toLowerCase())) return false;
+    if (positionFilter) {
       const combined = `${p.position ?? ""} ${p.secondaryPosition ?? ""}`.toLowerCase();
-      if (!combined.includes(deferredPositionFilter.toLowerCase())) return false;
+      if (!combined.includes(positionFilter.toLowerCase())) return false;
     }
-    if (deferredMaxAge !== "" && p.age !== null && p.age > deferredMaxAge) return false;
-    if (deferredMaxAge !== "" && p.age === null) return false;
-    if (selectedType === "EXTERNAL" && deferredStatusFilter && p.status !== deferredStatusFilter) return false;
+    if (maxAge !== "" && p.age !== null && p.age > maxAge) return false;
+    if (maxAge !== "" && p.age === null) return false;
+    if (selectedType === "EXTERNAL" && statusFilter && p.status !== statusFilter) return false;
     return true;
   });
 
@@ -115,9 +100,6 @@ export function PlayerPicker({
         )}
       </div>
 
-      {showBusySkeleton ? (
-        <PlayerPickerSkeleton selectedType={selectedType} rows={10} />
-      ) : (
       <div className="space-y-2 max-h-[560px] overflow-y-auto">
         {filtered.map((player) => (
           <div
@@ -157,7 +139,6 @@ export function PlayerPicker({
           <p className="text-sm text-text-muted">Geen spelers met deze filters.</p>
         )}
       </div>
-      )}
     </div>
   );
 }
