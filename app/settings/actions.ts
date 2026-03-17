@@ -62,7 +62,9 @@ export async function updateUserRole(userId: string, role: string) {
     throw new Error('Ongeldige rol');
   }
 
-  if (userId === session.user.id && role !== 'ADMIN' && role !== 'SUPERADMIN') {
+  // Users cannot remove their own admin rights.
+  // Note: SUPERADMIN is rejected above, so checking it here is redundant.
+  if (userId === session.user.id && role !== 'ADMIN') {
     throw new Error('Je kunt je eigen admin-rechten niet verwijderen');
   }
 
