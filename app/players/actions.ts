@@ -160,6 +160,9 @@ export async function updatePlayerProfile(playerId: string, formData: FormData) 
 export async function deletePlayer(playerId: string) {
   const session = await getSession();
   if (!session) throw new Error("Unauthorized");
+  if (session.user.role !== "ADMIN" && session.user.role !== "SUPERADMIN") {
+    throw new Error("Forbidden");
+  }
   const clubId = getEffectiveClubId(session);
   if (!clubId) throw new Error('Geen club geselecteerd');
 
@@ -181,7 +184,7 @@ export async function deletePlayer(playerId: string) {
 export async function deletePlayersBulk(playerIds: string[]) {
   const session = await getSession();
   if (!session) throw new Error("Unauthorized");
-  if (session.user.role !== "SUPERADMIN") {
+  if (session.user.role !== "ADMIN" && session.user.role !== "SUPERADMIN") {
     throw new Error("Forbidden");
   }
 

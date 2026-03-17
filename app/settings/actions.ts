@@ -7,6 +7,7 @@ import { revalidatePath } from 'next/cache';
 import { sanitizePrimaryColor } from '@/lib/branding';
 import { sendInviteEmail } from '@/lib/email';
 import { generateInviteToken, hashInviteToken } from '@/lib/inviteTokens';
+import { isAllowedRole } from '@/lib/roles';
 
 export async function updateClubBranding(formData: FormData) {
   const session = await getSession();
@@ -56,6 +57,10 @@ export async function updateUserRole(userId: string, role: string) {
   if (!session || (session.user.role !== 'ADMIN' && session.user.role !== 'SUPERADMIN')) throw new Error('Unauthorized');
   const clubId = getEffectiveClubId(session);
   if (!clubId) throw new Error('Geen club geselecteerd');
+
+  if (!isAllowedRole(role) || role === 'SUPERADMIN') {
+    throw new Error('Ongeldige rol');
+  }
 
   if (userId === session.user.id && role !== 'ADMIN' && role !== 'SUPERADMIN') {
     throw new Error('Je kunt je eigen admin-rechten niet verwijderen');
