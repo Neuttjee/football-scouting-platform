@@ -66,6 +66,7 @@ type Props = {
   clubUsers: { id: string; name: string }[];
   clubName: string | null;
   canBulkDelete: boolean;
+  canDeletePlayers?: boolean;
   initialSorting: SortingState;
   initialColumnVisibility: Record<string, boolean>;
 };
@@ -343,6 +344,7 @@ export function InternalPlayersTable({
   clubUsers,
   clubName,
   canBulkDelete,
+  canDeletePlayers = false,
   initialSorting,
   initialColumnVisibility,
 }: Props) {
