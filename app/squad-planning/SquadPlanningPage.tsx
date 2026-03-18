@@ -140,6 +140,11 @@ export default function SquadPlanningPage({
   const [clubUpdatedAt, setClubUpdatedAt] = React.useState<string | null>(null);
   const [userUpdatedAt, setUserUpdatedAt] = React.useState<string | null>(null);
   const [versionsOpen, setVersionsOpen] = React.useState(false);
+  const [overwriteClubConfirmOpen, setOverwriteClubConfirmOpen] = React.useState(false);
+  const [overwriteClubPushConfirmOpen, setOverwriteClubPushConfirmOpen] = React.useState(false);
+  const [conflictModalOpen, setConflictModalOpen] = React.useState(false);
+  const [conflictPendingAction, setConflictPendingAction] = React.useState<"saveAndSnapshot" | "pushToClub" | null>(null);
+  const [planReloadNonce, setPlanReloadNonce] = React.useState(0);
   const [snapshots, setSnapshots] = React.useState<
     { id: string; versionNumber: number; note: string | null; createdAt: string; createdBy: { id: string; name: string } | null }[]
   >([]);
@@ -147,14 +152,66 @@ export default function SquadPlanningPage({
 
   const showPlanSkeleton = useDelayedLoading(isLoadingPlan, { showDelayMs: 200, minShowMs: 300 });
 
+  const [unsavedChangesOpen, setUnsavedChangesOpen] = React.useState(false);
+  const [pendingKeyChange, setPendingKeyChange] = React.useState<{
+    selectedTeamId?: string | null;
+    seasonYear?: number;
+    formation?: Formation;
+    mode?: "club" | "user";
+  } | null>(null);
+
+  // Dirty tracking: vergelijkt de huidige UI state met de laatste DB-laad-snapshot.
+  const baselineRef = React.useRef<{
+    assignments: Record<string, string[]>;
+    slotMaxOverrides: Record<string, number>;
+  } | null>(null);
+
+  const isDirty = React.useMemo(() => {
+    if (!baselineRef.current) return false;
+    const base = baselineRef.current;
+    return (
+      JSON.stringify(assignments) !== JSON.stringify(base.assignments) ||
+      JSON.stringify(slotMaxOverrides) !== JSON.stringify(base.slotMaxOverrides)
+    );
+  }, [assignments, slotMaxOverrides]);
+
+  const applyKeyChange = React.useCallback(
+    (next: NonNullable<typeof pendingKeyChange>) => {
+      if (next.selectedTeamId !== undefined) setSelectedTeamId(next.selectedTeamId);
+      if (next.seasonYear !== undefined) setSeasonYear(next.seasonYear);
+      if (next.formation !== undefined) setFormation(next.formation);
+      if (next.mode !== undefined) setMode(next.mode);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
+
+  const requestKeyChange = React.useCallback(
+    (next: typeof pendingKeyChange) => {
+      if (!next) return;
+      if (!canEdit || !isDirty) {
+        applyKeyChange(next);
+        return;
+      }
+      setPendingKeyChange(next);
+      setUnsavedChangesOpen(true);
+    },
+    [applyKeyChange, canEdit, isDirty]
+  );
+
+  const discardPendingKeyChange = React.useCallback(() => {
+    if (!pendingKeyChange) {
+      setUnsavedChangesOpen(false);
+      return;
+    }
+    setUnsavedChangesOpen(false);
+    applyKeyChange(pendingKeyChange);
+    setPendingKeyChange(null);
+  }, [applyKeyChange, pendingKeyChange]);
+
   const assignmentsRef = React.useRef<Record<string, string[]>>({});
   const formationRef = React.useRef<Formation>(formation);
   const slotMaxOverridesRef = React.useRef<Record<string, number>>({});
-  const currentKeyRef = React.useRef<{ teamId: string | null; seasonYear: number }>({
-    teamId: selectedTeamId,
-    seasonYear,
-  });
-  const previousKeyRef = React.useRef<{ teamId: string | null; seasonYear: number } | null>(null);
 
   React.useEffect(() => {
     assignmentsRef.current = assignments;
@@ -168,24 +225,25 @@ export default function SquadPlanningPage({
     formationRef.current = formation;
   }, [formation]);
 
-  React.useEffect(() => {
-    currentKeyRef.current = { teamId: selectedTeamId, seasonYear };
-  }, [selectedTeamId, seasonYear]);
-
   const saveWorkingCopy = React.useCallback(
     async (
       teamId: string,
       seasonYearToSave: number,
       formationToSave: Formation,
       assignmentsToSave: Record<string, string[]>,
-      slotMaxOverridesToSave: Record<string, number>
-    ) => {
+      slotMaxOverridesToSave: Record<string, number>,
+      options?: { force?: boolean }
+    ): Promise<{ ok: true } | { ok: false; conflict?: boolean }> => {
       try {
-        if (!canEdit) return;
+        if (!canEdit) return { ok: false };
         setIsSaving(true);
         const endpoint =
           mode === "club" ? "/api/squad-planning/plan/club" : "/api/squad-planning/plan/draft";
-        const ifUpdatedAt = mode === "club" ? clubUpdatedAt : userUpdatedAt;
+        const ifUpdatedAt = options?.force
+          ? null
+          : mode === "club"
+            ? clubUpdatedAt
+            : userUpdatedAt;
         const res = await fetch(endpoint, {
           method: "POST",
           headers: {
@@ -205,9 +263,10 @@ export default function SquadPlanningPage({
           const text = await res.text();
           console.error("Failed to save squad plan", text);
           if (res.status === 409) {
-            setLoadError("Iemand anders heeft wijzigingen gedaan. Herlaad de pagina.");
+            return { ok: false, conflict: true };
           }
-          return;
+          setLoadError("Opslaan is mislukt.");
+          return { ok: false };
         }
 
         const data = (await res.json().catch(() => null)) as null | { updatedAt?: string | null };
@@ -216,8 +275,10 @@ export default function SquadPlanningPage({
           else setUserUpdatedAt(data.updatedAt);
         }
         setLastSavedAt(new Date());
+        return { ok: true };
       } catch (error) {
         console.error("Error saving squad plan", error);
+        return { ok: false };
       } finally {
         setIsSaving(false);
       }
@@ -244,23 +305,63 @@ export default function SquadPlanningPage({
   const filteredPlayers = React.useMemo(() => {
     return players.filter((player) => {
       const effectiveType = getEffectivePlayerType(player, seasonYear);
-      if (effectiveType === "EXTERNAL") return true;
+      if (effectiveType === "EXTERNAL") {
+        // Wanneer we onderliggende teams meenemen willen we externals die pas komend seizoen intern gaan
+        // niet als "externe" opties tonen in deze view (dus uitvinken).
+        if (
+          includeFeederTeams &&
+          player.plannedInternalFromSeasonYear != null &&
+          player.plannedInternalFromSeasonYear === seasonYear + 1
+        ) {
+          return false;
+        }
+        return true;
+      }
       if (!selectedTeamId) return true;
       if (!includeFeederTeams) return player.teamId === selectedTeamId;
       return player.teamOrder >= selectedTeamOrder;
     });
   }, [players, selectedTeamId, includeFeederTeams, selectedTeamOrder, seasonYear]);
 
+  const assignedPlayerIds = React.useMemo(() => {
+    return new Set(Object.values(assignments).flat());
+  }, [assignments]);
+
   const pickerPlayers = React.useMemo(() => {
-    return filteredPlayers.map((p) => ({
-      ...p,
-      type: getEffectivePlayerType(p, seasonYear),
-    }));
-  }, [filteredPlayers, seasonYear]);
+    return filteredPlayers
+      .filter((p) => !assignedPlayerIds.has(p.id))
+      .map((p) => {
+        const effectiveType = getEffectivePlayerType(p, seasonYear);
+        return {
+          ...p,
+          sourceType: p.type,
+          type: effectiveType,
+        };
+      });
+  }, [filteredPlayers, seasonYear, assignedPlayerIds]);
+
+  // For slot rendering we need player objects for ALL ids present in `assignments`,
+  // not only the ones shown in the picker list.
+  const playersForField = React.useMemo(() => {
+    const assignedPlayers = players.filter((p) => assignedPlayerIds.has(p.id));
+    const merged = [...filteredPlayers, ...assignedPlayers];
+    const dedupedById = new Map<string, PlanningPlayer>();
+    for (const p of merged) {
+      dedupedById.set(p.id, p);
+    }
+    return Array.from(dedupedById.values()).map((p) => {
+      const effectiveType = getEffectivePlayerType(p, seasonYear);
+      return {
+        ...p,
+        sourceType: p.type,
+        type: effectiveType,
+      };
+    });
+  }, [filteredPlayers, seasonYear, players, assignedPlayerIds]);
 
   const playersById = React.useMemo(
-    () => Object.fromEntries(pickerPlayers.map((player) => [player.id, player])),
-    [pickerPlayers]
+    () => Object.fromEntries(playersForField.map((player) => [player.id, player])),
+    [playersForField]
   );
 
   const effectiveMaxBySlotId = React.useMemo(() => {
@@ -270,20 +371,6 @@ export default function SquadPlanningPage({
     });
     return map;
   }, [slots, slotMaxOverrides]);
-
-  const assignedEntries = Object.entries(assignments).flatMap(([slotId, ids]) =>
-    ids.map((id) => ({ slotId, id }))
-  );
-  const duplicatePlayerIds = new Set(
-    Object.entries(
-      assignedEntries.reduce<Record<string, number>>((acc, entry) => {
-        acc[entry.id] = (acc[entry.id] ?? 0) + 1;
-        return acc;
-      }, {})
-    )
-      .filter(([, count]) => count > 1)
-      .map(([id]) => id)
-  );
 
   const handleDrop = (slotId: string, playerId: string) => {
     const currentSlots = Object.entries(assignments)
@@ -337,15 +424,6 @@ export default function SquadPlanningPage({
       const current = prev[slotId] ?? base;
       if (current >= MAX_SLOT_CAP) return prev;
       const next = { ...prev, [slotId]: current + 1 };
-      if (selectedTeamId) {
-        void saveWorkingCopy(
-          selectedTeamId,
-          seasonYear,
-          formationRef.current,
-          assignmentsRef.current,
-          next
-        );
-      }
       return next;
     });
   };
@@ -360,15 +438,6 @@ export default function SquadPlanningPage({
       if (assigned > nextMax) return prev;
       const next = { ...prev, [slotId]: nextMax };
       const nextOverrides = nextMax === base ? (() => { const { [slotId]: _, ...rest } = next; return rest; })() : next;
-      if (selectedTeamId) {
-        void saveWorkingCopy(
-          selectedTeamId,
-          seasonYear,
-          formationRef.current,
-          assignmentsRef.current,
-          nextOverrides
-        );
-      }
       return nextOverrides;
     });
   };
@@ -378,39 +447,7 @@ export default function SquadPlanningPage({
     [defaultSeasonYear]
   );
 
-  // Auto-save bij wisselen van team of seizoen (oude selectie wegschrijven)
-  React.useEffect(() => {
-    const previous = previousKeyRef.current;
-    if (
-      previous &&
-      previous.teamId &&
-      (previous.teamId !== selectedTeamId || previous.seasonYear !== seasonYear)
-    ) {
-      void saveWorkingCopy(
-        previous.teamId,
-        previous.seasonYear,
-        formationRef.current,
-        assignmentsRef.current,
-        slotMaxOverridesRef.current
-      );
-    }
-    previousKeyRef.current = { teamId: selectedTeamId, seasonYear };
-  }, [selectedTeamId, seasonYear, saveWorkingCopy]);
-
-  // Auto-save bij unmounten van de pagina (laatste versie bewaren)
-  React.useEffect(() => {
-    return () => {
-      const { teamId, seasonYear: seasonYearToSave } = currentKeyRef.current;
-      if (!teamId) return;
-      void saveWorkingCopy(
-        teamId,
-        seasonYearToSave,
-        formationRef.current,
-        assignmentsRef.current,
-        slotMaxOverridesRef.current
-      );
-    };
-  }, [saveWorkingCopy]);
+  // NOTE: Geen auto-save. De enige persistente schrijfactie gebeurt via expliciete "Opslaan".
 
   // Laad bestaande opstelling bij initialisatie / wisselen team of seizoen
   React.useEffect(() => {
@@ -450,6 +487,18 @@ export default function SquadPlanningPage({
         } else {
           setSlotMaxOverrides({});
         }
+
+        // Reset dirty tracking op basis van wat we uit de DB hebben geladen.
+        baselineRef.current = {
+          assignments:
+            planForMode?.assignments && typeof planForMode.assignments === "object"
+              ? planForMode.assignments
+              : {},
+          slotMaxOverrides:
+            planForMode?.slotMaxOverrides && typeof planForMode.slotMaxOverrides === "object"
+              ? planForMode.slotMaxOverrides
+              : {},
+        };
       } catch (error) {
         console.error("Error loading squad plan", error);
         setLoadError("Opstelling kon niet geladen worden.");
@@ -460,7 +509,7 @@ export default function SquadPlanningPage({
 
     loadPlan();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedTeamId, seasonYear, formation, mode, initialCanEdit]);
+  }, [selectedTeamId, seasonYear, formation, mode, initialCanEdit, planReloadNonce]);
 
   const refreshSnapshots = React.useCallback(async () => {
     if (!selectedTeamId) return;
@@ -500,8 +549,85 @@ export default function SquadPlanningPage({
     setLastSavedAt(new Date());
   };
 
+  const saveWorkingCopyThenSnapshot = React.useCallback(async (options?: { force?: boolean }) => {
+    if (!selectedTeamId) return;
+
+    // Eerst de working copy in `SquadPlan` up-to-date maken, zodat snapshot de laatste UI state bevat.
+    const result = await saveWorkingCopy(
+      selectedTeamId,
+      seasonYear,
+      formationRef.current,
+      assignmentsRef.current,
+      slotMaxOverridesRef.current,
+      options
+    );
+    if (!result.ok) {
+      if (result.conflict && !options?.force) {
+        setConflictPendingAction("saveAndSnapshot");
+        setConflictModalOpen(true);
+      }
+      return;
+    }
+
+    await createSnapshot();
+
+    // Werk dirty tracking bij: na Opslaan klopt de UI nu met de DB.
+    baselineRef.current = {
+      assignments: assignmentsRef.current,
+      slotMaxOverrides: slotMaxOverridesRef.current,
+    };
+    setLoadError(null);
+  }, [selectedTeamId, seasonYear, saveWorkingCopy, createSnapshot]);
+
+  const handleOpslaanClick = async () => {
+    if (!canEdit) return;
+    if (!selectedTeamId) return;
+
+    // Clubplanning is één waarheid; overschrijven vraagt om expliciete bevestiging.
+    if (mode === "club") {
+      setOverwriteClubConfirmOpen(true);
+      return;
+    }
+
+    await saveWorkingCopyThenSnapshot();
+  };
+
+  const handleConfirmOverwrite = async () => {
+    setOverwriteClubConfirmOpen(false);
+    await saveWorkingCopyThenSnapshot();
+  };
+
   const pushToClub = async () => {
     if (!selectedTeamId) return;
+
+    // Eerst jouw werk (draft) naar de DB schrijven, zodat push alles correct overneemt.
+    const result = await saveWorkingCopy(
+      selectedTeamId,
+      seasonYear,
+      formationRef.current,
+      assignmentsRef.current,
+      slotMaxOverridesRef.current
+    );
+    if (!result.ok) {
+      if (result.conflict) {
+        setConflictPendingAction("pushToClub");
+        setConflictModalOpen(true);
+      }
+      return;
+    }
+
+    baselineRef.current = {
+      assignments: assignmentsRef.current,
+      slotMaxOverrides: slotMaxOverridesRef.current,
+    };
+    setLoadError(null);
+
+    setOverwriteClubPushConfirmOpen(true);
+  };
+
+  const confirmPushToClub = async () => {
+    setOverwriteClubPushConfirmOpen(false);
+
     const res = await fetch("/api/squad-planning/plan/push-to-club", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -512,10 +638,52 @@ export default function SquadPlanningPage({
         createSnapshot: true,
       }),
     });
+
     if (!res.ok) return;
     if (mode === "club") return;
-    // after push, switch to club view and reload
+
+    // Na push naar clubplanning schakelen we naar club-view.
     setMode("club");
+  };
+
+  const handleConflictOverwrite = async () => {
+    setConflictModalOpen(false);
+    const action = conflictPendingAction;
+    setConflictPendingAction(null);
+
+    if (!selectedTeamId) return;
+
+    if (action === "saveAndSnapshot") {
+      await saveWorkingCopyThenSnapshot({ force: true });
+      return;
+    }
+
+    if (action === "pushToClub") {
+      const result = await saveWorkingCopy(
+        selectedTeamId,
+        seasonYear,
+        formationRef.current,
+        assignmentsRef.current,
+        slotMaxOverridesRef.current,
+        { force: true }
+      );
+
+      if (!result.ok) return;
+
+      baselineRef.current = {
+        assignments: assignmentsRef.current,
+        slotMaxOverrides: slotMaxOverridesRef.current,
+      };
+      setLoadError(null);
+      setOverwriteClubPushConfirmOpen(true);
+    }
+  };
+
+  const handleConflictRefresh = async () => {
+    setConflictModalOpen(false);
+    setConflictPendingAction(null);
+    setLoadError(null);
+    setPlanReloadNonce((n) => n + 1);
   };
 
   const restoreSnapshot = async (snapshotId: string) => {
@@ -551,7 +719,7 @@ export default function SquadPlanningPage({
               <button
                 type="button"
                 disabled={!canEdit}
-                onClick={() => setMode("club")}
+                onClick={() => requestKeyChange({ mode: "club" })}
                 className={cn(
                   "flex-1 px-3 py-1 text-xs font-medium rounded-md transition-colors",
                   mode === "club"
@@ -565,7 +733,7 @@ export default function SquadPlanningPage({
               <button
                 type="button"
                 disabled={!canEdit || !userId}
-                onClick={() => setMode("user")}
+                onClick={() => requestKeyChange({ mode: "user" })}
                 className={cn(
                   "flex-1 px-3 py-1 text-xs font-medium rounded-md transition-colors",
                   mode === "user"
@@ -584,7 +752,7 @@ export default function SquadPlanningPage({
                   <button
                     type="button"
                     disabled={isSaving}
-                    onClick={() => void createSnapshot()}
+                    onClick={() => void handleOpslaanClick()}
                     className={cn(
                       "w-full inline-flex items-center justify-center gap-2 px-3 py-1.5 rounded-md border border-border-dark text-xs",
                       isSaving
@@ -595,6 +763,36 @@ export default function SquadPlanningPage({
                   >
                     Opslaan
                   </button>
+                  <Dialog open={overwriteClubConfirmOpen} onOpenChange={setOverwriteClubConfirmOpen}>
+                    <DialogContent
+                      className="max-w-md bg-bg-card border-accent-primary text-text-primary"
+                    >
+                      <DialogHeader>
+                        <DialogTitle>Overschrijven?</DialogTitle>
+                      </DialogHeader>
+                      <p className="text-sm text-text-muted">
+                        Weet je zeker dat je de clubplanning voor dit seizoen wilt overschrijven?
+                      </p>
+                      <div className="flex justify-end gap-2 pt-2">
+                        <button
+                          type="button"
+                          className="px-3 py-1.5 rounded border border-border-dark text-text-secondary hover:text-text-primary hover:bg-bg-primary/60"
+                          onClick={() => setOverwriteClubConfirmOpen(false)}
+                          disabled={isSaving}
+                        >
+                          Annuleren
+                        </button>
+                        <button
+                          type="button"
+                          className="px-3 py-1.5 rounded bg-accent-primary text-primary-foreground text-xs disabled:opacity-60 disabled:cursor-not-allowed"
+                          onClick={() => void handleConfirmOverwrite()}
+                          disabled={isSaving}
+                        >
+                          Overschrijven
+                        </button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
                   {mode === "user" && (
                     <button
                       type="button"
@@ -606,6 +804,106 @@ export default function SquadPlanningPage({
                       Push naar club
                     </button>
                   )}
+                  <Dialog
+                    open={overwriteClubPushConfirmOpen}
+                    onOpenChange={setOverwriteClubPushConfirmOpen}
+                  >
+                    <DialogContent className="max-w-md bg-bg-card border-accent-primary text-text-primary">
+                      <DialogHeader>
+                        <DialogTitle>Overschrijven?</DialogTitle>
+                      </DialogHeader>
+                      <p className="text-sm text-text-muted">
+                        Weet je zeker dat je de clubplanning voor dit seizoen wilt overschrijven met jouw draft?
+                      </p>
+                      <div className="flex justify-end gap-2 pt-2">
+                        <button
+                          type="button"
+                          className="px-3 py-1.5 rounded border border-border-dark text-text-secondary hover:text-text-primary hover:bg-bg-primary/60"
+                          onClick={() => setOverwriteClubPushConfirmOpen(false)}
+                          disabled={isSaving}
+                        >
+                          Annuleren
+                        </button>
+                        <button
+                          type="button"
+                          className="px-3 py-1.5 rounded bg-accent-primary text-primary-foreground text-xs disabled:opacity-60 disabled:cursor-not-allowed"
+                          onClick={() => void confirmPushToClub()}
+                          disabled={isSaving}
+                        >
+                          Overschrijven
+                        </button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                  <Dialog
+                    open={unsavedChangesOpen}
+                    onOpenChange={(open) => {
+                      setUnsavedChangesOpen(open);
+                      if (!open) setPendingKeyChange(null);
+                    }}
+                  >
+                    <DialogContent className="max-w-md bg-bg-card border-accent-primary text-text-primary">
+                      <DialogHeader>
+                        <DialogTitle>Niet opgeslagen wijzigingen</DialogTitle>
+                      </DialogHeader>
+                      <p className="text-sm text-text-muted">
+                        Je hebt wijzigingen gemaakt. Weet je zeker dat je deze wilt weggooien?
+                      </p>
+                      <div className="flex justify-end gap-2 pt-2">
+                        <button
+                          type="button"
+                          className="px-3 py-1.5 rounded border border-border-dark text-text-secondary hover:text-text-primary hover:bg-bg-primary/60"
+                          onClick={() => {
+                            setUnsavedChangesOpen(false);
+                            setPendingKeyChange(null);
+                          }}
+                        >
+                          Annuleren
+                        </button>
+                        <button
+                          type="button"
+                          className="px-3 py-1.5 rounded bg-destructive text-destructive-foreground text-xs disabled:opacity-60 disabled:cursor-not-allowed"
+                          onClick={() => void discardPendingKeyChange()}
+                        >
+                          Wijzigingen weggooien
+                        </button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                  <Dialog
+                    open={conflictModalOpen}
+                    onOpenChange={(open) => {
+                      setConflictModalOpen(open);
+                      if (!open) setConflictPendingAction(null);
+                    }}
+                  >
+                    <DialogContent className="max-w-md bg-bg-card border-accent-primary text-text-primary">
+                      <DialogHeader>
+                        <DialogTitle>Wijziging conflict</DialogTitle>
+                      </DialogHeader>
+                      <p className="text-sm text-text-muted">
+                        Iemand anders heeft de planning aangepast. Wil je jouw wijzigingen overschrijven of de nieuwste versie laden?
+                      </p>
+                      <div className="flex justify-end gap-2 pt-2">
+                        <button
+                          type="button"
+                          className="px-3 py-1.5 rounded border border-border-dark text-text-secondary hover:text-text-primary hover:bg-bg-primary/60"
+                          onClick={() => void handleConflictRefresh()}
+                          disabled={isSaving}
+                        >
+                          Nieuwste versie laden
+                        </button>
+                        <button
+                          type="button"
+                          className="px-3 py-1.5 rounded bg-accent-primary text-primary-foreground text-xs disabled:opacity-60 disabled:cursor-not-allowed"
+                          onClick={() => void handleConflictOverwrite()}
+                          disabled={isSaving || !conflictPendingAction}
+                        >
+                          Overschrijven
+                        </button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
                   <Dialog open={versionsOpen} onOpenChange={setVersionsOpen}>
                     <DialogTrigger asChild>
                       <button
@@ -679,7 +977,7 @@ export default function SquadPlanningPage({
                   <button
                     key={team.id}
                     type="button"
-                    onClick={() => setSelectedTeamId(team.id)}
+                    onClick={() => requestKeyChange({ selectedTeamId: team.id })}
                     className={cn(
                       "px-3 py-1 text-xs font-medium rounded-md transition-colors",
                       active
@@ -699,7 +997,7 @@ export default function SquadPlanningPage({
               </label>
               <select
                 value={seasonYear}
-                onChange={(e) => setSeasonYear(parseInt(e.target.value, 10))}
+                onChange={(e) => requestKeyChange({ seasonYear: parseInt(e.target.value, 10) })}
                 className="border border-border-dark rounded px-2 py-1.5 text-xs bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
               >
                 {seasonOptions.map((year) => (
@@ -716,7 +1014,7 @@ export default function SquadPlanningPage({
               </label>
               <select
                 value={formation}
-                onChange={(e) => setFormation(e.target.value as Formation)}
+                onChange={(e) => requestKeyChange({ formation: e.target.value as Formation })}
                 className="border border-border-dark rounded px-2 py-1.5 text-xs bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
               >
                 <option value="4-3-3_POINT_BACK">4-3-3 p.n.a.</option>
@@ -746,9 +1044,7 @@ export default function SquadPlanningPage({
               assignments={assignments}
               playersById={playersById}
               seasonYear={seasonYear}
-              agingThreshold={agingThreshold}
               selectedTeamOrder={selectedTeamOrder}
-              duplicatePlayerIds={duplicatePlayerIds}
               slotMaxOverrides={slotMaxOverrides}
               effectiveMaxBySlotId={effectiveMaxBySlotId}
               canEdit={canEdit}
@@ -811,7 +1107,12 @@ export default function SquadPlanningPage({
               </DialogContent>
             </Dialog>
           </div>
-          <PlayerPicker players={pickerPlayers} selectedType={selectedType} onTypeChange={setSelectedType} />
+          <PlayerPicker
+            players={pickerPlayers}
+            selectedType={selectedType}
+            onTypeChange={setSelectedType}
+            seasonYear={seasonYear}
+          />
         </div>
       </div>
 

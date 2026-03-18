@@ -3,10 +3,25 @@
 import { cn } from "@/lib/utils";
 import { FieldSlot, PlanningPlayer } from "./types";
 
-function isContractExpired(player: PlanningPlayer, seasonYear: number) {
-  if (player.type !== "INTERNAL" || !player.contractEndDate) return false;
-  const seasonStart = new Date(seasonYear, 6, 1);
-  return new Date(player.contractEndDate) < seasonStart;
+function getSeasonStartDate(seasonYear: number) {
+  // 1 juli = start van het nieuwe seizoen
+  return new Date(seasonYear, 6, 1);
+}
+
+function isPlayerReadyForSeason(player: PlanningPlayer, seasonYear: number): boolean {
+  const seasonStart = getSeasonStartDate(seasonYear);
+
+  // Effective external: nog niet beschikbaar in deze season view.
+  if (player.type === "EXTERNAL") return false;
+
+  // Effective internal kan intern zijn (contract) of inbound (plannedInternalFromSeasonYear).
+  if (player.sourceType === "EXTERNAL") {
+    return (player.plannedInternalFromSeasonYear ?? Infinity) <= seasonYear;
+  }
+
+  // Source internal: klaar als contract nog geldig is.
+  if (!player.contractEndDate) return true;
+  return new Date(player.contractEndDate) >= seasonStart;
 }
 
 const MAX_SLOT_CAP = 5;
@@ -16,9 +31,7 @@ export function Field({
   assignments,
   playersById,
   seasonYear,
-  agingThreshold,
   selectedTeamOrder,
-  duplicatePlayerIds,
   slotMaxOverrides,
   effectiveMaxBySlotId,
   canEdit,
@@ -31,9 +44,7 @@ export function Field({
   assignments: Record<string, string[]>;
   playersById: Record<string, PlanningPlayer>;
   seasonYear: number;
-  agingThreshold: number;
   selectedTeamOrder: number;
-  duplicatePlayerIds: Set<string>;
   slotMaxOverrides: Record<string, number>;
   effectiveMaxBySlotId: Record<string, number>;
   canEdit: boolean;
@@ -106,40 +117,40 @@ export function Field({
                               "flex-1 min-w-0 h-8 rounded flex items-center justify-between px-2 text-sm",
                               !player
                                 ? "border border-dashed border-border-dark/80 bg-bg-primary/40"
-                                : "border border-border-dark bg-bg-primary/70"
+                                : player.type === "INTERNAL"
+                                  ? "border border-border-dark bg-bg-secondary/50"
+                                  : "border border-border-dark bg-bg-primary/70"
                             )}
                           >
                             {!player ? null : (
                               <>
-                                <span
-                                  className={cn(
-                                    "truncate font-medium",
-                                    isContractExpired(player, seasonYear)
-                                      ? "text-text-muted"
-                                      : "text-text-primary"
-                                  )}
-                                >
-                                  {player.name}
-                                </span>
+                                {(() => {
+                                  const isReady = isPlayerReadyForSeason(player, seasonYear);
+                                  return (
+                                    <span
+                                      className={cn(
+                                        "truncate font-medium",
+                                        isReady ? "text-text-primary" : "text-amber-300"
+                                      )}
+                                    >
+                                      {player.name}
+                                    </span>
+                                  );
+                                })()}
                                 <div className="flex items-center gap-0.5 pl-1 shrink-0">
                                   {player.type === "INTERNAL" && player.teamOrder > selectedTeamOrder && (
-                                    <span className="text-[10px] px-1.5 rounded border border-border-dark text-text-muted">
+                                    <span
+                                      className={cn(
+                                        "text-[10px] px-1.5 rounded border",
+                                        "border-border-dark text-text-muted"
+                                      )}
+                                    >
                                       {player.teamLabel}
                                     </span>
                                   )}
                                   {player.type === "EXTERNAL" && (
                                     <span className="text-[10px] px-1.5 rounded border border-border-dark text-text-muted">
                                       EXT
-                                    </span>
-                                  )}
-                                  {player.age !== null && player.age >= agingThreshold && (
-                                    <span className="text-[10px] px-1.5 rounded border border-accent-primary/40 text-text-muted">
-                                      +
-                                    </span>
-                                  )}
-                                  {duplicatePlayerIds.has(player.id) && (
-                                    <span className="text-[10px] px-1.5 rounded border border-accent-primary/40 text-text-muted">
-                                      2×
                                     </span>
                                   )}
                                   {canEdit ? (

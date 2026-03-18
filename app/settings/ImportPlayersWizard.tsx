@@ -60,8 +60,9 @@ export function ImportPlayersWizard({ open, onOpenChange }: ImportPlayersWizardP
   const targetFields =
     importMode === "INTERNAL" ? playerTargetFieldsInternal : playerTargetFieldsExternal;
 
-  const dialogMaxHeightClass =
-    step === 4 || step === 5 ? "max-h-[92vh]" : "max-h-[85vh]";
+  const isPreviewStep = step === 4 || step === 5;
+  const dialogMaxHeightClass = isPreviewStep ? "max-h-[92vh]" : "max-h-[85vh]";
+  const stepContentOverflowClass = isPreviewStep ? "overflow-hidden" : "overflow-y-auto";
 
   const handleFileSelected = async (file: File) => {
     setError(null);
@@ -133,7 +134,7 @@ export function ImportPlayersWizard({ open, onOpenChange }: ImportPlayersWizardP
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         className={cn(
-          "max-w-[1400px] w-[min(1400px,100%-2rem)] overflow-y-auto",
+          "max-w-[1680px] w-[min(1680px,100%-2rem)] flex flex-col overflow-hidden",
           dialogMaxHeightClass
         )}
       >
@@ -141,7 +142,7 @@ export function ImportPlayersWizard({ open, onOpenChange }: ImportPlayersWizardP
           <DialogTitle>Spelers importeren</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6">
+        <div className="space-y-6 flex flex-col flex-1 min-h-0">
           <div className="flex items-center justify-between gap-3">
             <div className="text-sm text-text-secondary">
               Import type: <span className="text-text-primary font-medium">{importMode === "INTERNAL" ? "Intern" : "Extern"}</span>
@@ -180,7 +181,12 @@ export function ImportPlayersWizard({ open, onOpenChange }: ImportPlayersWizardP
             ))}
           </ol>
 
-          <div className="min-h-[260px] rounded-lg border border-border-dark bg-bg-primary p-4">
+          <div
+            className={cn(
+              "min-h-[260px] rounded-lg border border-border-dark bg-bg-primary p-4 flex flex-col flex-1 min-h-0",
+              stepContentOverflowClass
+            )}
+          >
             {(step === 1 || step === 2) && (
               <FileUploadStep onFileSelected={handleFileSelected} isBusy={isBusy} error={error} />
             )}
@@ -198,7 +204,7 @@ export function ImportPlayersWizard({ open, onOpenChange }: ImportPlayersWizardP
             {step === 7 && <ImportSummaryStep summary={summary} />}
           </div>
 
-          <div className="flex items-center justify-between pt-2">
+          <div className="flex items-center justify-between pt-2 flex-none">
             <button
               type="button"
               onClick={close}

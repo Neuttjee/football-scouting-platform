@@ -10,10 +10,12 @@ export function PlayerPicker({
   players,
   selectedType,
   onTypeChange,
+  seasonYear,
 }: {
   players: PlanningPlayer[];
   selectedType: PlayerTypeValue;
   onTypeChange: (type: PlayerTypeValue) => void;
+  seasonYear: number;
 }) {
   const [query, setQuery] = React.useState("");
   const [positionFilter, setPositionFilter] = React.useState("");
@@ -35,6 +37,25 @@ export function PlayerPicker({
       new Set(players.map((p) => p.status).filter((value): value is string => !!value))
     ).sort();
   }, [players]);
+
+  const seasonStart = React.useMemo(() => new Date(seasonYear, 6, 1), [seasonYear]);
+
+  const isPlayerReadyForSeason = React.useCallback(
+    (player: PlanningPlayer) => {
+      // Effective external: nog niet beschikbaar voor deze season view.
+      if (player.type === "EXTERNAL") return false;
+
+      // Effective internal kan komen vanuit interne speler of inbound externe speler.
+      if (player.sourceType === "EXTERNAL") {
+        return (player.plannedInternalFromSeasonYear ?? Infinity) <= seasonYear;
+      }
+
+      // Source internal: klaar als contract geldig is in dit seizoen.
+      if (!player.contractEndDate) return true;
+      return new Date(player.contractEndDate) >= seasonStart;
+    },
+    [seasonStart, seasonYear]
+  );
 
   const filtered = players.filter((p) => {
     if (p.type !== selectedType) return false;
@@ -112,6 +133,7 @@ export function PlayerPicker({
               typeof plannedSeasonYear === "number"
                 ? `${plannedSeasonYear}/${plannedSeasonYear + 1}`
                 : null;
+            const isReady = isPlayerReadyForSeason(player);
             return (
           <div
             key={player.id}
@@ -119,10 +141,18 @@ export function PlayerPicker({
             onDragStart={(e) => {
               e.dataTransfer.setData("text/player-id", player.id);
             }}
-            className="border border-border-dark rounded p-2 bg-bg-secondary/50 cursor-grab active:cursor-grabbing"
+            className={cn(
+              "border rounded p-2 cursor-grab active:cursor-grabbing",
+              player.type === "INTERNAL" ? "border-border-dark bg-bg-secondary/50" : "border-border-dark bg-bg-primary/70"
+            )}
           >
             <div className="flex items-center justify-between gap-3">
-              <div className="text-sm text-text-primary font-medium truncate">
+              <div
+                className={cn(
+                  "text-sm font-medium truncate",
+                  isReady ? "text-text-primary" : "text-amber-300"
+                )}
+              >
                 {player.name}
               </div>
               <div className="flex items-center gap-1">
@@ -133,7 +163,11 @@ export function PlayerPicker({
                   />
                 )}
                 {plannedLabel ? (
-                  <span className="text-[10px] px-1 py-0.5 rounded border border-accent-primary/40 text-text-muted">
+                  <span
+                    className={cn(
+                      "text-[10px] px-1 py-0.5 rounded border border-accent-primary/40 text-text-muted"
+                    )}
+                  >
                     INT vanaf {plannedLabel}
                   </span>
                 ) : player.type === "EXTERNAL" ? (
@@ -143,7 +177,7 @@ export function PlayerPicker({
                 ) : null}
               </div>
             </div>
-            <div className="text-xs text-text-muted mt-1">
+            <div className="text-xs mt-1 text-text-muted">
               {(player.teamLabel || "-")} • {player.position || "-"} •{" "}
               {player.age != null ? `${player.age}j` : "-"}
             </div>
