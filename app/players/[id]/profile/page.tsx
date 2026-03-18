@@ -100,6 +100,13 @@ export default async function PlayerProfilePage({
               />
             )}
           </div>
+          {player.type === 'EXTERNAL' && player.plannedInternalFromSeasonYear ? (
+            <div className="mb-2">
+              <span className="inline-flex text-[11px] px-2 py-1 rounded-md bg-accent-primary/15 border border-accent-primary/40 text-text-primary">
+                INT vanaf {player.plannedInternalFromSeasonYear}/{player.plannedInternalFromSeasonYear + 1}
+              </span>
+            </div>
+          ) : null}
           <div className="flex items-center gap-3 text-sm text-text-secondary">
             <span>{currentClubLabel}</span>
             <span className="w-1 h-1 rounded-full bg-border-dark"></span>

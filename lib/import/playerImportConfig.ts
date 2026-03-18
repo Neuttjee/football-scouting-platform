@@ -1,6 +1,6 @@
 import type { ImportTargetField } from "./types";
 
-export const playerTargetFields: ImportTargetField[] = [
+export const playerTargetFieldsExternal: ImportTargetField[] = [
   { key: "name", label: "Naam", required: true, type: "string" },
   { key: "dateOfBirth", label: "Geboortedatum", type: "date" },
   { key: "position", label: "Positie", type: "string" },
@@ -13,8 +13,24 @@ export const playerTargetFields: ImportTargetField[] = [
   { key: "step", label: "Processtap", type: "string" },
   { key: "advies", label: "Advies", type: "string" },
   { key: "notes", label: "Notities", type: "string" },
-  { key: "type", label: "Type (INTERNAL/EXTERNAL)", type: "string" },
 ];
+
+export const playerTargetFieldsInternal: ImportTargetField[] = [
+  { key: "name", label: "Naam", required: true, type: "string" },
+  { key: "dateOfBirth", label: "Geboortedatum", type: "date" },
+  { key: "position", label: "Positie", type: "string" },
+  { key: "secondaryPosition", label: "Nevenpositie", type: "string" },
+  { key: "preferredFoot", label: "Voorkeursbeen", type: "string" },
+  { key: "team", label: "Team", required: true, type: "string" },
+  { key: "joinedAt", label: "Bij club sinds (datum)", type: "date" },
+  { key: "contractEndDate", label: "Contract tot (datum)", type: "date" },
+  { key: "distanceFromClubKm", label: "Afstand tot club (km)", type: "number" },
+  { key: "optionYear", label: "Optiejaar (true/false)", type: "boolean" },
+  { key: "notes", label: "Notities", type: "string" },
+];
+
+// Backwards compatible default
+export const playerTargetFields: ImportTargetField[] = playerTargetFieldsExternal;
 
 export const playerFieldAliases: Record<string, string[]> = {
   name: ["naam", "speler", "player", "player name", "full name"],
@@ -35,6 +51,9 @@ export const playerFieldAliases: Record<string, string[]> = {
   step: ["processtap", "step", "pipeline step"],
   advies: ["advies", "recommendation"],
   notes: ["notities", "notes", "commentaar", "comments"],
-  type: ["type", "speler type", "player type", "internal/external"],
+  joinedAt: ["bij club sinds", "joined at", "join date", "startdatum"],
+  contractEndDate: ["contract tot", "contract end", "einde contract", "end date"],
+  distanceFromClubKm: ["afstand", "afstand tot club", "distance", "km"],
+  optionYear: ["optiejaar", "option year", "option"],
 };
 

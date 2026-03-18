@@ -11,6 +11,7 @@ import { hexToRgb, sanitizePrimaryColor, DEFAULT_PRIMARY_COLOR } from '@/lib/bra
 import { ClubConfigProvider } from '@/components/club/ClubConfigProvider';
 import { getClubConfigByClubId } from '@/lib/clubConfig';
 import { RootClientLayout } from './RootClientLayout';
+import { SeasonRolloverNewsModal } from './SeasonRolloverNewsModal';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 
@@ -86,6 +87,7 @@ export default async function RootLayout({
                   <Topbar />
                   <main className="flex-1 overflow-y-auto pb-16 md:pb-0 relative bg-bg-secondary">
                     <div className="p-4 md:p-8 w-full max-w-[1600px] mx-auto">
+                      <SeasonRolloverNewsModal />
                       {children}
                     </div>
                   </main>

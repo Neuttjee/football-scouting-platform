@@ -8,10 +8,11 @@ import { PlayerMappingStep } from "@/components/import/PlayerMappingStep";
 import { PreviewTableStep } from "@/components/import/PreviewTableStep";
 import { ImportSummaryStep } from "@/components/import/ImportSummaryStep";
 import type { FieldMapping, ParsedFile } from "@/lib/import/types";
-import { playerTargetFields } from "@/lib/import/playerImportConfig";
+import { playerTargetFieldsExternal, playerTargetFieldsInternal } from "@/lib/import/playerImportConfig";
 import { suggestColumnMapping } from "@/lib/import/mapping";
 import { executePlayerImport, parseImportFile, preparePlayerImport } from "./importPlayersActions";
 import type { PlayerImportPreviewResult } from "@/lib/import/validation";
+import { PlayerTypeToggle, type PlayerTypeValue } from "@/components/PlayerTypeToggle";
 
 type ImportPlayersWizardProps = {
   open: boolean;
@@ -25,6 +26,7 @@ export function ImportPlayersWizard({ open, onOpenChange }: ImportPlayersWizardP
   const [parsedFile, setParsedFile] = React.useState<ParsedFile | null>(null);
   const [mapping, setMapping] = React.useState<FieldMapping>({});
   const [preview, setPreview] = React.useState<PlayerImportPreviewResult | null>(null);
+  const [importMode, setImportMode] = React.useState<PlayerTypeValue>("EXTERNAL");
   const [summary, setSummary] = React.useState<{
     importedCount: number;
     skippedInvalidCount: number;
@@ -42,6 +44,7 @@ export function ImportPlayersWizard({ open, onOpenChange }: ImportPlayersWizardP
     setSummary(null);
     setError(null);
     setIsBusy(false);
+    setImportMode("EXTERNAL");
   };
 
   const steps: { id: WizardStep; label: string }[] = [
@@ -54,6 +57,9 @@ export function ImportPlayersWizard({ open, onOpenChange }: ImportPlayersWizardP
     { id: 7, label: "Resultaat" },
   ];
 
+  const targetFields =
+    importMode === "INTERNAL" ? playerTargetFieldsInternal : playerTargetFieldsExternal;
+
   const handleFileSelected = async (file: File) => {
     setError(null);
     setIsBusy(true);
@@ -63,7 +69,7 @@ export function ImportPlayersWizard({ open, onOpenChange }: ImportPlayersWizardP
       formData.append("file", file);
       const result = await parseImportFile(formData);
       setParsedFile(result.parsed);
-      const initial = suggestColumnMapping(result.parsed.columns, playerTargetFields);
+      const initial = suggestColumnMapping(result.parsed.columns, targetFields);
       setMapping(initial);
       setStep(3);
     } catch (e: any) {
@@ -92,7 +98,7 @@ export function ImportPlayersWizard({ open, onOpenChange }: ImportPlayersWizardP
     setIsBusy(true);
     setError(null);
     try {
-      const result = await preparePlayerImport(parsedFile, mapping);
+      const result = await preparePlayerImport(parsedFile, mapping, { importMode });
       setPreview(result);
     } catch (e: any) {
       console.error(e);
@@ -109,7 +115,7 @@ export function ImportPlayersWizard({ open, onOpenChange }: ImportPlayersWizardP
     try {
       const result = await executePlayerImport(parsedFile, mapping, {
         importDuplicates: false,
-      });
+      }, { importMode });
       setSummary(result);
       setStep(7);
     } catch (e: any) {
@@ -128,6 +134,23 @@ export function ImportPlayersWizard({ open, onOpenChange }: ImportPlayersWizardP
         </DialogHeader>
 
         <div className="space-y-6">
+          <div className="flex items-center justify-between gap-3">
+            <div className="text-sm text-text-secondary">
+              Import type: <span className="text-text-primary font-medium">{importMode === "INTERNAL" ? "Intern" : "Extern"}</span>
+            </div>
+            <PlayerTypeToggle
+              value={importMode}
+              onChange={(v) => {
+                setImportMode(v);
+                if (parsedFile) {
+                  const next = suggestColumnMapping(parsedFile.columns, v === "INTERNAL" ? playerTargetFieldsInternal : playerTargetFieldsExternal);
+                  setMapping(next);
+                  setPreview(null);
+                }
+              }}
+              size="sm"
+            />
+          </div>
           <ol className="flex flex-wrap gap-2 text-xs">
             {steps.map((s) => (
               <li
@@ -156,7 +179,7 @@ export function ImportPlayersWizard({ open, onOpenChange }: ImportPlayersWizardP
             {step === 3 && parsedFile && (
               <PlayerMappingStep
                 columns={parsedFile.columns}
-                targetFields={playerTargetFields}
+                targetFields={targetFields}
                 mapping={mapping}
                 onMappingChange={setMapping}
               />

@@ -38,6 +38,7 @@ export type PlayerFormValues = {
   advies?: string | null;
   notes?: string | null;
   plannedInternalFromSeasonYear?: number | null;
+  plannedInternalTeamId?: string | null;
 };
 
 type PlayerFormProps = {
@@ -167,6 +168,8 @@ export function PlayerForm({
     typeof initialValues.plannedInternalFromSeasonYear === "number"
       ? String(initialValues.plannedInternalFromSeasonYear)
       : "";
+
+  const plannedInternalTeamDefault = initialValues.plannedInternalTeamId ?? "";
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 pt-2 pb-4">
@@ -405,6 +408,26 @@ export function PlayerForm({
               </select>
               <p className="text-[11px] text-text-muted mt-1">
                 Wordt als intern gezien vanaf start van dit seizoen.
+              </p>
+            </div>
+            <div>
+              <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
+                Wordt intern bij team
+              </label>
+              <select
+                name="plannedInternalTeamId"
+                defaultValue={plannedInternalTeamDefault}
+                className="w-full border border-border-dark rounded p-2 bg-background text-text-primary focus-border-accent-primary focus-visible:outline-none"
+              >
+                <option value="">Selecteer team...</option>
+                {teams.map((team) => (
+                  <option key={team.id} value={team.id}>
+                    {team.code || team.name}
+                  </option>
+                ))}
+              </select>
+              <p className="text-[11px] text-text-muted mt-1">
+                Nodig om de speler op 1 juli automatisch intern te maken.
               </p>
             </div>
             <div>

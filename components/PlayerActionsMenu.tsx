@@ -40,6 +40,7 @@ export interface PlayerForActions {
   advies: string | null;
   notes: string | null;
   plannedInternalFromSeasonYear?: number | null;
+  plannedInternalTeamId?: string | null;
   // Extra (optionele) velden voor interne spelers
   teamId?: string | null;
   joinedAt?: Date | null;
@@ -162,6 +163,7 @@ export function PlayerActionsMenu({
               joinedAt: player.joinedAt ?? null,
               contractEndDate: player.contractEndDate ?? null,
               plannedInternalFromSeasonYear: player.plannedInternalFromSeasonYear ?? null,
+              plannedInternalTeamId: player.plannedInternalTeamId ?? null,
               distanceFromClubKm: player.distanceFromClubKm ?? null,
               isTopTalent: !!player.isTopTalent,
               niveau: player.niveau,

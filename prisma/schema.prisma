@@ -58,6 +58,8 @@ model Club {
   contacts       ContactMoment[]
   tasks          Task[]
   squadPlans     SquadPlan[]
+  seasonRolloverRuns SeasonRolloverRun[]
+  userSeasonRolloverSeen UserSeasonRolloverSeen[]
 
   auditLogs      AuditLog[]      @relation("ClubAuditLogs")
   tablePreferences UserTablePreference[]
@@ -196,6 +198,7 @@ model User {
   tasksAssigned        Task[]          @relation("TaskAssignedTo")
   squadPlans           SquadPlan[]
   squadPlanSnapshots   SquadPlanSnapshot[] @relation("SquadPlanSnapshotCreatedBy")
+  seasonRolloverSeen   UserSeasonRolloverSeen[]
   auditLogs            AuditLog[]      @relation("UserAuditLogs")
   tablePreferences     UserTablePreference[]
 
@@ -228,6 +231,8 @@ model Player {
   isTopTalent           Boolean  @default(false)
   distanceFromClubKm    Int?
   plannedInternalFromSeasonYear Int?
+  plannedInternalTeamId String?
+  plannedInternalTeam   Team?    @relation("PlannedInternalTeam", fields: [plannedInternalTeamId], references: [id], onDelete: SetNull)
 
   // New fields
   currentClub           String?
@@ -254,6 +259,32 @@ model Player {
   updatedAt             DateTime @updatedAt
 }
 
+model SeasonRolloverRun {
+  id           String   @id @default(uuid())
+  clubId       String
+  club         Club     @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  seasonYear   Int
+  inboundCount Int      @default(0)
+  outboundCount Int     @default(0)
+  ranAt        DateTime @default(now())
+
+  @@unique([clubId, seasonYear])
+  @@index([clubId, ranAt])
+}
+
+model UserSeasonRolloverSeen {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  clubId     String
+  club       Club     @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  seasonYear Int
+  seenAt     DateTime @default(now())
+
+  @@unique([userId, clubId, seasonYear])
+  @@index([clubId, seasonYear])
+}
+
 model Team {
   id           String   @id @default(uuid())
   clubId       String
@@ -264,6 +295,7 @@ model Team {
   isActive     Boolean  @default(true)
   displayOrder Int      @default(0)
   players      Player[]
+  plannedInternalPlayers Player[] @relation("PlannedInternalTeam")
   squadPlans   SquadPlan[]
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
