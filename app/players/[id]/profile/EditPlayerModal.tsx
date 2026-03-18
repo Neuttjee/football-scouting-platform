@@ -30,6 +30,8 @@ type EditablePlayer = {
   teamId: string | null
   joinedAt: string | Date | null
   contractEndDate: string | Date | null
+  plannedInternalFromSeasonYear?: number | null
+  plannedInternalTeamId?: string | null
   distanceFromClubKm: number | null
   isTopTalent: boolean
   niveau: string | null
@@ -62,7 +64,7 @@ export function EditPlayerModal({
         </Button>
       </DialogTrigger>
       <DialogContent
-        className="max-w-2xl max-h-[85vh] overflow-y-auto bg-bg-card border-accent-primary text-text-primary"
+        className="max-w-3xl max-h-[85vh] overflow-y-auto bg-bg-card border-accent-primary text-text-primary"
         onInteractOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
@@ -82,6 +84,8 @@ export function EditPlayerModal({
             teamId: player.teamId,
             joinedAt: player.joinedAt,
             contractEndDate: player.contractEndDate,
+            plannedInternalFromSeasonYear: player.plannedInternalFromSeasonYear ?? null,
+            plannedInternalTeamId: player.plannedInternalTeamId ?? null,
             distanceFromClubKm: player.distanceFromClubKm,
             isTopTalent: player.isTopTalent,
             niveau: player.niveau,

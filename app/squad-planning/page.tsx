@@ -60,6 +60,7 @@ export default async function SquadPlanningServerPage() {
       ? player.contractEndDate.toISOString()
       : null,
     isTopTalent: player.isTopTalent,
+    plannedInternalFromSeasonYear: player.plannedInternalFromSeasonYear ?? null,
   }));
 
   const now = new Date();
@@ -73,6 +74,8 @@ export default async function SquadPlanningServerPage() {
       teams={teams}
       agingThreshold={clubWithAging?.agingThreshold ?? 30}
       defaultSeasonYear={currentSeasonStartYear}
+      userRole={session.user?.role ?? null}
+      userId={session.user?.id ?? null}
     />
   );
 }

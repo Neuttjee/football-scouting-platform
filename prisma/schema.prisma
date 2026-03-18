@@ -58,6 +58,8 @@ model Club {
   contacts       ContactMoment[]
   tasks          Task[]
   squadPlans     SquadPlan[]
+  seasonRolloverRuns SeasonRolloverRun[]
+  userSeasonRolloverSeen UserSeasonRolloverSeen[]
 
   auditLogs      AuditLog[]      @relation("ClubAuditLogs")
   tablePreferences UserTablePreference[]
@@ -195,6 +197,8 @@ model User {
   tasksCreated         Task[]          @relation("TaskCreatedBy")
   tasksAssigned        Task[]          @relation("TaskAssignedTo")
   squadPlans           SquadPlan[]
+  squadPlanSnapshots   SquadPlanSnapshot[] @relation("SquadPlanSnapshotCreatedBy")
+  seasonRolloverSeen   UserSeasonRolloverSeen[]
   auditLogs            AuditLog[]      @relation("UserAuditLogs")
   tablePreferences     UserTablePreference[]
 
@@ -226,6 +230,9 @@ model Player {
   optionYear            Boolean  @default(false)
   isTopTalent           Boolean  @default(false)
   distanceFromClubKm    Int?
+  plannedInternalFromSeasonYear Int?
+  plannedInternalTeamId String?
+  plannedInternalTeam   Team?    @relation("PlannedInternalTeam", fields: [plannedInternalTeamId], references: [id], onDelete: SetNull)
 
   // New fields
   currentClub           String?
@@ -252,6 +259,32 @@ model Player {
   updatedAt             DateTime @updatedAt
 }
 
+model SeasonRolloverRun {
+  id           String   @id @default(uuid())
+  clubId       String
+  club         Club     @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  seasonYear   Int
+  inboundCount Int      @default(0)
+  outboundCount Int     @default(0)
+  ranAt        DateTime @default(now())
+
+  @@unique([clubId, seasonYear])
+  @@index([clubId, ranAt])
+}
+
+model UserSeasonRolloverSeen {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  clubId     String
+  club       Club     @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  seasonYear Int
+  seenAt     DateTime @default(now())
+
+  @@unique([userId, clubId, seasonYear])
+  @@index([clubId, seasonYear])
+}
+
 model Team {
   id           String   @id @default(uuid())
   clubId       String
@@ -262,6 +295,7 @@ model Team {
   isActive     Boolean  @default(true)
   displayOrder Int      @default(0)
   players      Player[]
+  plannedInternalPlayers Player[] @relation("PlannedInternalTeam")
   squadPlans   SquadPlan[]
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
@@ -332,12 +366,39 @@ model SquadPlan {
   slotMaxOverridesJson Json?
   isClubDefault  Boolean  @default(false)
 
+  activeSnapshotId String?
+  activeSnapshot   SquadPlanSnapshot? @relation("ActiveSquadPlanSnapshot", fields: [activeSnapshotId], references: [id], onDelete: SetNull)
+  snapshots        SquadPlanSnapshot[]
+
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
   @@index([clubId, teamId, seasonYear, userId, isClubDefault])
   @@unique([clubId, teamId, seasonYear, formation, userId])
   @@unique([clubId, teamId, seasonYear, formation, isClubDefault])
+}
+
+model SquadPlanSnapshot {
+  id                   String   @id @default(uuid())
+
+  squadPlanId           String
+  squadPlan             SquadPlan @relation(fields: [squadPlanId], references: [id], onDelete: Cascade)
+
+  versionNumber         Int
+  note                  String?
+
+  createdById           String?
+  createdBy             User?    @relation("SquadPlanSnapshotCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+
+  activeForPlans        SquadPlan[] @relation("ActiveSquadPlanSnapshot")
+
+  assignmentsJson       Json
+  slotMaxOverridesJson  Json?
+
+  createdAt             DateTime @default(now())
+
+  @@unique([squadPlanId, versionNumber])
+  @@index([squadPlanId, createdAt])
 }
 
 model UserTablePreference {

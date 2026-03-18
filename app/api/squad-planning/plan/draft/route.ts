@@ -1,0 +1,127 @@
+import { NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
+import { getSession, getEffectiveClubId } from "@/lib/auth";
+import { canEditSquadPlanning } from "@/lib/roles";
+
+const SLOT_MAX_OVERRIDES_MAX_VALUE = 5;
+
+type DraftPayload = {
+  teamId: string;
+  seasonYear: number;
+  formation: string;
+  assignments: Record<string, string[]>;
+  slotMaxOverrides?: Record<string, number>;
+  ifUpdatedAt?: string | null;
+};
+
+export async function POST(request: Request) {
+  const session = await getSession();
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const clubId = getEffectiveClubId(session);
+  if (!clubId) return NextResponse.json({ error: "No club selected" }, { status: 400 });
+
+  if (!canEditSquadPlanning(session.user?.role)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  const userId = session.user?.id ?? null;
+  if (!userId) return NextResponse.json({ error: "User id required" }, { status: 400 });
+
+  let body: DraftPayload;
+  try {
+    body = (await request.json()) as DraftPayload;
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+  }
+
+  const { teamId, seasonYear, formation, assignments, slotMaxOverrides, ifUpdatedAt } = body;
+
+  if (!teamId || typeof teamId !== "string") {
+    return NextResponse.json({ error: "teamId is required" }, { status: 400 });
+  }
+  if (!Number.isInteger(seasonYear)) {
+    return NextResponse.json({ error: "seasonYear must be an integer" }, { status: 400 });
+  }
+  if (!formation || typeof formation !== "string") {
+    return NextResponse.json({ error: "formation is required" }, { status: 400 });
+  }
+  if (!assignments || typeof assignments !== "object") {
+    return NextResponse.json({ error: "assignments must be an object" }, { status: 400 });
+  }
+
+  let slotMaxOverridesJson: Record<string, number> | null = null;
+  if (slotMaxOverrides !== undefined) {
+    if (
+      typeof slotMaxOverrides !== "object" ||
+      slotMaxOverrides === null ||
+      Array.isArray(slotMaxOverrides)
+    ) {
+      return NextResponse.json({ error: "slotMaxOverrides must be an object" }, { status: 400 });
+    }
+    const invalid = Object.entries(slotMaxOverrides).find(
+      ([, v]) => !Number.isInteger(v) || v < 2 || v > SLOT_MAX_OVERRIDES_MAX_VALUE
+    );
+    if (invalid) {
+      return NextResponse.json(
+        {
+          error: `slotMaxOverrides values must be integers between 2 and ${SLOT_MAX_OVERRIDES_MAX_VALUE}`,
+        },
+        { status: 400 }
+      );
+    }
+    slotMaxOverridesJson = slotMaxOverrides as Record<string, number>;
+  }
+
+  const team = await prisma.team.findFirst({
+    where: { id: teamId, clubId },
+    select: { id: true },
+  });
+  if (!team) {
+    return NextResponse.json({ error: "Team does not belong to this club" }, { status: 400 });
+  }
+
+  const existing = await prisma.squadPlan.findFirst({
+    where: { clubId, teamId, seasonYear, formation, userId },
+    select: { id: true, updatedAt: true },
+  });
+
+  const data = {
+    clubId,
+    teamId,
+    seasonYear,
+    userId,
+    formation,
+    assignmentsJson: assignments,
+    ...(slotMaxOverridesJson !== null && { slotMaxOverridesJson }),
+    isClubDefault: false,
+  };
+
+  if (existing) {
+    const expectedUpdatedAt = ifUpdatedAt ? new Date(ifUpdatedAt) : null;
+    if (expectedUpdatedAt) {
+      const result = await prisma.squadPlan.updateMany({
+        where: { id: existing.id, updatedAt: expectedUpdatedAt },
+        data,
+      });
+      if (result.count === 0) {
+        return NextResponse.json(
+          { error: "Conflict", currentUpdatedAt: existing.updatedAt.toISOString() },
+          { status: 409 }
+        );
+      }
+    } else {
+      await prisma.squadPlan.update({ where: { id: existing.id }, data });
+    }
+  } else {
+    await prisma.squadPlan.create({ data });
+  }
+
+  const updated = await prisma.squadPlan.findFirst({
+    where: { clubId, teamId, seasonYear, formation, userId },
+    select: { updatedAt: true },
+  });
+
+  return NextResponse.json({ success: true, updatedAt: updated?.updatedAt.toISOString() ?? null });
+}
+

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getSession, getEffectiveClubId } from "@/lib/auth";
+import { canEditSquadPlanning } from "@/lib/roles";
 
 const SLOT_MAX_OVERRIDES_MAX_VALUE = 5;
 
@@ -11,6 +12,7 @@ type SquadPlanPayload = {
   assignments: Record<string, string[]>;
   slotMaxOverrides?: Record<string, number>;
   isClubDefault?: boolean;
+  ifUpdatedAt?: string | null;
 };
 
 export async function GET(request: Request) {
@@ -46,43 +48,41 @@ export async function GET(request: Request) {
 
   const userId = session.user?.id ?? null;
 
-  // Eerst proberen: persoonlijke opstelling
-  const personalPlan = userId
-    ? await prisma.squadPlan.findFirst({
-        where: {
-          clubId,
-          teamId,
-          seasonYear,
-          formation,
-          userId,
-        },
-      })
-    : null;
+  const [userDraft, clubPlan] = await Promise.all([
+    userId
+      ? prisma.squadPlan.findFirst({
+          where: { clubId, teamId, seasonYear, formation, userId },
+        })
+      : Promise.resolve(null),
+    prisma.squadPlan.findFirst({
+      where: { clubId, teamId, seasonYear, formation, isClubDefault: true },
+    }),
+  ]);
 
-  // Fallback: club-default
-  const clubDefaultPlan = await prisma.squadPlan.findFirst({
-    where: {
-      clubId,
-      teamId,
-      seasonYear,
-      formation,
-      isClubDefault: true,
-    },
-  });
-
-  const plan = personalPlan ?? clubDefaultPlan;
-
-  if (!plan) {
-    return NextResponse.json({ plan: null });
-  }
+  const canEdit = canEditSquadPlanning(session.user?.role);
 
   return NextResponse.json({
-    plan: {
-      formation: plan.formation,
-      assignments: plan.assignmentsJson ?? {},
-      slotMaxOverrides: (plan.slotMaxOverridesJson as Record<string, number>) ?? {},
-      isClubDefault: plan.isClubDefault,
-    },
+    canEdit,
+    userDraft: userDraft
+      ? {
+          id: userDraft.id,
+          formation: userDraft.formation,
+          assignments: userDraft.assignmentsJson ?? {},
+          slotMaxOverrides:
+            (userDraft.slotMaxOverridesJson as Record<string, number>) ?? {},
+          updatedAt: userDraft.updatedAt.toISOString(),
+        }
+      : null,
+    clubPlan: clubPlan
+      ? {
+          id: clubPlan.id,
+          formation: clubPlan.formation,
+          assignments: clubPlan.assignmentsJson ?? {},
+          slotMaxOverrides:
+            (clubPlan.slotMaxOverridesJson as Record<string, number>) ?? {},
+          updatedAt: clubPlan.updatedAt.toISOString(),
+        }
+      : null,
   });
 }
 
@@ -106,7 +106,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
 
-  const { teamId, seasonYear, formation, assignments, slotMaxOverrides, isClubDefault } = body;
+  const { teamId, seasonYear, formation, assignments, slotMaxOverrides, isClubDefault, ifUpdatedAt } = body;
 
   if (!teamId || typeof teamId !== "string") {
     return NextResponse.json({ error: "teamId is required" }, { status: 400 });
@@ -171,6 +171,10 @@ export async function POST(request: Request) {
 
   const saveAsClubDefault = Boolean(isClubDefault);
 
+  if (!canEditSquadPlanning(session.user?.role)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
   if (!saveAsClubDefault && !userId) {
     return NextResponse.json(
       { error: "User id required for personal plans" },
@@ -211,10 +215,18 @@ export async function POST(request: Request) {
   };
 
   if (existing) {
-    await prisma.squadPlan.update({
-      where: { id: existing.id },
-      data,
-    });
+    const expectedUpdatedAt = ifUpdatedAt ? new Date(ifUpdatedAt) : null;
+    if (expectedUpdatedAt) {
+      const result = await prisma.squadPlan.updateMany({
+        where: { id: existing.id, updatedAt: expectedUpdatedAt },
+        data,
+      });
+      if (result.count === 0) {
+        return NextResponse.json({ error: "Conflict" }, { status: 409 });
+      }
+    } else {
+      await prisma.squadPlan.update({ where: { id: existing.id }, data });
+    }
   } else {
     await prisma.squadPlan.create({
       data,

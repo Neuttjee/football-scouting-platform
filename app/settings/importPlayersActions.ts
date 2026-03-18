@@ -52,10 +52,12 @@ type PreviewResult = PlayerImportPreviewResult;
 
 export async function preparePlayerImport(
   parsed: ParsedFile,
-  mapping: FieldMapping
+  mapping: FieldMapping,
+  options?: { importMode?: "INTERNAL" | "EXTERNAL" }
 ): Promise<PreviewResult> {
   const { clubId } = await ensureAdminSession();
-  const result = await buildPlayerImportPreview(clubId, parsed, mapping);
+  const importMode = options?.importMode ?? "EXTERNAL";
+  const result = await buildPlayerImportPreview(clubId, parsed, mapping, { importMode });
   return result;
 }
 
@@ -68,10 +70,12 @@ type ExecuteResult = {
 export async function executePlayerImport(
   parsed: ParsedFile,
   mapping: FieldMapping,
-  options: { importDuplicates?: boolean }
+  options: { importDuplicates?: boolean },
+  extra?: { importMode?: "INTERNAL" | "EXTERNAL" }
 ): Promise<ExecuteResult> {
   const { session, clubId } = await ensureAdminSession();
-  const preview = await buildPlayerImportPreview(clubId, parsed, mapping);
+  const importMode = extra?.importMode ?? "EXTERNAL";
+  const preview = await buildPlayerImportPreview(clubId, parsed, mapping, { importMode });
 
   const validRows = preview.rows.filter((r) => r.draft && r.issues.errors.length === 0);
 
@@ -88,28 +92,51 @@ export async function executePlayerImport(
     };
   }
 
+  const teams = await (prisma as any).team.findMany({
+    where: { clubId, isActive: true },
+    select: { id: true, name: true, code: true, niveau: true },
+  });
+  const teamByLabel = new Map<string, { id: string; label: string; niveau?: string | null }>();
+  for (const t of teams as any[]) {
+    const label = (t.code || t.name || "").trim();
+    if (label) teamByLabel.set(label.toLowerCase(), { id: t.id, label, niveau: t.niveau ?? null });
+    if (t.name) teamByLabel.set(String(t.name).trim().toLowerCase(), { id: t.id, label, niveau: t.niveau ?? null });
+    if (t.code) teamByLabel.set(String(t.code).trim().toLowerCase(), { id: t.id, label, niveau: t.niveau ?? null });
+  }
+
   await prisma.$transaction(
-    rowsToInsert.map((r) =>
-      prisma.player.create({
+    rowsToInsert.map((r) => {
+      const draft = r.draft!;
+      const teamLookup = draft.team ? teamByLabel.get(draft.team.trim().toLowerCase()) : null;
+      const resolvedTeamId = importMode === "INTERNAL" ? (teamLookup?.id ?? null) : null;
+      const resolvedTeamLabel = importMode === "INTERNAL" ? (teamLookup?.label ?? draft.team ?? null) : draft.team ?? null;
+      const resolvedNiveau = importMode === "INTERNAL" ? (teamLookup?.niveau ?? draft.niveau ?? null) : draft.niveau ?? null;
+
+      return prisma.player.create({
         data: {
-          name: r.draft!.name,
-          type: r.draft!.type ?? 'EXTERNAL',
-          position: r.draft!.position,
-          secondaryPosition: r.draft!.secondaryPosition,
-          preferredFoot: r.draft!.preferredFoot,
-          team: r.draft!.team,
-          niveau: r.draft!.niveau,
-          currentClub: r.draft!.currentClub,
-          status: r.draft!.status,
-          step: r.draft!.step,
-          advies: r.draft!.advies,
-          notes: r.draft!.notes,
-          dateOfBirth: r.draft!.dateOfBirth ?? null,
+          name: draft.name,
+          type: importMode,
+          position: draft.position,
+          secondaryPosition: draft.secondaryPosition,
+          preferredFoot: draft.preferredFoot,
+          team: resolvedTeamLabel,
+          teamId: resolvedTeamId,
+          niveau: resolvedNiveau,
+          currentClub: draft.currentClub,
+          status: draft.status,
+          step: draft.step,
+          advies: draft.advies,
+          notes: draft.notes,
+          dateOfBirth: draft.dateOfBirth ?? null,
+          joinedAt: importMode === "INTERNAL" ? (draft.joinedAt ?? null) : null,
+          contractEndDate: importMode === "INTERNAL" ? (draft.contractEndDate ?? null) : null,
+          optionYear: importMode === "INTERNAL" ? (draft.optionYear ?? false) : false,
+          distanceFromClubKm: importMode === "INTERNAL" ? (draft.distanceFromClubKm ?? null) : null,
           clubId,
           createdById: session.user.id,
         },
-      })
-    )
+      });
+    })
   );
 
   const importedCount = rowsToInsert.length;

@@ -39,6 +39,7 @@ type PlayerWithRelations = {
   contractEndDate: Date | null;
   isTopTalent: boolean;
   distanceFromClubKm: number | null;
+  plannedInternalFromSeasonYear: number | null;
 };
 
 type TeamOption = {
@@ -134,6 +135,7 @@ export default async function PlayersPage() {
       advies: p.advies,
       notes: p.notes,
       isTopTalent: p.isTopTalent,
+      plannedInternalFromSeasonYear: p.plannedInternalFromSeasonYear,
     }));
 
   const internalPlayers: InternalPlayerForPage[] = players

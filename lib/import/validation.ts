@@ -27,7 +27,10 @@ export type PlayerDraft = {
   step?: string | null;
   advies?: string | null;
   notes?: string | null;
-  type?: "INTERNAL" | "EXTERNAL";
+  joinedAt?: Date | null;
+  contractEndDate?: Date | null;
+  optionYear?: boolean;
+  distanceFromClubKm?: number | null;
 };
 
 export type PlayerImportPreviewRow = {
@@ -70,6 +73,34 @@ function parseDate(value: unknown): Date | null {
   return null;
 }
 
+function parseSeasonStartYear(value: unknown): number | null {
+  const raw = safeString(value);
+  if (!raw) return null;
+  const m = raw.match(/^(\d{4})\s*[-/]\s*(\d{4})$/);
+  if (!m) return null;
+  const start = parseInt(m[1], 10);
+  const end = parseInt(m[2], 10);
+  if (!Number.isFinite(start) || !Number.isFinite(end)) return null;
+  if (end !== start + 1) return null;
+  return start;
+}
+
+function parseJoinedAtFromSeasonOrDate(value: unknown): Date | null {
+  const asDate = parseDate(value);
+  if (asDate) return asDate;
+  const season = parseSeasonStartYear(value);
+  if (season == null) return null;
+  return new Date(season, 6, 1);
+}
+
+function parseContractEndFromSeasonOrDate(value: unknown): Date | null {
+  const asDate = parseDate(value);
+  if (asDate) return asDate;
+  const season = parseSeasonStartYear(value);
+  if (season == null) return null;
+  return new Date(season + 1, 5, 30);
+}
+
 type DuplicateIndex = {
   byNameDob: Map<string, true>;
   byNameClub: Map<string, true>;
@@ -103,9 +134,11 @@ async function buildDuplicateIndex(clubId: string): Promise<DuplicateIndex> {
 export async function buildPlayerImportPreview(
   clubId: string,
   parsed: ParsedFile,
-  mapping: FieldMapping
+  mapping: FieldMapping,
+  options?: { importMode?: "INTERNAL" | "EXTERNAL" }
 ): Promise<PlayerImportPreviewResult> {
   const duplicateIndex = await buildDuplicateIndex(clubId);
+  const importMode = options?.importMode ?? "EXTERNAL";
 
   const fileDuplicatesByNameDob = new Map<string, number>();
   const fileDuplicatesByNameClub = new Map<string, number>();
@@ -140,17 +173,34 @@ export async function buildPlayerImportPreview(
     const advies = safeString(row[mapping["advies"] || ""]);
     const notes = safeString(row[mapping["notes"] || ""]);
 
-    let type: "INTERNAL" | "EXTERNAL" | undefined;
-    const typeRaw = safeString(row[mapping["type"] || ""]);
-    if (typeRaw) {
-      const t = typeRaw.toUpperCase();
-      if (t === "INTERNAL" || t === "INTERN") type = "INTERNAL";
-      else if (t === "EXTERNAL" || t === "EXTERN") type = "EXTERNAL";
-      else {
-        warnings.push({
-          field: "type",
-          message: `Onbekend type "${typeRaw}", standaard EXTERNAL wordt gebruikt.`,
-        });
+    const joinedAt = parseJoinedAtFromSeasonOrDate(row[mapping["joinedAt"] || ""]);
+    const contractEndDate = parseContractEndFromSeasonOrDate(row[mapping["contractEndDate"] || ""]);
+    const optionYearRaw = safeString(row[mapping["optionYear"] || ""]);
+    const optionYear =
+      optionYearRaw != null
+        ? ["true", "1", "yes", "ja", "y"].includes(optionYearRaw.toLowerCase())
+        : undefined;
+    const distRaw = safeString(row[mapping["distanceFromClubKm"] || ""]);
+    const distanceFromClubKm =
+      distRaw != null && distRaw !== ""
+        ? (() => {
+            const v = parseInt(distRaw, 10);
+            return Number.isNaN(v) ? null : v;
+          })()
+        : undefined;
+
+    if (importMode === "INTERNAL") {
+      if (!team) {
+        errors.push({ field: "team", message: "Team is verplicht voor interne spelers." });
+      }
+      if (row[mapping["joinedAt"] || ""] && !joinedAt) {
+        errors.push({ field: "joinedAt", message: "Ongeldige waarde voor 'Bij club sinds' (gebruik datum of seizoen 2025/2026)." });
+      }
+      if (row[mapping["contractEndDate"] || ""] && !contractEndDate) {
+        errors.push({ field: "contractEndDate", message: "Ongeldige waarde voor 'Contract tot' (gebruik datum of seizoen 2025/2026)." });
+      }
+      if (row[mapping["distanceFromClubKm"] || ""] && distanceFromClubKm === null) {
+        errors.push({ field: "distanceFromClubKm", message: "Ongeldige afstand (km)." });
       }
     }
 
@@ -168,7 +218,10 @@ export async function buildPlayerImportPreview(
           step,
           advies,
           notes,
-          type,
+          joinedAt,
+          contractEndDate,
+          optionYear,
+          distanceFromClubKm,
         }
       : null;
 

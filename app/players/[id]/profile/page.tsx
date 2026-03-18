@@ -10,6 +10,19 @@ import { TaskList } from '@/app/tasks/TaskList';
 import { PlayerRadarChart } from "./PlayerRadarChart";
 import { Star } from "lucide-react";
 
+function formatSeasonFromJoinedAt(value: string | Date): string {
+  const d = new Date(value);
+  const year = d.getFullYear();
+  return `${year}/${year + 1}`;
+}
+
+function formatSeasonFromContractEnd(value: string | Date): string {
+  const d = new Date(value);
+  const endYear = d.getFullYear();
+  const startYear = endYear - 1;
+  return `${startYear}/${startYear + 1}`;
+}
+
 export default async function PlayerProfilePage({
   params,
 }: {
@@ -66,6 +79,12 @@ export default async function PlayerProfilePage({
     : player.age;
 
   const internalTeamLabel = player.teamRef?.code || player.teamRef?.name || player.team || '-';
+  const plannedTeamLabel =
+    player.plannedInternalTeamId
+      ? (teams as any[]).find((t) => t.id === player.plannedInternalTeamId)?.code ||
+        (teams as any[]).find((t) => t.id === player.plannedInternalTeamId)?.name ||
+        null
+      : null;
 
   const backHref = player.type === 'INTERNAL' ? '/players?view=internal' : '/players';
 
@@ -93,6 +112,11 @@ export default async function PlayerProfilePage({
             <h1 className="text-4xl font-bold text-text-primary">
               {player.name}
             </h1>
+            {player.type === 'EXTERNAL' && player.plannedInternalFromSeasonYear ? (
+              <span className="inline-flex text-[11px] px-2 py-1 rounded-md bg-accent-primary/15 border border-accent-primary/40 text-text-primary">
+                INT vanaf {player.plannedInternalFromSeasonYear}/{player.plannedInternalFromSeasonYear + 1}
+              </span>
+            ) : null}
             {player.type === 'INTERNAL' && player.isTopTalent && (
               <Star
                 className="mt-1 size-5 text-[#FFD700]"
@@ -270,7 +294,7 @@ export default async function PlayerProfilePage({
                     </div>
                     <div className="font-bold text-lg text-text-primary">
                       {player.joinedAt
-                        ? new Date(player.joinedAt).toLocaleDateString('nl-NL')
+                        ? formatSeasonFromJoinedAt(player.joinedAt)
                         : '-'}
                     </div>
                   </div>
@@ -281,7 +305,7 @@ export default async function PlayerProfilePage({
                     </div>
                     <div className="font-bold text-lg text-text-primary">
                       {player.contractEndDate
-                        ? new Date(player.contractEndDate).toLocaleDateString('nl-NL')
+                        ? formatSeasonFromContractEnd(player.contractEndDate)
                         : '-'}
                     </div>
                   </div>
@@ -331,6 +355,27 @@ export default async function PlayerProfilePage({
                     {player.advies || '-'}
                   </div>
                 </div>
+
+                {player.plannedInternalFromSeasonYear ? (
+                  <>
+                    <div>
+                      <div className="text-text-muted uppercase tracking-wider text-xs mb-1">
+                        wordt intern per seizoen
+                      </div>
+                      <div className="font-bold text-lg text-text-primary">
+                        {player.plannedInternalFromSeasonYear}/{player.plannedInternalFromSeasonYear + 1}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-text-muted uppercase tracking-wider text-xs mb-1">
+                        wordt intern bij team
+                      </div>
+                      <div className="font-bold text-lg text-text-primary">
+                        {plannedTeamLabel ?? '-'}
+                      </div>
+                    </div>
+                  </>
+                ) : null}
               </CardContent>
             </Card>
           )}

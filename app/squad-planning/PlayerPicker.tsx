@@ -4,7 +4,7 @@ import * as React from "react";
 import { Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PlanningPlayer } from "./types";
-import type { PlayerTypeValue } from "@/components/PlayerTypeToggle";
+import { PlayerTypeToggle, type PlayerTypeValue } from "@/components/PlayerTypeToggle";
 
 export function PlayerPicker({
   players,
@@ -51,6 +51,9 @@ export function PlayerPicker({
 
   return (
     <div className="card-premium rounded-xl p-4 space-y-4">
+      <div className="flex items-center justify-center">
+        <PlayerTypeToggle value={selectedType} onChange={onTypeChange} size="sm" />
+      </div>
       <div className="space-y-2">
         <input
           value={query}
@@ -102,6 +105,14 @@ export function PlayerPicker({
 
       <div className="space-y-2 max-h-[560px] overflow-y-auto">
         {filtered.map((player) => (
+          (() => {
+            const plannedSeasonYear =
+              player.type === "INTERNAL" ? player.plannedInternalFromSeasonYear : null;
+            const plannedLabel =
+              typeof plannedSeasonYear === "number"
+                ? `${plannedSeasonYear}/${plannedSeasonYear + 1}`
+                : null;
+            return (
           <div
             key={player.id}
             draggable
@@ -121,11 +132,15 @@ export function PlayerPicker({
                     fill="var(--primary-color, #FF6A00)"
                   />
                 )}
-                {player.type === "EXTERNAL" && (
+                {plannedLabel ? (
+                  <span className="text-[10px] px-1 py-0.5 rounded border border-accent-primary/40 text-text-muted">
+                    INT vanaf {plannedLabel}
+                  </span>
+                ) : player.type === "EXTERNAL" ? (
                   <span className="text-[10px] px-1 py-0.5 rounded border border-border-dark text-text-muted">
                     EXT
                   </span>
-                )}
+                ) : null}
               </div>
             </div>
             <div className="text-xs text-text-muted mt-1">
@@ -133,6 +148,8 @@ export function PlayerPicker({
               {player.age != null ? `${player.age}j` : "-"}
             </div>
           </div>
+            );
+          })()
         ))}
 
         {filtered.length === 0 && (

@@ -47,6 +47,15 @@ async function savePlayerLogic(playerId: string | null, formData: FormData) {
   const joinedAt = joinedAtStr ? new Date(joinedAtStr) : null;
   const contractEndDateStr = formData.get('contractEndDate') as string;
   const contractEndDate = contractEndDateStr ? new Date(contractEndDateStr) : null;
+  const plannedInternalFromSeasonYearStr = (formData.get('plannedInternalFromSeasonYear') as string) || "";
+  const plannedInternalFromSeasonYear =
+    plannedInternalFromSeasonYearStr.trim() !== ""
+      ? parseInt(plannedInternalFromSeasonYearStr, 10)
+      : null;
+  if (plannedInternalFromSeasonYear !== null && Number.isNaN(plannedInternalFromSeasonYear)) {
+    throw new Error("Ongeldig seizoen voor 'Wordt intern per'.");
+  }
+  const plannedInternalTeamIdInput = (formData.get('plannedInternalTeamId') as string | null) || null;
 
   const safeType = playerTypeInput === 'INTERNAL' ? 'INTERNAL' : 'EXTERNAL';
   const isInternalType = safeType === 'INTERNAL';
@@ -115,6 +124,8 @@ async function savePlayerLogic(playerId: string | null, formData: FormData) {
     baseData.contractEndDate = contractEndDate;
     baseData.optionYear = optionYear;
     baseData.distanceFromClubKm = distanceFromClubKm;
+    baseData.plannedInternalFromSeasonYear = null;
+    baseData.plannedInternalTeamId = null;
   } else {
     baseData.team = team || null;
     baseData.teamId = null;
@@ -122,6 +133,31 @@ async function savePlayerLogic(playerId: string | null, formData: FormData) {
     baseData.contractEndDate = null;
     baseData.optionYear = false;
     baseData.distanceFromClubKm = null;
+    if (plannedInternalFromSeasonYear !== null) {
+      const today = new Date();
+      const currentYear = today.getFullYear();
+      const currentMonth = today.getMonth();
+      const currentSeasonStartYear = currentMonth >= 6 ? currentYear : currentYear - 1;
+      const nextSeasonStartYear = currentSeasonStartYear + 1;
+      if (plannedInternalFromSeasonYear < nextSeasonStartYear) {
+        throw new Error("'Wordt intern per' moet vanaf volgend seizoen zijn.");
+      }
+      if (plannedInternalFromSeasonYear > nextSeasonStartYear + 2) {
+        throw new Error("'Wordt intern per' mag maximaal 3 seizoenen vooruit zijn.");
+      }
+      if (!plannedInternalTeamIdInput) {
+        throw new Error("Kies ook een team bij 'Wordt intern bij team'.");
+      }
+      const plannedTeam = await prisma.team.findFirst({
+        where: { id: plannedInternalTeamIdInput, clubId },
+        select: { id: true },
+      });
+      if (!plannedTeam) {
+        throw new Error("Ongeldig team gekozen voor 'Wordt intern bij team'.");
+      }
+    }
+    baseData.plannedInternalFromSeasonYear = plannedInternalFromSeasonYear;
+    baseData.plannedInternalTeamId = plannedInternalFromSeasonYear !== null ? plannedInternalTeamIdInput : null;
   }
 
   if (playerId) {
