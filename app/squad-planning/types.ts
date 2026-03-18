@@ -19,7 +19,7 @@ export type PlanningPlayer = {
   status: string | null;
   contractEndDate: string | null;
   isTopTalent: boolean;
-  plannedInternalFromDate?: string | null;
+  plannedInternalFromSeasonYear?: number | null;
 };
 
 export type Formation =

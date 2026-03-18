@@ -37,7 +37,7 @@ export type PlayerFormValues = {
   step?: string | null;
   advies?: string | null;
   notes?: string | null;
-  plannedInternalFromDate?: string | Date | null;
+  plannedInternalFromSeasonYear?: number | null;
 };
 
 type PlayerFormProps = {
@@ -158,14 +158,15 @@ export function PlayerForm({
   const joinedAtDefault = deriveJoinedAtDefault();
   const contractEndDefault = deriveContractEndDefault();
 
-  const derivePlannedInternalFromDefault = () => {
-    if (!initialValues.plannedInternalFromDate) return "";
-    const d = new Date(initialValues.plannedInternalFromDate);
-    if (Number.isNaN(d.getTime())) return "";
-    return d.toISOString().split("T")[0];
-  };
+  const nextSeasonStartYear = currentSeasonStartYear + 1;
+  const plannedInternalSeasonOptions = React.useMemo(() => {
+    return Array.from({ length: 3 }, (_, idx) => nextSeasonStartYear + idx);
+  }, [nextSeasonStartYear]);
 
-  const plannedInternalFromDefault = derivePlannedInternalFromDefault();
+  const plannedInternalFromDefault =
+    typeof initialValues.plannedInternalFromSeasonYear === "number"
+      ? String(initialValues.plannedInternalFromSeasonYear)
+      : "";
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 pt-2 pb-4">
@@ -390,14 +391,20 @@ export function PlayerForm({
               <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
                 Wordt intern per
               </label>
-              <input
-                type="date"
-                name="plannedInternalFromDate"
+              <select
+                name="plannedInternalFromSeasonYear"
                 defaultValue={plannedInternalFromDefault}
-                className="w-full border border-border-dark rounded p-2 bg-background focus-border-accent-primary focus-visible:outline-none"
-              />
+                className="w-full border border-border-dark rounded p-2 bg-background text-text-primary focus-border-accent-primary focus-visible:outline-none"
+              >
+                <option value="">—</option>
+                {plannedInternalSeasonOptions.map((year) => (
+                  <option key={year} value={String(year)}>
+                    Seizoen {year}/{year + 1}
+                  </option>
+                ))}
+              </select>
               <p className="text-[11px] text-text-muted mt-1">
-                Tip: gebruik meestal 1 juli bij seizoenswissel.
+                Wordt als intern gezien vanaf start van dit seizoen.
               </p>
             </div>
             <div>

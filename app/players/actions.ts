@@ -47,10 +47,13 @@ async function savePlayerLogic(playerId: string | null, formData: FormData) {
   const joinedAt = joinedAtStr ? new Date(joinedAtStr) : null;
   const contractEndDateStr = formData.get('contractEndDate') as string;
   const contractEndDate = contractEndDateStr ? new Date(contractEndDateStr) : null;
-  const plannedInternalFromDateStr = formData.get('plannedInternalFromDate') as string;
-  const plannedInternalFromDate = plannedInternalFromDateStr ? new Date(plannedInternalFromDateStr) : null;
-  if (plannedInternalFromDate && Number.isNaN(plannedInternalFromDate.getTime())) {
-    throw new Error("Ongeldige datum voor 'Wordt intern per'.");
+  const plannedInternalFromSeasonYearStr = (formData.get('plannedInternalFromSeasonYear') as string) || "";
+  const plannedInternalFromSeasonYear =
+    plannedInternalFromSeasonYearStr.trim() !== ""
+      ? parseInt(plannedInternalFromSeasonYearStr, 10)
+      : null;
+  if (plannedInternalFromSeasonYear !== null && Number.isNaN(plannedInternalFromSeasonYear)) {
+    throw new Error("Ongeldig seizoen voor 'Wordt intern per'.");
   }
 
   const safeType = playerTypeInput === 'INTERNAL' ? 'INTERNAL' : 'EXTERNAL';
@@ -120,7 +123,7 @@ async function savePlayerLogic(playerId: string | null, formData: FormData) {
     baseData.contractEndDate = contractEndDate;
     baseData.optionYear = optionYear;
     baseData.distanceFromClubKm = distanceFromClubKm;
-    baseData.plannedInternalFromDate = null;
+    baseData.plannedInternalFromSeasonYear = null;
   } else {
     baseData.team = team || null;
     baseData.teamId = null;
@@ -128,14 +131,20 @@ async function savePlayerLogic(playerId: string | null, formData: FormData) {
     baseData.contractEndDate = null;
     baseData.optionYear = false;
     baseData.distanceFromClubKm = null;
-    if (plannedInternalFromDate) {
+    if (plannedInternalFromSeasonYear !== null) {
       const today = new Date();
-      const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-      if (plannedInternalFromDate < startOfToday) {
-        throw new Error("'Wordt intern per' moet in de toekomst liggen.");
+      const currentYear = today.getFullYear();
+      const currentMonth = today.getMonth();
+      const currentSeasonStartYear = currentMonth >= 6 ? currentYear : currentYear - 1;
+      const nextSeasonStartYear = currentSeasonStartYear + 1;
+      if (plannedInternalFromSeasonYear < nextSeasonStartYear) {
+        throw new Error("'Wordt intern per' moet vanaf volgend seizoen zijn.");
+      }
+      if (plannedInternalFromSeasonYear > nextSeasonStartYear + 2) {
+        throw new Error("'Wordt intern per' mag maximaal 3 seizoenen vooruit zijn.");
       }
     }
-    baseData.plannedInternalFromDate = plannedInternalFromDate;
+    baseData.plannedInternalFromSeasonYear = plannedInternalFromSeasonYear;
   }
 
   if (playerId) {

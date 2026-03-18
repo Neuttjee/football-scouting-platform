@@ -79,7 +79,7 @@ export function NewPlayerModal({ teams, clubName }: { teams: TeamOption[]; clubN
             teamId: null,
             joinedAt: null,
             contractEndDate: null,
-            plannedInternalFromDate: null,
+            plannedInternalFromSeasonYear: null,
             distanceFromClubKm: null,
             isTopTalent: false,
             niveau: null,

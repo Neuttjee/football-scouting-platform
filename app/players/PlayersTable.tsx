@@ -139,12 +139,10 @@ export function getColumns(
         const age = player.dateOfBirth
           ? calculateAgeFromDate(new Date(player.dateOfBirth))
           : player.age;
-        const plannedInternalDate = player.plannedInternalFromDate
-          ? new Date(player.plannedInternalFromDate as any)
-          : null;
+        const plannedSeasonYear = (player as any).plannedInternalFromSeasonYear as number | null | undefined;
         const plannedInternalLabel =
-          plannedInternalDate && !Number.isNaN(plannedInternalDate.getTime())
-            ? plannedInternalDate.toLocaleDateString("nl-NL")
+          typeof plannedSeasonYear === "number"
+            ? `${plannedSeasonYear}/${plannedSeasonYear + 1}`
             : null;
         
         return (

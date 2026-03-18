@@ -22,7 +22,7 @@ type ExternalPlayer = {
   age: number | null;
   advies: string | null;
   notes: string | null;
-  plannedInternalFromDate?: Date | null;
+  plannedInternalFromSeasonYear?: number | null;
 };
 
 type InternalPlayer = {

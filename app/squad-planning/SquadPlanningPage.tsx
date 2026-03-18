@@ -80,11 +80,8 @@ const MAX_SLOT_CAP = 5;
 function getEffectivePlayerType(player: PlanningPlayer, seasonYear: number): "INTERNAL" | "EXTERNAL" {
   if (player.type === "INTERNAL") return "INTERNAL";
   if (player.type !== "EXTERNAL") return "EXTERNAL";
-  if (!player.plannedInternalFromDate) return "EXTERNAL";
-  const planned = new Date(player.plannedInternalFromDate);
-  if (Number.isNaN(planned.getTime())) return "EXTERNAL";
-  const seasonStart = new Date(seasonYear, 6, 1);
-  return planned <= seasonStart ? "INTERNAL" : "EXTERNAL";
+  if (player.plannedInternalFromSeasonYear == null) return "EXTERNAL";
+  return player.plannedInternalFromSeasonYear <= seasonYear ? "INTERNAL" : "EXTERNAL";
 }
 
 function addToSlot(

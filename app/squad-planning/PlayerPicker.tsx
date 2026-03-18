@@ -103,13 +103,11 @@ export function PlayerPicker({
       <div className="space-y-2 max-h-[560px] overflow-y-auto">
         {filtered.map((player) => (
           (() => {
-            const planned =
-              player.plannedInternalFromDate && player.type === "INTERNAL"
-                ? new Date(player.plannedInternalFromDate)
-                : null;
+            const plannedSeasonYear =
+              player.type === "INTERNAL" ? player.plannedInternalFromSeasonYear : null;
             const plannedLabel =
-              planned && !Number.isNaN(planned.getTime())
-                ? planned.toLocaleDateString("nl-NL")
+              typeof plannedSeasonYear === "number"
+                ? `${plannedSeasonYear}/${plannedSeasonYear + 1}`
                 : null;
             return (
           <div

@@ -30,7 +30,7 @@ type EditablePlayer = {
   teamId: string | null
   joinedAt: string | Date | null
   contractEndDate: string | Date | null
-  plannedInternalFromDate?: string | Date | null
+  plannedInternalFromSeasonYear?: number | null
   distanceFromClubKm: number | null
   isTopTalent: boolean
   niveau: string | null
@@ -83,7 +83,7 @@ export function EditPlayerModal({
             teamId: player.teamId,
             joinedAt: player.joinedAt,
             contractEndDate: player.contractEndDate,
-            plannedInternalFromDate: player.plannedInternalFromDate ?? null,
+            plannedInternalFromSeasonYear: player.plannedInternalFromSeasonYear ?? null,
             distanceFromClubKm: player.distanceFromClubKm,
             isTopTalent: player.isTopTalent,
             niveau: player.niveau,
