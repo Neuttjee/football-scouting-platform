@@ -124,7 +124,6 @@ export async function executePlayerImport(
           niveau: resolvedNiveau,
           currentClub: draft.currentClub,
           status: draft.status,
-          step: draft.step,
           advies: draft.advies,
           notes: draft.notes,
           dateOfBirth: draft.dateOfBirth ?? null,

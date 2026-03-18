@@ -1,5 +1,5 @@
 import { updatePlayer } from '../actions';
-import { targetSteps, targetStatuses } from '@/lib/statusMapping';
+import { targetStatuses } from '@/lib/statusMapping';
 import Link from 'next/link';
 import prisma from '@/lib/prisma';
 import { getSession, getEffectiveClubId } from '@/lib/auth';
@@ -65,20 +65,11 @@ export default async function EditPlayerPage({ params }: { params: { id: string 
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Processtap</label>
-          <select name="step" defaultValue={player.step || ''} className="w-full border rounded p-2">
-            <option value="">Selecteer processtap...</option>
-            {targetSteps.map(s => <option key={s} value={s}>{s}</option>)}
-          </select>
-        </div>
-
-        <div>
           <label className="block text-sm font-medium mb-1">Status (Override)</label>
           <select name="status" defaultValue={player.statusManuallyChanged ? (player.status || '') : ''} className="w-full border rounded p-2 text-gray-600">
-            <option value="">Automatisch bepalen via processtap</option>
+            <option value="">—</option>
             {targetStatuses.map(s => <option key={s} value={s}>{s}</option>)}
           </select>
-          <p className="text-xs text-gray-500 mt-1">Laat leeg om status automatisch te laten bepalen op basis van de processtap. Huidige status: {player.status || 'Geen'}</p>
         </div>
 
         <div>

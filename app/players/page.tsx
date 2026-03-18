@@ -123,7 +123,6 @@ export default async function PlayersPage() {
       id: p.id,
       name: p.name,
       position: p.position,
-      step: p.step,
       status: p.status,
       currentClub: p.currentClub,
       team: p.team,

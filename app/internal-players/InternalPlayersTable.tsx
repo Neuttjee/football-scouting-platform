@@ -227,7 +227,6 @@ const INTERNAL_BASE_COLUMNS: ColumnDef<InternalPlayer>[] = [
         preferredFoot: p.preferredFoot,
         dateOfBirth: null,
         age: p.age,
-        step: null,
         status: null,
         advies: null,
         notes: null,

@@ -90,7 +90,6 @@ export function NewPlayerModal({ teams, clubName }: { teams: TeamOption[]; clubN
             preferredFoot: null,
             contactPerson: null,
             status: null,
-            step: null,
             advies: null,
             notes: null,
           }}

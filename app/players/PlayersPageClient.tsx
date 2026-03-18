@@ -11,7 +11,6 @@ type ExternalPlayer = {
   id: string;
   name: string;
   position: string | null;
-  step: string | null;
   status: string | null;
   currentClub: string | null;
   team: string | null;

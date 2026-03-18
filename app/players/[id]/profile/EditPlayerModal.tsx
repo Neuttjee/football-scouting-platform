@@ -41,7 +41,6 @@ type EditablePlayer = {
   preferredFoot: string | null
   contactPerson: string | null
   status: string | null
-  step: string | null
   advies: string | null
   notes: string | null
 }
@@ -95,7 +94,6 @@ export function EditPlayerModal({
             preferredFoot: player.preferredFoot,
             contactPerson: player.contactPerson,
             status: player.status,
-            step: player.step,
             advies: player.advies,
             notes: player.notes,
           }}

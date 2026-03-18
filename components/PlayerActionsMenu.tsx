@@ -35,7 +35,6 @@ export interface PlayerForActions {
   preferredFoot: string | null;
   dateOfBirth: Date | null;
   age: number | null;
-  step: string | null;
   status: string | null;
   advies: string | null;
   notes: string | null;
@@ -173,7 +172,6 @@ export function PlayerActionsMenu({
               preferredFoot: player.preferredFoot,
               contactPerson: null,
               status: player.status,
-              step: player.step,
               advies: player.advies,
               notes: player.notes,
             }}

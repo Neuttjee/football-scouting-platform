@@ -10,7 +10,6 @@ export const playerTargetFieldsExternal: ImportTargetField[] = [
   { key: "team", label: "Team", type: "string" },
   { key: "niveau", label: "Niveau", type: "string" },
   { key: "status", label: "Status", type: "string" },
-  { key: "step", label: "Processtap", type: "string" },
   { key: "advies", label: "Advies", type: "string" },
   { key: "notes", label: "Notities", type: "string" },
 ];
@@ -48,7 +47,6 @@ export const playerFieldAliases: Record<string, string[]> = {
   team: ["team", "elftal", "squad"],
   niveau: ["niveau", "level", "league level"],
   status: ["status", "stap status", "state"],
-  step: ["processtap", "step", "pipeline step"],
   advies: ["advies", "recommendation"],
   notes: ["notities", "notes", "commentaar", "comments"],
   joinedAt: ["bij club sinds", "joined at", "join date", "startdatum", "seizoen start", "season start"],

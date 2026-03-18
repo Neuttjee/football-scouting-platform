@@ -24,7 +24,6 @@ export type PlayerDraft = {
   team?: string | null;
   niveau?: string | null;
   status?: string | null;
-  step?: string | null;
   advies?: string | null;
   notes?: string | null;
   joinedAt?: Date | null;
@@ -169,7 +168,6 @@ export async function buildPlayerImportPreview(
     const team = safeString(row[mapping["team"] || ""]);
     const niveau = safeString(row[mapping["niveau"] || ""]);
     const status = safeString(row[mapping["status"] || ""]);
-    const step = safeString(row[mapping["step"] || ""]);
     const advies = safeString(row[mapping["advies"] || ""]);
     const notes = safeString(row[mapping["notes"] || ""]);
 
@@ -215,7 +213,6 @@ export async function buildPlayerImportPreview(
           team,
           niveau,
           status,
-          step,
           advies,
           notes,
           joinedAt,

@@ -4,7 +4,7 @@ import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { PlayerDobAgeFields } from "./PlayerDobAgeFields";
 import { PlayerTypeToggle, PlayerTypeValue } from "@/components/PlayerTypeToggle";
-import { targetSteps, targetStatuses, adviesOptions } from "@/lib/statusMapping";
+import { targetStatuses, adviesOptions } from "@/lib/statusMapping";
 
 type TeamOption = {
   id: string;
@@ -34,7 +34,6 @@ export type PlayerFormValues = {
   preferredFoot?: string | null;
   contactPerson?: string | null;
   status?: string | null;
-  step?: string | null;
   advies?: string | null;
   notes?: string | null;
   plannedInternalFromSeasonYear?: number | null;
@@ -393,7 +392,7 @@ export function PlayerForm({
           </div>
         </div>
 
-        {/* Extern: Status / Processtap / Advies */}
+        {/* Extern: Status / Advies */}
         {!isInternal && (
           <>
             <div>
@@ -408,23 +407,6 @@ export function PlayerForm({
               >
                 <option value=""></option>
                 {targetStatuses.map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
-                Processtap
-              </label>
-              <select
-                name="step"
-                defaultValue={initialValues.step || ""}
-                className="w-full border border-border-dark rounded p-2 bg-background focus-border-accent-primary focus-visible:outline-none"
-              >
-                <option value=""></option>
-                {targetSteps.map((s) => (
                   <option key={s} value={s}>
                     {s}
                   </option>

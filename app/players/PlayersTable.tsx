@@ -30,7 +30,7 @@ import {
 } from "@/components/ui/table"
 import { DataTable } from "@/components/DataTable"
 import { deletePlayersBulk, updatePlayerField } from "./actions"
-import { targetSteps, targetStatuses, adviesOptions } from "@/lib/statusMapping"
+import { targetStatuses, adviesOptions } from "@/lib/statusMapping"
 import { calculateAgeFromDate } from "@/lib/age"
 import { PlayerActionsMenu, PlayerForActions } from "@/components/PlayerActionsMenu";
 import { MoreHorizontal, Settings, Star } from "lucide-react";
@@ -41,7 +41,6 @@ interface Player extends PlayerForActions {
 }
 
 const STATUS_OPTIONS = targetStatuses;
-const STEP_OPTIONS = targetSteps;
 const ADVIES_OPTIONS = adviesOptions;
 
 function InlineSelect({ 
@@ -265,23 +264,6 @@ export function getColumns(
       },
     },
     {
-      accessorKey: "step",
-      header: "Processtap",
-      filterFn: "arrIncludesSome",
-      cell: ({ row }) => {
-        const player = row.original;
-        return (
-          <InlineSelect 
-            value={player.step} 
-            options={STEP_OPTIONS}
-            onChange={async (val) => {
-              await updatePlayerField(player.id, 'step', val)
-            }}
-          />
-        )
-      },
-    },
-    {
       accessorKey: "advies",
       header: "Advies",
       filterFn: "arrIncludesSome",
@@ -333,7 +315,6 @@ function Filter({
     'secondaryPosition',
     'preferredFoot',
     'status',
-    'step',
     'advies',
     'age',
   ].includes(column.id)
@@ -500,7 +481,6 @@ export function PlayersTable({
       "Been",
       "Leeftijd",
       "Status",
-      "Processtap",
       "Advies",
       "Notities",
     ];
@@ -527,7 +507,6 @@ export function PlayersTable({
             ? calculateAgeFromDate(new Date(p.dateOfBirth))
             : p.age,
           p.status,
-          p.step,
           p.advies,
           p.notes,
         ]

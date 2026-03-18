@@ -20,7 +20,9 @@ async function savePlayerLogic(playerId: string | null, formData: FormData) {
   const team = formData.get('team') as string;
   const teamIdInput = (formData.get('teamId') as string | null) || null;
   const playerTypeInput = (formData.get('type') as string | null) || 'EXTERNAL';
-  const step = formData.get('step') as string || null;
+  const stepInput = formData.has('step')
+    ? ((formData.get('step') as string | null) || null)
+    : undefined;
   const statusInput = formData.get('status') as string || null;
 
   const currentClub = formData.get('currentClub') as string || null;
@@ -95,8 +97,8 @@ async function savePlayerLogic(playerId: string | null, formData: FormData) {
   }
 
   // Geen automatische mapping meer:
-  // - step wordt gewoon opgeslagen zoals gekozen
   // - status komt direct uit het formulier (statusInput)
+  // - `step` wordt alleen meegestuurd als de UI het expliciet verstuurt
 
   const baseData: any = {
     name,
@@ -107,7 +109,6 @@ async function savePlayerLogic(playerId: string | null, formData: FormData) {
     type: safeType,
     dateOfBirth,
     age,
-    step,
     status: statusInput,
     currentClub,
     advies,
@@ -116,6 +117,10 @@ async function savePlayerLogic(playerId: string | null, formData: FormData) {
     notes,
     isTopTalent,
   };
+
+  if (stepInput !== undefined) {
+    baseData.step = stepInput;
+  }
 
   if (isInternalType) {
     baseData.team = resolvedTeamName;
