@@ -102,6 +102,16 @@ export function PlayerPicker({
 
       <div className="space-y-2 max-h-[560px] overflow-y-auto">
         {filtered.map((player) => (
+          (() => {
+            const planned =
+              player.plannedInternalFromDate && player.type === "INTERNAL"
+                ? new Date(player.plannedInternalFromDate)
+                : null;
+            const plannedLabel =
+              planned && !Number.isNaN(planned.getTime())
+                ? planned.toLocaleDateString("nl-NL")
+                : null;
+            return (
           <div
             key={player.id}
             draggable
@@ -121,11 +131,15 @@ export function PlayerPicker({
                     fill="var(--primary-color, #FF6A00)"
                   />
                 )}
-                {player.type === "EXTERNAL" && (
+                {plannedLabel ? (
+                  <span className="text-[10px] px-1 py-0.5 rounded border border-accent-primary/40 text-text-muted">
+                    INT vanaf {plannedLabel}
+                  </span>
+                ) : player.type === "EXTERNAL" ? (
                   <span className="text-[10px] px-1 py-0.5 rounded border border-border-dark text-text-muted">
                     EXT
                   </span>
-                )}
+                ) : null}
               </div>
             </div>
             <div className="text-xs text-text-muted mt-1">
@@ -133,6 +147,8 @@ export function PlayerPicker({
               {player.age != null ? `${player.age}j` : "-"}
             </div>
           </div>
+            );
+          })()
         ))}
 
         {filtered.length === 0 && (

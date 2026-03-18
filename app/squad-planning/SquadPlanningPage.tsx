@@ -77,6 +77,16 @@ function getSlots(formation: Formation): FieldSlot[] {
 const DEFAULT_MAX_PLAYERS_PER_SLOT = 2;
 const MAX_SLOT_CAP = 5;
 
+function getEffectivePlayerType(player: PlanningPlayer, seasonYear: number): "INTERNAL" | "EXTERNAL" {
+  if (player.type === "INTERNAL") return "INTERNAL";
+  if (player.type !== "EXTERNAL") return "EXTERNAL";
+  if (!player.plannedInternalFromDate) return "EXTERNAL";
+  const planned = new Date(player.plannedInternalFromDate);
+  if (Number.isNaN(planned.getTime())) return "EXTERNAL";
+  const seasonStart = new Date(seasonYear, 6, 1);
+  return planned <= seasonStart ? "INTERNAL" : "EXTERNAL";
+}
+
 function addToSlot(
   assignments: Record<string, string[]>,
   slotId: string,
@@ -236,16 +246,24 @@ export default function SquadPlanningPage({
 
   const filteredPlayers = React.useMemo(() => {
     return players.filter((player) => {
-      if (player.type === "EXTERNAL") return true;
+      const effectiveType = getEffectivePlayerType(player, seasonYear);
+      if (effectiveType === "EXTERNAL") return true;
       if (!selectedTeamId) return true;
       if (!includeFeederTeams) return player.teamId === selectedTeamId;
       return player.teamOrder >= selectedTeamOrder;
     });
-  }, [players, selectedTeamId, includeFeederTeams, selectedTeamOrder]);
+  }, [players, selectedTeamId, includeFeederTeams, selectedTeamOrder, seasonYear]);
+
+  const pickerPlayers = React.useMemo(() => {
+    return filteredPlayers.map((p) => ({
+      ...p,
+      type: getEffectivePlayerType(p, seasonYear),
+    }));
+  }, [filteredPlayers, seasonYear]);
 
   const playersById = React.useMemo(
-    () => Object.fromEntries(filteredPlayers.map((player) => [player.id, player])),
-    [filteredPlayers]
+    () => Object.fromEntries(pickerPlayers.map((player) => [player.id, player])),
+    [pickerPlayers]
   );
 
   const effectiveMaxBySlotId = React.useMemo(() => {
@@ -780,7 +798,7 @@ export default function SquadPlanningPage({
             </Dialog>
           </div>
           <PlayerTypeToggle value={selectedType} onChange={setSelectedType} size="sm" />
-          <PlayerPicker players={filteredPlayers} selectedType={selectedType} onTypeChange={setSelectedType} />
+          <PlayerPicker players={pickerPlayers} selectedType={selectedType} onTypeChange={setSelectedType} />
           {lastSavedAt && (
             <p className="text-[11px] text-text-muted">
               Laatst opgeslagen: {lastSavedAt.toLocaleTimeString()}

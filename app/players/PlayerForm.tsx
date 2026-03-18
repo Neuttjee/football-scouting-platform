@@ -37,6 +37,7 @@ export type PlayerFormValues = {
   step?: string | null;
   advies?: string | null;
   notes?: string | null;
+  plannedInternalFromDate?: string | Date | null;
 };
 
 type PlayerFormProps = {
@@ -156,6 +157,15 @@ export function PlayerForm({
 
   const joinedAtDefault = deriveJoinedAtDefault();
   const contractEndDefault = deriveContractEndDefault();
+
+  const derivePlannedInternalFromDefault = () => {
+    if (!initialValues.plannedInternalFromDate) return "";
+    const d = new Date(initialValues.plannedInternalFromDate);
+    if (Number.isNaN(d.getTime())) return "";
+    return d.toISOString().split("T")[0];
+  };
+
+  const plannedInternalFromDefault = derivePlannedInternalFromDefault();
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 pt-2 pb-4">
@@ -376,6 +386,20 @@ export function PlayerForm({
         {/* Extern: Status / Processtap / Advies */}
         {!isInternal && (
           <>
+            <div>
+              <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
+                Wordt intern per
+              </label>
+              <input
+                type="date"
+                name="plannedInternalFromDate"
+                defaultValue={plannedInternalFromDefault}
+                className="w-full border border-border-dark rounded p-2 bg-background focus-border-accent-primary focus-visible:outline-none"
+              />
+              <p className="text-[11px] text-text-muted mt-1">
+                Tip: gebruik meestal 1 juli bij seizoenswissel.
+              </p>
+            </div>
             <div>
               <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
                 Status

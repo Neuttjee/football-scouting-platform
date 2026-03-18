@@ -60,6 +60,9 @@ export default async function SquadPlanningServerPage() {
       ? player.contractEndDate.toISOString()
       : null,
     isTopTalent: player.isTopTalent,
+    plannedInternalFromDate: player.plannedInternalFromDate
+      ? player.plannedInternalFromDate.toISOString()
+      : null,
   }));
 
   const now = new Date();

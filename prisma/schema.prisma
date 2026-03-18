@@ -227,6 +227,7 @@ model Player {
   optionYear            Boolean  @default(false)
   isTopTalent           Boolean  @default(false)
   distanceFromClubKm    Int?
+  plannedInternalFromDate DateTime?
 
   // New fields
   currentClub           String?

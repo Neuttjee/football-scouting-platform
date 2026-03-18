@@ -47,6 +47,11 @@ async function savePlayerLogic(playerId: string | null, formData: FormData) {
   const joinedAt = joinedAtStr ? new Date(joinedAtStr) : null;
   const contractEndDateStr = formData.get('contractEndDate') as string;
   const contractEndDate = contractEndDateStr ? new Date(contractEndDateStr) : null;
+  const plannedInternalFromDateStr = formData.get('plannedInternalFromDate') as string;
+  const plannedInternalFromDate = plannedInternalFromDateStr ? new Date(plannedInternalFromDateStr) : null;
+  if (plannedInternalFromDate && Number.isNaN(plannedInternalFromDate.getTime())) {
+    throw new Error("Ongeldige datum voor 'Wordt intern per'.");
+  }
 
   const safeType = playerTypeInput === 'INTERNAL' ? 'INTERNAL' : 'EXTERNAL';
   const isInternalType = safeType === 'INTERNAL';
@@ -115,6 +120,7 @@ async function savePlayerLogic(playerId: string | null, formData: FormData) {
     baseData.contractEndDate = contractEndDate;
     baseData.optionYear = optionYear;
     baseData.distanceFromClubKm = distanceFromClubKm;
+    baseData.plannedInternalFromDate = null;
   } else {
     baseData.team = team || null;
     baseData.teamId = null;
@@ -122,6 +128,14 @@ async function savePlayerLogic(playerId: string | null, formData: FormData) {
     baseData.contractEndDate = null;
     baseData.optionYear = false;
     baseData.distanceFromClubKm = null;
+    if (plannedInternalFromDate) {
+      const today = new Date();
+      const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      if (plannedInternalFromDate < startOfToday) {
+        throw new Error("'Wordt intern per' moet in de toekomst liggen.");
+      }
+    }
+    baseData.plannedInternalFromDate = plannedInternalFromDate;
   }
 
   if (playerId) {

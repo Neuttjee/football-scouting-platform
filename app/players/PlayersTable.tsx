@@ -139,6 +139,13 @@ export function getColumns(
         const age = player.dateOfBirth
           ? calculateAgeFromDate(new Date(player.dateOfBirth))
           : player.age;
+        const plannedInternalDate = player.plannedInternalFromDate
+          ? new Date(player.plannedInternalFromDate as any)
+          : null;
+        const plannedInternalLabel =
+          plannedInternalDate && !Number.isNaN(plannedInternalDate.getTime())
+            ? plannedInternalDate.toLocaleDateString("nl-NL")
+            : null;
         
         return (
           <HoverCard>
@@ -151,6 +158,11 @@ export function getColumns(
                 {player.isTopTalent && (
                   <Star className="ml-1 size-4 text-[#FFD700]" fill="#FFD700" />
                 )}
+                {plannedInternalLabel && (
+                  <span className="ml-1 text-[10px] px-1.5 py-0.5 rounded border border-accent-primary/40 text-text-muted">
+                    INT vanaf {plannedInternalLabel}
+                  </span>
+                )}
               </Link>
             </HoverCardTrigger>
             <HoverCardContent className="w-80 bg-bg-card border-accent-primary shadow-[0_0_30px_rgba(0,0,0,0.5)] z-50">
@@ -160,6 +172,11 @@ export function getColumns(
                   <p className="text-xs text-text-secondary">
                     {player.currentClub || 'Geen club'} • {player.team || 'Geen team'}
                   </p>
+                  {plannedInternalLabel && (
+                    <p className="text-xs text-text-muted">
+                      Intern vanaf: <span className="text-text-primary">{plannedInternalLabel}</span>
+                    </p>
+                  )}
                   <div className="flex items-center pt-2">
                     <span className="text-xs text-text-muted">
                       Positie: <span className="text-accent-primary font-medium">{player.position || '-'}</span>
