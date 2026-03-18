@@ -244,19 +244,40 @@ export default function SquadPlanningPage({
   const filteredPlayers = React.useMemo(() => {
     return players.filter((player) => {
       const effectiveType = getEffectivePlayerType(player, seasonYear);
-      if (effectiveType === "EXTERNAL") return true;
+      if (effectiveType === "EXTERNAL") {
+        // Wanneer we onderliggende teams meenemen willen we externals die pas komend seizoen intern gaan
+        // niet als "externe" opties tonen in deze view (dus uitvinken).
+        if (
+          includeFeederTeams &&
+          player.plannedInternalFromSeasonYear != null &&
+          player.plannedInternalFromSeasonYear === seasonYear + 1
+        ) {
+          return false;
+        }
+        return true;
+      }
       if (!selectedTeamId) return true;
       if (!includeFeederTeams) return player.teamId === selectedTeamId;
       return player.teamOrder >= selectedTeamOrder;
     });
   }, [players, selectedTeamId, includeFeederTeams, selectedTeamOrder, seasonYear]);
 
+  const assignedPlayerIds = React.useMemo(() => {
+    return new Set(Object.values(assignments).flat());
+  }, [assignments]);
+
   const pickerPlayers = React.useMemo(() => {
-    return filteredPlayers.map((p) => ({
-      ...p,
-      type: getEffectivePlayerType(p, seasonYear),
-    }));
-  }, [filteredPlayers, seasonYear]);
+    return filteredPlayers
+      .filter((p) => !assignedPlayerIds.has(p.id))
+      .map((p) => {
+        const effectiveType = getEffectivePlayerType(p, seasonYear);
+        return {
+          ...p,
+          sourceType: p.type,
+          type: effectiveType,
+        };
+      });
+  }, [filteredPlayers, seasonYear, assignedPlayerIds]);
 
   const playersById = React.useMemo(
     () => Object.fromEntries(pickerPlayers.map((player) => [player.id, player])),
@@ -270,20 +291,6 @@ export default function SquadPlanningPage({
     });
     return map;
   }, [slots, slotMaxOverrides]);
-
-  const assignedEntries = Object.entries(assignments).flatMap(([slotId, ids]) =>
-    ids.map((id) => ({ slotId, id }))
-  );
-  const duplicatePlayerIds = new Set(
-    Object.entries(
-      assignedEntries.reduce<Record<string, number>>((acc, entry) => {
-        acc[entry.id] = (acc[entry.id] ?? 0) + 1;
-        return acc;
-      }, {})
-    )
-      .filter(([, count]) => count > 1)
-      .map(([id]) => id)
-  );
 
   const handleDrop = (slotId: string, playerId: string) => {
     const currentSlots = Object.entries(assignments)
@@ -746,9 +753,7 @@ export default function SquadPlanningPage({
               assignments={assignments}
               playersById={playersById}
               seasonYear={seasonYear}
-              agingThreshold={agingThreshold}
               selectedTeamOrder={selectedTeamOrder}
-              duplicatePlayerIds={duplicatePlayerIds}
               slotMaxOverrides={slotMaxOverrides}
               effectiveMaxBySlotId={effectiveMaxBySlotId}
               canEdit={canEdit}
@@ -811,7 +816,12 @@ export default function SquadPlanningPage({
               </DialogContent>
             </Dialog>
           </div>
-          <PlayerPicker players={pickerPlayers} selectedType={selectedType} onTypeChange={setSelectedType} />
+          <PlayerPicker
+            players={pickerPlayers}
+            selectedType={selectedType}
+            onTypeChange={setSelectedType}
+            seasonYear={seasonYear}
+          />
         </div>
       </div>
 

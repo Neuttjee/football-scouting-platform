@@ -10,6 +10,11 @@ export type PlanningPlayer = {
   id: string;
   name: string;
   type: "INTERNAL" | "EXTERNAL";
+  /**
+   * Original player type from the DB (before we apply effective internal/external logic for the selected season).
+   * Used for UI hints (e.g. "internal needs renewal" vs "external will join later").
+   */
+  sourceType?: "INTERNAL" | "EXTERNAL";
   teamId: string | null;
   teamLabel: string | null;
   teamOrder: number;
