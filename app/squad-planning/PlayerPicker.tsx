@@ -4,7 +4,7 @@ import * as React from "react";
 import { Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PlanningPlayer } from "./types";
-import type { PlayerTypeValue } from "@/components/PlayerTypeToggle";
+import { PlayerTypeToggle, type PlayerTypeValue } from "@/components/PlayerTypeToggle";
 
 export function PlayerPicker({
   players,
@@ -51,6 +51,9 @@ export function PlayerPicker({
 
   return (
     <div className="card-premium rounded-xl p-4 space-y-4">
+      <div className="flex items-center justify-center">
+        <PlayerTypeToggle value={selectedType} onChange={onTypeChange} size="sm" />
+      </div>
       <div className="space-y-2">
         <input
           value={query}

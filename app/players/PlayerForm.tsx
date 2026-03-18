@@ -431,7 +431,7 @@ export function PlayerForm({
                 ))}
               </select>
             </div>
-            <div>
+            <div className="md:col-span-2">
               <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
                 Advies
               </label>

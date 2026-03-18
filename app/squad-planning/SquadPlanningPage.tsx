@@ -8,7 +8,7 @@ import { Field } from "./Field";
 import { FieldSkeleton } from "./FieldSkeleton";
 import { PlayerPicker } from "./PlayerPicker";
 import { FieldSlot, Formation, PlanningPlayer, TeamOption } from "./types";
-import { PlayerTypeToggle, PlayerTypeValue } from "@/components/PlayerTypeToggle";
+import { type PlayerTypeValue } from "@/components/PlayerTypeToggle";
 import { canEditSquadPlanning } from "@/lib/roles";
 import {
   Dialog,
@@ -578,6 +578,100 @@ export default function SquadPlanningPage({
               </button>
             </div>
 
+            <div className="space-y-2">
+              {canEdit && (
+                <>
+                  <button
+                    type="button"
+                    disabled={isSaving}
+                    onClick={() => void createSnapshot()}
+                    className={cn(
+                      "w-full inline-flex items-center justify-center gap-2 px-3 py-1.5 rounded-md border border-border-dark text-xs",
+                      isSaving
+                        ? "text-text-muted cursor-not-allowed"
+                        : "text-text-secondary hover:text-text-primary hover:bg-bg-primary/60"
+                    )}
+                    title="Sla een versie-snapshot op"
+                  >
+                    Opslaan
+                  </button>
+                  {mode === "user" && (
+                    <button
+                      type="button"
+                      onClick={() => void pushToClub()}
+                      disabled={!userId}
+                      className="w-full inline-flex items-center justify-center gap-2 px-3 py-1.5 rounded-md bg-accent-primary text-primary-foreground text-xs disabled:opacity-60 disabled:cursor-not-allowed"
+                      title="Zet jouw draft door naar clubplanning"
+                    >
+                      Push naar club
+                    </button>
+                  )}
+                  <Dialog open={versionsOpen} onOpenChange={setVersionsOpen}>
+                    <DialogTrigger asChild>
+                      <button
+                        type="button"
+                        className="w-full inline-flex items-center justify-center gap-2 px-3 py-1.5 rounded-md border border-border-dark text-xs text-text-secondary hover:text-text-primary hover:bg-bg-primary/60"
+                      >
+                        Versies
+                      </button>
+                    </DialogTrigger>
+                    <DialogContent
+                      size="wide"
+                      className="max-h-[90vh] overflow-y-auto bg-bg-card border-accent-primary text-text-primary"
+                    >
+                      <DialogHeader>
+                        <DialogTitle>
+                          Versies ({mode === "club" ? "clubplanning" : "mijn draft"})
+                        </DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-2">
+                        {snapshots.length === 0 ? (
+                          <p className="text-sm text-text-muted">
+                            Nog geen versies opgeslagen.
+                          </p>
+                        ) : (
+                          snapshots.map((s) => (
+                            <div
+                              key={s.id}
+                              className="flex items-center justify-between gap-3 border border-border-dark rounded-md p-3 bg-bg-secondary/30"
+                            >
+                              <div className="min-w-0">
+                                <p className="text-sm font-medium text-text-primary truncate">
+                                  v{s.versionNumber}
+                                  {s.id === activeSnapshotId ? " (actief)" : ""}
+                                </p>
+                                <p className="text-xs text-text-muted truncate">
+                                  {new Date(s.createdAt).toLocaleString()} •{" "}
+                                  {s.createdBy?.name ?? "Onbekend"}
+                                  {s.note ? ` • ${s.note}` : ""}
+                                </p>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => void restoreSnapshot(s.id)}
+                                className="px-3 py-1.5 rounded border border-border-dark text-xs text-text-secondary hover:text-text-primary hover:bg-bg-primary/60"
+                              >
+                                Terugzetten
+                              </button>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                </>
+              )}
+
+              {lastSavedAt && (
+                <p className="text-[11px] text-text-muted">
+                  Laatst opgeslagen: {lastSavedAt.toLocaleTimeString()}
+                </p>
+              )}
+              {loadError && (
+                <p className="text-[11px] text-destructive">{loadError}</p>
+              )}
+            </div>
+
             <div className="inline-flex flex-wrap items-center gap-1 rounded-md bg-bg-secondary/80 border border-border-dark shadow-sm p-0.5">
               {teams.map((team) => {
                 const active = team.id === selectedTeamId;
@@ -669,83 +763,6 @@ export default function SquadPlanningPage({
 
         <div className="space-y-8">
           <div className="flex justify-end gap-2 flex-wrap">
-            {canEdit && (
-              <>
-                <button
-                  type="button"
-                  disabled={isSaving}
-                  onClick={() => void createSnapshot()}
-                  className={cn(
-                    "inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-border-dark text-xs",
-                    isSaving
-                      ? "text-text-muted cursor-not-allowed"
-                      : "text-text-secondary hover:text-text-primary hover:bg-bg-primary/60"
-                  )}
-                  title="Sla een versie-snapshot op"
-                >
-                  Opslaan
-                </button>
-                {mode === "user" && (
-                  <button
-                    type="button"
-                    onClick={() => void pushToClub()}
-                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-accent-primary text-primary-foreground text-xs"
-                    title="Zet jouw draft door naar clubplanning"
-                  >
-                    Push naar club
-                  </button>
-                )}
-                <Dialog open={versionsOpen} onOpenChange={setVersionsOpen}>
-                  <DialogTrigger asChild>
-                    <button
-                      type="button"
-                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-border-dark text-xs text-text-secondary hover:text-text-primary hover:bg-bg-primary/60"
-                    >
-                      Versies
-                    </button>
-                  </DialogTrigger>
-                  <DialogContent
-                    size="wide"
-                    className="max-h-[90vh] overflow-y-auto bg-bg-card border-accent-primary text-text-primary"
-                  >
-                    <DialogHeader>
-                      <DialogTitle>Versies ({mode === "club" ? "clubplanning" : "mijn draft"})</DialogTitle>
-                    </DialogHeader>
-                    <div className="space-y-2">
-                      {snapshots.length === 0 ? (
-                        <p className="text-sm text-text-muted">Nog geen versies opgeslagen.</p>
-                      ) : (
-                        snapshots.map((s) => (
-                          <div
-                            key={s.id}
-                            className="flex items-center justify-between gap-3 border border-border-dark rounded-md p-3 bg-bg-secondary/30"
-                          >
-                            <div className="min-w-0">
-                              <p className="text-sm font-medium text-text-primary truncate">
-                                v{s.versionNumber}
-                                {s.id === activeSnapshotId ? " (actief)" : ""}
-                              </p>
-                              <p className="text-xs text-text-muted truncate">
-                                {new Date(s.createdAt).toLocaleString()} •{" "}
-                                {s.createdBy?.name ?? "Onbekend"}
-                                {s.note ? ` • ${s.note}` : ""}
-                              </p>
-                            </div>
-                            <button
-                              type="button"
-                              onClick={() => void restoreSnapshot(s.id)}
-                              className="px-3 py-1.5 rounded border border-border-dark text-xs text-text-secondary hover:text-text-primary hover:bg-bg-primary/60"
-                            >
-                              Terugzetten
-                            </button>
-                          </div>
-                        ))
-                      )}
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              </>
-            )}
             <Dialog open={analyticsOpen} onOpenChange={setAnalyticsOpen}>
               <DialogTrigger asChild>
                 <button
@@ -794,18 +811,7 @@ export default function SquadPlanningPage({
               </DialogContent>
             </Dialog>
           </div>
-          <PlayerTypeToggle value={selectedType} onChange={setSelectedType} size="sm" />
           <PlayerPicker players={pickerPlayers} selectedType={selectedType} onTypeChange={setSelectedType} />
-          {lastSavedAt && (
-            <p className="text-[11px] text-text-muted">
-              Laatst opgeslagen: {lastSavedAt.toLocaleTimeString()}
-            </p>
-          )}
-          {loadError && (
-            <p className="text-[11px] text-destructive">
-              {loadError}
-            </p>
-          )}
         </div>
       </div>
 

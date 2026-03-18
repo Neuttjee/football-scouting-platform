@@ -64,7 +64,7 @@ export function EditPlayerModal({
         </Button>
       </DialogTrigger>
       <DialogContent
-        className="max-w-2xl max-h-[85vh] overflow-y-auto bg-bg-card border-accent-primary text-text-primary"
+        className="max-w-3xl max-h-[85vh] overflow-y-auto bg-bg-card border-accent-primary text-text-primary"
         onInteractOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
       >

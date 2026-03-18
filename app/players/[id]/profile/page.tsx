@@ -316,17 +316,6 @@ export default async function PlayerProfilePage({
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                {player.plannedInternalFromSeasonYear ? (
-                  <div className="rounded-lg border border-accent-primary/30 bg-accent-primary/10 p-3">
-                    <div className="text-[10px] uppercase tracking-wider text-text-muted mb-1">
-                      Wordt intern
-                    </div>
-                    <div className="text-sm text-text-primary font-medium">
-                      Seizoen {player.plannedInternalFromSeasonYear}/{player.plannedInternalFromSeasonYear + 1}
-                      {plannedTeamLabel ? ` • ${plannedTeamLabel}` : ""}
-                    </div>
-                  </div>
-                ) : null}
                 <div>
                   <div className="text-text-muted uppercase tracking-wider text-xs mb-1">
                     Status
@@ -353,6 +342,27 @@ export default async function PlayerProfilePage({
                     {player.advies || '-'}
                   </div>
                 </div>
+
+                {player.plannedInternalFromSeasonYear ? (
+                  <>
+                    <div>
+                      <div className="text-text-muted uppercase tracking-wider text-xs mb-1">
+                        wordt intern per seizoen
+                      </div>
+                      <div className="font-bold text-lg text-text-primary">
+                        {player.plannedInternalFromSeasonYear}/{player.plannedInternalFromSeasonYear + 1}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-text-muted uppercase tracking-wider text-xs mb-1">
+                        wordt intern bij team
+                      </div>
+                      <div className="font-bold text-lg text-text-primary">
+                        {plannedTeamLabel ?? '-'}
+                      </div>
+                    </div>
+                  </>
+                ) : null}
               </CardContent>
             </Card>
           )}
