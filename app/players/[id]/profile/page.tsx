@@ -10,6 +10,19 @@ import { TaskList } from '@/app/tasks/TaskList';
 import { PlayerRadarChart } from "./PlayerRadarChart";
 import { Star } from "lucide-react";
 
+function formatSeasonFromJoinedAt(value: string | Date): string {
+  const d = new Date(value);
+  const year = d.getFullYear();
+  return `${year}/${year + 1}`;
+}
+
+function formatSeasonFromContractEnd(value: string | Date): string {
+  const d = new Date(value);
+  const endYear = d.getFullYear();
+  const startYear = endYear - 1;
+  return `${startYear}/${startYear + 1}`;
+}
+
 export default async function PlayerProfilePage({
   params,
 }: {
@@ -281,7 +294,7 @@ export default async function PlayerProfilePage({
                     </div>
                     <div className="font-bold text-lg text-text-primary">
                       {player.joinedAt
-                        ? new Date(player.joinedAt).toLocaleDateString('nl-NL')
+                        ? formatSeasonFromJoinedAt(player.joinedAt)
                         : '-'}
                     </div>
                   </div>
@@ -292,7 +305,7 @@ export default async function PlayerProfilePage({
                     </div>
                     <div className="font-bold text-lg text-text-primary">
                       {player.contractEndDate
-                        ? new Date(player.contractEndDate).toLocaleDateString('nl-NL')
+                        ? formatSeasonFromContractEnd(player.contractEndDate)
                         : '-'}
                     </div>
                   </div>

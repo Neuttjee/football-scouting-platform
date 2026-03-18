@@ -60,6 +60,9 @@ export function ImportPlayersWizard({ open, onOpenChange }: ImportPlayersWizardP
   const targetFields =
     importMode === "INTERNAL" ? playerTargetFieldsInternal : playerTargetFieldsExternal;
 
+  const dialogMaxHeightClass =
+    step === 4 || step === 5 ? "max-h-[92vh]" : "max-h-[85vh]";
+
   const handleFileSelected = async (file: File) => {
     setError(null);
     setIsBusy(true);
@@ -128,7 +131,12 @@ export function ImportPlayersWizard({ open, onOpenChange }: ImportPlayersWizardP
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[1400px] w-[min(1400px,100%-2rem)] max-h-[85vh]">
+      <DialogContent
+        className={cn(
+          "max-w-[1400px] w-[min(1400px,100%-2rem)] overflow-y-auto",
+          dialogMaxHeightClass
+        )}
+      >
         <DialogHeader>
           <DialogTitle>Spelers importeren</DialogTitle>
         </DialogHeader>

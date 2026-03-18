@@ -72,6 +72,19 @@ type Props = {
   initialColumnVisibility: Record<string, boolean>;
 };
 
+function formatSeasonFromJoinedAt(value: Date | null): string {
+  if (!value) return "-";
+  const year = value.getFullYear();
+  return `${year}/${year + 1}`;
+}
+
+function formatSeasonFromContractEnd(value: Date | null): string {
+  if (!value) return "-";
+  const endYear = value.getFullYear();
+  const startYear = endYear - 1;
+  return `${startYear}/${startYear + 1}`;
+}
+
 const INTERNAL_BASE_COLUMNS: ColumnDef<InternalPlayer>[] = [
   {
     accessorKey: "name",
@@ -165,11 +178,7 @@ const INTERNAL_BASE_COLUMNS: ColumnDef<InternalPlayer>[] = [
     filterFn: "arrIncludesSome",
     cell: ({ row }) => {
       const value = row.original.joinedAt;
-      return (
-        <span className="text-text-secondary">
-          {value ? new Date(value).toLocaleDateString("nl-NL") : "-"}
-        </span>
-      );
+      return <span className="text-text-secondary">{formatSeasonFromJoinedAt(value)}</span>;
     },
   },
   {
@@ -178,11 +187,7 @@ const INTERNAL_BASE_COLUMNS: ColumnDef<InternalPlayer>[] = [
     filterFn: "arrIncludesSome",
     cell: ({ row }) => {
       const value = row.original.contractEndDate;
-      return (
-        <span className="text-text-secondary">
-          {value ? new Date(value).toLocaleDateString("nl-NL") : "-"}
-        </span>
-      );
+      return <span className="text-text-secondary">{formatSeasonFromContractEnd(value)}</span>;
     },
   },
   {
