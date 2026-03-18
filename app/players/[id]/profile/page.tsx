@@ -66,6 +66,12 @@ export default async function PlayerProfilePage({
     : player.age;
 
   const internalTeamLabel = player.teamRef?.code || player.teamRef?.name || player.team || '-';
+  const plannedTeamLabel =
+    player.plannedInternalTeamId
+      ? (teams as any[]).find((t) => t.id === player.plannedInternalTeamId)?.code ||
+        (teams as any[]).find((t) => t.id === player.plannedInternalTeamId)?.name ||
+        null
+      : null;
 
   const backHref = player.type === 'INTERNAL' ? '/players?view=internal' : '/players';
 
@@ -93,6 +99,11 @@ export default async function PlayerProfilePage({
             <h1 className="text-4xl font-bold text-text-primary">
               {player.name}
             </h1>
+            {player.type === 'EXTERNAL' && player.plannedInternalFromSeasonYear ? (
+              <span className="inline-flex text-[11px] px-2 py-1 rounded-md bg-accent-primary/15 border border-accent-primary/40 text-text-primary">
+                INT vanaf {player.plannedInternalFromSeasonYear}/{player.plannedInternalFromSeasonYear + 1}
+              </span>
+            ) : null}
             {player.type === 'INTERNAL' && player.isTopTalent && (
               <Star
                 className="mt-1 size-5 text-[#FFD700]"
@@ -100,13 +111,6 @@ export default async function PlayerProfilePage({
               />
             )}
           </div>
-          {player.type === 'EXTERNAL' && player.plannedInternalFromSeasonYear ? (
-            <div className="mb-2">
-              <span className="inline-flex text-[11px] px-2 py-1 rounded-md bg-accent-primary/15 border border-accent-primary/40 text-text-primary">
-                INT vanaf {player.plannedInternalFromSeasonYear}/{player.plannedInternalFromSeasonYear + 1}
-              </span>
-            </div>
-          ) : null}
           <div className="flex items-center gap-3 text-sm text-text-secondary">
             <span>{currentClubLabel}</span>
             <span className="w-1 h-1 rounded-full bg-border-dark"></span>
@@ -312,6 +316,17 @@ export default async function PlayerProfilePage({
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
+                {player.plannedInternalFromSeasonYear ? (
+                  <div className="rounded-lg border border-accent-primary/30 bg-accent-primary/10 p-3">
+                    <div className="text-[10px] uppercase tracking-wider text-text-muted mb-1">
+                      Wordt intern
+                    </div>
+                    <div className="text-sm text-text-primary font-medium">
+                      Seizoen {player.plannedInternalFromSeasonYear}/{player.plannedInternalFromSeasonYear + 1}
+                      {plannedTeamLabel ? ` • ${plannedTeamLabel}` : ""}
+                    </div>
+                  </div>
+                ) : null}
                 <div>
                   <div className="text-text-muted uppercase tracking-wider text-xs mb-1">
                     Status

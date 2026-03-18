@@ -60,6 +60,7 @@ export function PlayerForm({
   const [playerType, setPlayerType] = React.useState<PlayerTypeValue>(
     initialValues.type === "INTERNAL" ? "INTERNAL" : "EXTERNAL"
   );
+  const [externalStatus, setExternalStatus] = React.useState(initialValues.status || "");
   const [name, setName] = React.useState(initialValues.name || "");
   const [currentClubValue, setCurrentClubValue] = React.useState(
     initialValues.currentClub || ""
@@ -170,6 +171,11 @@ export function PlayerForm({
       : "";
 
   const plannedInternalTeamDefault = initialValues.plannedInternalTeamId ?? "";
+
+  const showPlannedInternalFields = React.useMemo(() => {
+    const s = (externalStatus || "").toLowerCase();
+    return s.includes("getekend");
+  }, [externalStatus]);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 pt-2 pb-4">
@@ -392,51 +398,12 @@ export function PlayerForm({
           <>
             <div>
               <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
-                Wordt intern per
-              </label>
-              <select
-                name="plannedInternalFromSeasonYear"
-                defaultValue={plannedInternalFromDefault}
-                className="w-full border border-border-dark rounded p-2 bg-background text-text-primary focus-border-accent-primary focus-visible:outline-none"
-              >
-                <option value="">—</option>
-                {plannedInternalSeasonOptions.map((year) => (
-                  <option key={year} value={String(year)}>
-                    Seizoen {year}/{year + 1}
-                  </option>
-                ))}
-              </select>
-              <p className="text-[11px] text-text-muted mt-1">
-                Wordt als intern gezien vanaf start van dit seizoen.
-              </p>
-            </div>
-            <div>
-              <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
-                Wordt intern bij team
-              </label>
-              <select
-                name="plannedInternalTeamId"
-                defaultValue={plannedInternalTeamDefault}
-                className="w-full border border-border-dark rounded p-2 bg-background text-text-primary focus-border-accent-primary focus-visible:outline-none"
-              >
-                <option value="">Selecteer team...</option>
-                {teams.map((team) => (
-                  <option key={team.id} value={team.id}>
-                    {team.code || team.name}
-                  </option>
-                ))}
-              </select>
-              <p className="text-[11px] text-text-muted mt-1">
-                Nodig om de speler op 1 juli automatisch intern te maken.
-              </p>
-            </div>
-            <div>
-              <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
                 Status
               </label>
               <select
                 name="status"
-                defaultValue={initialValues.status || ""}
+                value={externalStatus}
+                onChange={(e) => setExternalStatus(e.target.value)}
                 className="w-full border border-border-dark rounded p-2 bg-background focus-border-accent-primary focus-visible:outline-none"
               >
                 <option value=""></option>
@@ -481,6 +448,49 @@ export function PlayerForm({
                 ))}
               </select>
             </div>
+            {showPlannedInternalFields ? (
+              <>
+                <div>
+                  <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
+                    Wordt intern per seizoen
+                  </label>
+                  <select
+                    name="plannedInternalFromSeasonYear"
+                    defaultValue={plannedInternalFromDefault}
+                    className="w-full border border-border-dark rounded p-2 bg-background text-text-primary focus-border-accent-primary focus-visible:outline-none"
+                  >
+                    <option value="">—</option>
+                    {plannedInternalSeasonOptions.map((year) => (
+                      <option key={year} value={String(year)}>
+                        Seizoen {year}/{year + 1}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
+                    Wordt intern bij team
+                  </label>
+                  <select
+                    name="plannedInternalTeamId"
+                    defaultValue={plannedInternalTeamDefault}
+                    className="w-full border border-border-dark rounded p-2 bg-background text-text-primary focus-border-accent-primary focus-visible:outline-none"
+                  >
+                    <option value="">Selecteer team...</option>
+                    {teams.map((team) => (
+                      <option key={team.id} value={team.id}>
+                        {team.code || team.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="md:col-span-2">
+                  <p className="text-[11px] text-text-muted">
+                    Deze velden worden gebruikt voor automatische omzetting op 1 juli.
+                  </p>
+                </div>
+              </>
+            ) : null}
           </>
         )}
 

@@ -128,7 +128,7 @@ export function ImportPlayersWizard({ open, onOpenChange }: ImportPlayersWizardP
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-6xl w-[min(1100px,100%-2rem)] max-h-[85vh]">
+      <DialogContent className="max-w-7xl w-[min(1300px,100%-2rem)] max-h-[85vh]">
         <DialogHeader>
           <DialogTitle>Spelers importeren</DialogTitle>
         </DialogHeader>
