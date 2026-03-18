@@ -13,6 +13,7 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
+  type PaginationState,
 } from "@tanstack/react-table";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -359,6 +360,10 @@ export function InternalPlayersTable({
     React.useState<Record<string, boolean>>(initialColumnVisibility ?? {});
   const [rowSelection, setRowSelection] =
     React.useState<Record<string, boolean>>({});
+  const [pagination, setPagination] = React.useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 50,
+  });
 
   const columns = React.useMemo(() => {
     if (!canBulkDelete) return INTERNAL_BASE_COLUMNS;
@@ -400,8 +405,10 @@ export function InternalPlayersTable({
       columnFilters,
       columnVisibility,
       rowSelection,
+      pagination,
     },
     onColumnVisibilityChange: setColumnVisibility,
+    onPaginationChange: setPagination,
     meta: {
       clubUsers,
       clubName,
@@ -430,6 +437,8 @@ export function InternalPlayersTable({
         (r) => (r.original as InternalPlayer).id,
       )
     : [];
+
+  const filteredCount = table.getFilteredRowModel().rows.length;
 
   const exportInternalPlayers = (playersToExport: InternalPlayer[]) => {
     const headers = [
@@ -671,6 +680,41 @@ export function InternalPlayersTable({
             )}
           </TableBody>
         </Table>
+        <div className="flex flex-col items-center gap-3 px-3 py-2 border-t border-border-dark text-xs text-text-secondary">
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
+              className="px-3 py-1 rounded border border-border-dark bg-bg-secondary text-text-secondary text-xs disabled:opacity-40 disabled:cursor-not-allowed hover:bg-bg-hover transition-colors"
+            >
+              Vorige
+            </button>
+            <button
+              type="button"
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
+              className="px-3 py-1 rounded border border-border-dark bg-bg-secondary text-text-secondary text-xs disabled:opacity-40 disabled:cursor-not-allowed hover:bg-bg-hover transition-colors"
+            >
+              Volgende
+            </button>
+          </div>
+          <span>
+            Pagina{" "}
+            <span className="font-semibold text-text-primary">
+              {table.getState().pagination.pageIndex + 1}
+            </span>{" "}
+            van{" "}
+            <span className="font-semibold text-text-primary">
+              {table.getPageCount() || 1}
+            </span>
+            {" • "}
+            <span className="font-semibold text-text-primary">
+              {filteredCount}
+            </span>{" "}
+            spelers
+          </span>
+        </div>
       </div>
     </DataTable.Wrapper>
   );
