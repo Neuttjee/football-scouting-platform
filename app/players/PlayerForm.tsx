@@ -431,7 +431,7 @@ export function PlayerForm({
                 ))}
               </select>
             </div>
-            <div className="md:col-span-2">
+            <div>
               <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
                 Advies
               </label>
@@ -448,6 +448,8 @@ export function PlayerForm({
                 ))}
               </select>
             </div>
+            {/* Vul de 2e kolom op zodat de geplande interne velden netjes op een rij eronder komen */}
+            <div className="hidden md:block" />
             {showPlannedInternalFields ? (
               <>
                 <div>
