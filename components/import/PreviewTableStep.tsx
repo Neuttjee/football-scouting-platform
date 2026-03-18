@@ -28,7 +28,7 @@ export function PreviewTableStep({ preview }: PreviewTableStepProps) {
         </span>
       </div>
 
-      <div className="rounded-lg border border-border-dark bg-bg-secondary/40 overflow-x-auto overflow-y-auto max-h-[60vh]">
+      <div className="rounded-lg border border-border-dark bg-bg-secondary/40 overflow-x-auto">
         <table className="min-w-full text-xs">
           <thead className="bg-bg-secondary">
             <tr>
