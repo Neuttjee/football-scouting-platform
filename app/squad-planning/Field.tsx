@@ -117,38 +117,39 @@ export function Field({
                               "flex-1 min-w-0 h-8 rounded flex items-center justify-between px-2 text-sm",
                               !player
                                 ? "border border-dashed border-border-dark/80 bg-bg-primary/40"
-                                : isPlayerReadyForSeason(player, seasonYear)
-                                  ? "border border-border-dark bg-bg-primary/70"
-                                  : "border border-amber-500/50 bg-amber-500/10"
+                                : player.type === "INTERNAL"
+                                  ? "border border-border-dark bg-bg-secondary/50"
+                                  : "border border-border-dark bg-bg-primary/70"
                             )}
                           >
                             {!player ? null : (
                               <>
-                                <span
-                                  className={cn(
-                                    "truncate font-medium",
-                                    isPlayerReadyForSeason(player, seasonYear)
-                                      ? "text-text-primary"
-                                      : "text-amber-300"
-                                  )}
-                                >
-                                  {player.name}
-                                </span>
+                                {(() => {
+                                  const isReady = isPlayerReadyForSeason(player, seasonYear);
+                                  return (
+                                    <span
+                                      className={cn(
+                                        "truncate font-medium",
+                                        isReady ? "text-text-primary" : "text-amber-300"
+                                      )}
+                                    >
+                                      {player.name}
+                                    </span>
+                                  );
+                                })()}
                                 <div className="flex items-center gap-0.5 pl-1 shrink-0">
                                   {player.type === "INTERNAL" && player.teamOrder > selectedTeamOrder && (
                                     <span
                                       className={cn(
                                         "text-[10px] px-1.5 rounded border",
-                                        isPlayerReadyForSeason(player, seasonYear)
-                                          ? "border-border-dark text-text-primary"
-                                          : "border-amber-500/50 text-amber-200"
+                                        "border-border-dark text-text-muted"
                                       )}
                                     >
                                       {player.teamLabel}
                                     </span>
                                   )}
                                   {player.type === "EXTERNAL" && (
-                                    <span className="text-[10px] px-1.5 rounded border border-amber-500/50 text-amber-200">
+                                    <span className="text-[10px] px-1.5 rounded border border-border-dark text-text-muted">
                                       EXT
                                     </span>
                                   )}

@@ -143,9 +143,7 @@ export function PlayerPicker({
             }}
             className={cn(
               "border rounded p-2 cursor-grab active:cursor-grabbing",
-              isReady
-                ? "border-border-dark bg-bg-secondary/50"
-                : "border-amber-500/50 bg-amber-500/10"
+              player.type === "INTERNAL" ? "border-border-dark bg-bg-secondary/50" : "border-border-dark bg-bg-primary/70"
             )}
           >
             <div className="flex items-center justify-between gap-3">
@@ -167,22 +165,19 @@ export function PlayerPicker({
                 {plannedLabel ? (
                   <span
                     className={cn(
-                      "text-[10px] px-1 py-0.5 rounded border",
-                      isReady
-                        ? "border-accent-primary/40 text-text-primary"
-                        : "border-amber-500/50 text-amber-200"
+                      "text-[10px] px-1 py-0.5 rounded border border-accent-primary/40 text-text-muted"
                     )}
                   >
                     INT vanaf {plannedLabel}
                   </span>
                 ) : player.type === "EXTERNAL" ? (
-                  <span className="text-[10px] px-1 py-0.5 rounded border border-amber-500/50 text-amber-200">
+                  <span className="text-[10px] px-1 py-0.5 rounded border border-border-dark text-text-muted">
                     EXT
                   </span>
                 ) : null}
               </div>
             </div>
-            <div className={cn("text-xs mt-1", isReady ? "text-text-muted" : "text-amber-200/80")}>
+            <div className="text-xs mt-1 text-text-muted">
               {(player.teamLabel || "-")} • {player.position || "-"} •{" "}
               {player.age != null ? `${player.age}j` : "-"}
             </div>
