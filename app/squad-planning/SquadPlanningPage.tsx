@@ -9,6 +9,7 @@ import { FieldSkeleton } from "./FieldSkeleton";
 import { PlayerPicker } from "./PlayerPicker";
 import { FieldSlot, Formation, PlanningPlayer, TeamOption } from "./types";
 import { PlayerTypeToggle, PlayerTypeValue } from "@/components/PlayerTypeToggle";
+import { canEditSquadPlanning } from "@/lib/roles";
 import {
   Dialog,
   DialogContent,
@@ -98,12 +99,17 @@ export default function SquadPlanningPage({
   teams,
   agingThreshold,
   defaultSeasonYear,
+  userRole,
+  userId,
 }: {
   players: PlanningPlayer[];
   teams: TeamOption[];
   agingThreshold: number;
   defaultSeasonYear: number;
+  userRole: string | null;
+  userId: string | null;
 }) {
+  const initialCanEdit = React.useMemo(() => canEditSquadPlanning(userRole), [userRole]);
   const [selectedTeamId, setSelectedTeamId] = React.useState<string | null>(teams[0]?.id ?? null);
   const [includeFeederTeams, setIncludeFeederTeams] = React.useState(true);
   const [selectedType, setSelectedType] = React.useState<PlayerTypeValue>("INTERNAL");
@@ -122,6 +128,15 @@ export default function SquadPlanningPage({
   const [loadError, setLoadError] = React.useState<string | null>(null);
   const [slotMaxOverrides, setSlotMaxOverrides] = React.useState<Record<string, number>>({});
   const [isLoadingPlan, setIsLoadingPlan] = React.useState(false);
+  const [mode, setMode] = React.useState<"club" | "user">(initialCanEdit ? "club" : "club");
+  const [canEdit, setCanEdit] = React.useState(initialCanEdit);
+  const [clubUpdatedAt, setClubUpdatedAt] = React.useState<string | null>(null);
+  const [userUpdatedAt, setUserUpdatedAt] = React.useState<string | null>(null);
+  const [versionsOpen, setVersionsOpen] = React.useState(false);
+  const [snapshots, setSnapshots] = React.useState<
+    { id: string; versionNumber: number; note: string | null; createdAt: string; createdBy: { id: string; name: string } | null }[]
+  >([]);
+  const [activeSnapshotId, setActiveSnapshotId] = React.useState<string | null>(null);
 
   const showPlanSkeleton = useDelayedLoading(isLoadingPlan, { showDelayMs: 200, minShowMs: 300 });
 
@@ -150,7 +165,7 @@ export default function SquadPlanningPage({
     currentKeyRef.current = { teamId: selectedTeamId, seasonYear };
   }, [selectedTeamId, seasonYear]);
 
-  const savePlan = React.useCallback(
+  const saveWorkingCopy = React.useCallback(
     async (
       teamId: string,
       seasonYearToSave: number,
@@ -159,8 +174,12 @@ export default function SquadPlanningPage({
       slotMaxOverridesToSave: Record<string, number>
     ) => {
       try {
+        if (!canEdit) return;
         setIsSaving(true);
-        const res = await fetch("/api/squad-planning/plan", {
+        const endpoint =
+          mode === "club" ? "/api/squad-planning/plan/club" : "/api/squad-planning/plan/draft";
+        const ifUpdatedAt = mode === "club" ? clubUpdatedAt : userUpdatedAt;
+        const res = await fetch(endpoint, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -171,15 +190,24 @@ export default function SquadPlanningPage({
             formation: formationToSave,
             assignments: assignmentsToSave,
             slotMaxOverrides: slotMaxOverridesToSave,
-            isClubDefault: false,
+            ifUpdatedAt,
           }),
         });
 
         if (!res.ok) {
-          console.error("Failed to save squad plan", await res.text());
+          const text = await res.text();
+          console.error("Failed to save squad plan", text);
+          if (res.status === 409) {
+            setLoadError("Iemand anders heeft wijzigingen gedaan. Herlaad de pagina.");
+          }
           return;
         }
 
+        const data = (await res.json().catch(() => null)) as null | { updatedAt?: string | null };
+        if (data?.updatedAt) {
+          if (mode === "club") setClubUpdatedAt(data.updatedAt);
+          else setUserUpdatedAt(data.updatedAt);
+        }
         setLastSavedAt(new Date());
       } catch (error) {
         console.error("Error saving squad plan", error);
@@ -187,7 +215,7 @@ export default function SquadPlanningPage({
         setIsSaving(false);
       }
     },
-    []
+    [canEdit, mode, clubUpdatedAt, userUpdatedAt]
   );
 
   React.useEffect(() => {
@@ -295,7 +323,13 @@ export default function SquadPlanningPage({
       if (current >= MAX_SLOT_CAP) return prev;
       const next = { ...prev, [slotId]: current + 1 };
       if (selectedTeamId) {
-        void savePlan(selectedTeamId, seasonYear, formationRef.current, assignmentsRef.current, next);
+        void saveWorkingCopy(
+          selectedTeamId,
+          seasonYear,
+          formationRef.current,
+          assignmentsRef.current,
+          next
+        );
       }
       return next;
     });
@@ -312,7 +346,13 @@ export default function SquadPlanningPage({
       const next = { ...prev, [slotId]: nextMax };
       const nextOverrides = nextMax === base ? (() => { const { [slotId]: _, ...rest } = next; return rest; })() : next;
       if (selectedTeamId) {
-        void savePlan(selectedTeamId, seasonYear, formationRef.current, assignmentsRef.current, nextOverrides);
+        void saveWorkingCopy(
+          selectedTeamId,
+          seasonYear,
+          formationRef.current,
+          assignmentsRef.current,
+          nextOverrides
+        );
       }
       return nextOverrides;
     });
@@ -331,7 +371,7 @@ export default function SquadPlanningPage({
       previous.teamId &&
       (previous.teamId !== selectedTeamId || previous.seasonYear !== seasonYear)
     ) {
-      void savePlan(
+      void saveWorkingCopy(
         previous.teamId,
         previous.seasonYear,
         formationRef.current,
@@ -340,14 +380,14 @@ export default function SquadPlanningPage({
       );
     }
     previousKeyRef.current = { teamId: selectedTeamId, seasonYear };
-  }, [selectedTeamId, seasonYear, savePlan]);
+  }, [selectedTeamId, seasonYear, saveWorkingCopy]);
 
   // Auto-save bij unmounten van de pagina (laatste versie bewaren)
   React.useEffect(() => {
     return () => {
       const { teamId, seasonYear: seasonYearToSave } = currentKeyRef.current;
       if (!teamId) return;
-      void savePlan(
+      void saveWorkingCopy(
         teamId,
         seasonYearToSave,
         formationRef.current,
@@ -355,7 +395,7 @@ export default function SquadPlanningPage({
         slotMaxOverridesRef.current
       );
     };
-  }, [savePlan]);
+  }, [saveWorkingCopy]);
 
   // Laad bestaande opstelling bij initialisatie / wisselen team of seizoen
   React.useEffect(() => {
@@ -374,16 +414,24 @@ export default function SquadPlanningPage({
           console.error("Failed to load squad plan", await res.text());
           return;
         }
-        const data = await res.json();
-        if (data?.plan) {
-          if (data.plan.assignments && typeof data.plan.assignments === "object") {
-            setAssignments(data.plan.assignments as Record<string, string[]>);
-          }
-          if (data.plan.slotMaxOverrides && typeof data.plan.slotMaxOverrides === "object") {
-            setSlotMaxOverrides(data.plan.slotMaxOverrides as Record<string, number>);
-          } else {
-            setSlotMaxOverrides({});
-          }
+        const data = (await res.json()) as {
+          canEdit?: boolean;
+          userDraft: null | { assignments: Record<string, string[]>; slotMaxOverrides: Record<string, number>; updatedAt: string };
+          clubPlan: null | { assignments: Record<string, string[]>; slotMaxOverrides: Record<string, number>; updatedAt: string };
+        };
+
+        setCanEdit(Boolean(data?.canEdit ?? initialCanEdit));
+        setClubUpdatedAt(data?.clubPlan?.updatedAt ?? null);
+        setUserUpdatedAt(data?.userDraft?.updatedAt ?? null);
+
+        const planForMode = mode === "club" ? data?.clubPlan : data?.userDraft;
+        if (planForMode?.assignments && typeof planForMode.assignments === "object") {
+          setAssignments(planForMode.assignments);
+        } else {
+          setAssignments({});
+        }
+        if (planForMode?.slotMaxOverrides && typeof planForMode.slotMaxOverrides === "object") {
+          setSlotMaxOverrides(planForMode.slotMaxOverrides);
         } else {
           setSlotMaxOverrides({});
         }
@@ -397,7 +445,86 @@ export default function SquadPlanningPage({
 
     loadPlan();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedTeamId, seasonYear, formation]);
+  }, [selectedTeamId, seasonYear, formation, mode, initialCanEdit]);
+
+  const refreshSnapshots = React.useCallback(async () => {
+    if (!selectedTeamId) return;
+    const params = new URLSearchParams({
+      teamId: selectedTeamId,
+      seasonYear: String(seasonYear),
+      formation,
+      scope: mode,
+    });
+    const res = await fetch(`/api/squad-planning/plan/snapshots?${params.toString()}`);
+    if (!res.ok) return;
+    const data = await res.json();
+    setSnapshots(Array.isArray(data?.snapshots) ? data.snapshots : []);
+    setActiveSnapshotId(data?.activeSnapshotId ?? null);
+  }, [selectedTeamId, seasonYear, formation, mode]);
+
+  React.useEffect(() => {
+    if (!versionsOpen) return;
+    void refreshSnapshots();
+  }, [versionsOpen, refreshSnapshots]);
+
+  const createSnapshot = async () => {
+    if (!selectedTeamId) return;
+    const res = await fetch("/api/squad-planning/plan/snapshot", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        teamId: selectedTeamId,
+        seasonYear,
+        formation,
+        scope: mode,
+        setActive: true,
+      }),
+    });
+    if (!res.ok) return;
+    await refreshSnapshots();
+    setLastSavedAt(new Date());
+  };
+
+  const pushToClub = async () => {
+    if (!selectedTeamId) return;
+    const res = await fetch("/api/squad-planning/plan/push-to-club", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        teamId: selectedTeamId,
+        seasonYear,
+        formation,
+        createSnapshot: true,
+      }),
+    });
+    if (!res.ok) return;
+    if (mode === "club") return;
+    // after push, switch to club view and reload
+    setMode("club");
+  };
+
+  const restoreSnapshot = async (snapshotId: string) => {
+    const res = await fetch("/api/squad-planning/plan/restore", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ snapshotId }),
+    });
+    if (!res.ok) return;
+    await refreshSnapshots();
+    // Reload current plan state
+    const params = new URLSearchParams({
+      teamId: selectedTeamId ?? "",
+      seasonYear: String(seasonYear),
+      formation,
+    });
+    const planRes = await fetch(`/api/squad-planning/plan?${params.toString()}`);
+    if (planRes.ok) {
+      const data = await planRes.json();
+      const planForMode = mode === "club" ? data?.clubPlan : data?.userDraft;
+      if (planForMode?.assignments) setAssignments(planForMode.assignments);
+      if (planForMode?.slotMaxOverrides) setSlotMaxOverrides(planForMode.slotMaxOverrides);
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -405,6 +532,37 @@ export default function SquadPlanningPage({
         <div className="flex flex-col md:flex-row gap-4 items-start">
           {/* Linkerkolom: teamselectie + filters onder elkaar */}
           <div className="w-full md:w-60 max-w-xs space-y-3">
+            <div className="inline-flex w-full items-center gap-1 rounded-md bg-bg-secondary/80 border border-border-dark shadow-sm p-0.5">
+              <button
+                type="button"
+                disabled={!canEdit}
+                onClick={() => setMode("club")}
+                className={cn(
+                  "flex-1 px-3 py-1 text-xs font-medium rounded-md transition-colors",
+                  mode === "club"
+                    ? "bg-accent-primary text-primary-foreground"
+                    : "text-text-muted hover:text-text-primary hover:bg-bg-primary/70",
+                  !canEdit && "opacity-60 cursor-not-allowed"
+                )}
+              >
+                Clubplanning
+              </button>
+              <button
+                type="button"
+                disabled={!canEdit || !userId}
+                onClick={() => setMode("user")}
+                className={cn(
+                  "flex-1 px-3 py-1 text-xs font-medium rounded-md transition-colors",
+                  mode === "user"
+                    ? "bg-accent-primary text-primary-foreground"
+                    : "text-text-muted hover:text-text-primary hover:bg-bg-primary/70",
+                  (!canEdit || !userId) && "opacity-60 cursor-not-allowed"
+                )}
+              >
+                Mijn draft
+              </button>
+            </div>
+
             <div className="inline-flex flex-wrap items-center gap-1 rounded-md bg-bg-secondary/80 border border-border-dark shadow-sm p-0.5">
               {teams.map((team) => {
                 const active = team.id === selectedTeamId;
@@ -484,6 +642,7 @@ export default function SquadPlanningPage({
               duplicatePlayerIds={duplicatePlayerIds}
               slotMaxOverrides={slotMaxOverrides}
               effectiveMaxBySlotId={effectiveMaxBySlotId}
+              canEdit={canEdit}
               onDropPlayer={handleDrop}
               onRemoveFromSlot={removeFromSlot}
               onSlotMaxIncrease={handleSlotMaxIncrease}
@@ -494,7 +653,84 @@ export default function SquadPlanningPage({
         </div>
 
         <div className="space-y-8">
-          <div className="flex justify-end gap-2">
+          <div className="flex justify-end gap-2 flex-wrap">
+            {canEdit && (
+              <>
+                <button
+                  type="button"
+                  disabled={isSaving}
+                  onClick={() => void createSnapshot()}
+                  className={cn(
+                    "inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-border-dark text-xs",
+                    isSaving
+                      ? "text-text-muted cursor-not-allowed"
+                      : "text-text-secondary hover:text-text-primary hover:bg-bg-primary/60"
+                  )}
+                  title="Sla een versie-snapshot op"
+                >
+                  Opslaan
+                </button>
+                {mode === "user" && (
+                  <button
+                    type="button"
+                    onClick={() => void pushToClub()}
+                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-accent-primary text-primary-foreground text-xs"
+                    title="Zet jouw draft door naar clubplanning"
+                  >
+                    Push naar club
+                  </button>
+                )}
+                <Dialog open={versionsOpen} onOpenChange={setVersionsOpen}>
+                  <DialogTrigger asChild>
+                    <button
+                      type="button"
+                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-border-dark text-xs text-text-secondary hover:text-text-primary hover:bg-bg-primary/60"
+                    >
+                      Versies
+                    </button>
+                  </DialogTrigger>
+                  <DialogContent
+                    size="wide"
+                    className="max-h-[90vh] overflow-y-auto bg-bg-card border-accent-primary text-text-primary"
+                  >
+                    <DialogHeader>
+                      <DialogTitle>Versies ({mode === "club" ? "clubplanning" : "mijn draft"})</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-2">
+                      {snapshots.length === 0 ? (
+                        <p className="text-sm text-text-muted">Nog geen versies opgeslagen.</p>
+                      ) : (
+                        snapshots.map((s) => (
+                          <div
+                            key={s.id}
+                            className="flex items-center justify-between gap-3 border border-border-dark rounded-md p-3 bg-bg-secondary/30"
+                          >
+                            <div className="min-w-0">
+                              <p className="text-sm font-medium text-text-primary truncate">
+                                v{s.versionNumber}
+                                {s.id === activeSnapshotId ? " (actief)" : ""}
+                              </p>
+                              <p className="text-xs text-text-muted truncate">
+                                {new Date(s.createdAt).toLocaleString()} •{" "}
+                                {s.createdBy?.name ?? "Onbekend"}
+                                {s.note ? ` • ${s.note}` : ""}
+                              </p>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => void restoreSnapshot(s.id)}
+                              className="px-3 py-1.5 rounded border border-border-dark text-xs text-text-secondary hover:text-text-primary hover:bg-bg-primary/60"
+                            >
+                              Terugzetten
+                            </button>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </>
+            )}
             <Dialog open={analyticsOpen} onOpenChange={setAnalyticsOpen}>
               <DialogTrigger asChild>
                 <button

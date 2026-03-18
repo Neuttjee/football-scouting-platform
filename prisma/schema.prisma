@@ -195,6 +195,7 @@ model User {
   tasksCreated         Task[]          @relation("TaskCreatedBy")
   tasksAssigned        Task[]          @relation("TaskAssignedTo")
   squadPlans           SquadPlan[]
+  squadPlanSnapshots   SquadPlanSnapshot[] @relation("SquadPlanSnapshotCreatedBy")
   auditLogs            AuditLog[]      @relation("UserAuditLogs")
   tablePreferences     UserTablePreference[]
 
@@ -332,12 +333,39 @@ model SquadPlan {
   slotMaxOverridesJson Json?
   isClubDefault  Boolean  @default(false)
 
+  activeSnapshotId String?
+  activeSnapshot   SquadPlanSnapshot? @relation("ActiveSquadPlanSnapshot", fields: [activeSnapshotId], references: [id], onDelete: SetNull)
+  snapshots        SquadPlanSnapshot[]
+
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
   @@index([clubId, teamId, seasonYear, userId, isClubDefault])
   @@unique([clubId, teamId, seasonYear, formation, userId])
   @@unique([clubId, teamId, seasonYear, formation, isClubDefault])
+}
+
+model SquadPlanSnapshot {
+  id                   String   @id @default(uuid())
+
+  squadPlanId           String
+  squadPlan             SquadPlan @relation(fields: [squadPlanId], references: [id], onDelete: Cascade)
+
+  versionNumber         Int
+  note                  String?
+
+  createdById           String?
+  createdBy             User?    @relation("SquadPlanSnapshotCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+
+  activeForPlans        SquadPlan[] @relation("ActiveSquadPlanSnapshot")
+
+  assignmentsJson       Json
+  slotMaxOverridesJson  Json?
+
+  createdAt             DateTime @default(now())
+
+  @@unique([squadPlanId, versionNumber])
+  @@index([squadPlanId, createdAt])
 }
 
 model UserTablePreference {

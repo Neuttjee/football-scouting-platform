@@ -21,6 +21,7 @@ export function Field({
   duplicatePlayerIds,
   slotMaxOverrides,
   effectiveMaxBySlotId,
+  canEdit,
   onDropPlayer,
   onRemoveFromSlot,
   onSlotMaxIncrease,
@@ -35,6 +36,7 @@ export function Field({
   duplicatePlayerIds: Set<string>;
   slotMaxOverrides: Record<string, number>;
   effectiveMaxBySlotId: Record<string, number>;
+  canEdit: boolean;
   onDropPlayer: (slotId: string, playerId: string) => void;
   onRemoveFromSlot: (slotId: string, playerId: string) => void;
   onSlotMaxIncrease: (slotId: string) => void;
@@ -79,8 +81,12 @@ export function Field({
                 key={slot.id}
                 className="absolute -translate-x-1/2 -translate-y-1/2 w-48 md:w-60"
                 style={{ left: `${slot.x}%`, top: `${slot.y}%` }}
-                onDragOver={(e) => e.preventDefault()}
+                onDragOver={(e) => {
+                  if (!canEdit) return;
+                  e.preventDefault();
+                }}
                 onDrop={(e) => {
+                  if (!canEdit) return;
                   e.preventDefault();
                   const playerId = e.dataTransfer.getData("text/player-id");
                   if (playerId) onDropPlayer(slot.id, playerId);
@@ -136,19 +142,21 @@ export function Field({
                                       2×
                                     </span>
                                   )}
-                                  <button
-                                    type="button"
-                                    onClick={() => onRemoveFromSlot(slot.id, player.id)}
-                                    className="text-text-muted hover:text-text-primary leading-none"
-                                    aria-label="Verwijderen"
-                                  >
-                                    ×
-                                  </button>
+                                  {canEdit ? (
+                                    <button
+                                      type="button"
+                                      onClick={() => onRemoveFromSlot(slot.id, player.id)}
+                                      className="text-text-muted hover:text-text-primary leading-none"
+                                      aria-label="Verwijderen"
+                                    >
+                                      ×
+                                    </button>
+                                  ) : null}
                                 </div>
                               </>
                             )}
                           </div>
-                          {isLastRow && (showMinus ? (
+                          {canEdit && isLastRow && (showMinus ? (
                             <button
                               type="button"
                               onClick={() => onSlotMaxDecrease(slot.id)}
