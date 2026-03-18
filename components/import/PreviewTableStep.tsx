@@ -11,7 +11,7 @@ export function PreviewTableStep({ preview }: PreviewTableStepProps) {
   const headers = ["Naam", "Geboortedatum", "Positie", "Club", "Status", "Issues"];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 flex flex-col flex-1 min-h-0">
       <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
         <span>
           Totaal rijen: <span className="text-text-primary font-semibold">{preview.total}</span>
@@ -28,7 +28,7 @@ export function PreviewTableStep({ preview }: PreviewTableStepProps) {
         </span>
       </div>
 
-      <div className="rounded-lg border border-border-dark bg-bg-secondary/40 overflow-x-auto">
+      <div className="rounded-lg border border-border-dark bg-bg-secondary/40 overflow-x-auto overflow-y-auto flex-1 min-h-0">
         <table className="min-w-full text-xs">
           <thead className="bg-bg-secondary">
             <tr>
