@@ -430,8 +430,8 @@ export function PlayerForm({
                 ))}
               </select>
             </div>
-            {/* Vul de 2e kolom op zodat de geplande interne velden netjes op een rij eronder komen */}
-            <div className="hidden md:block" />
+            {/* Zorg dat de geplande interne velden op 1 rij onder elkaar uitlijnen (links: per seizoen, rechts: bij team). */}
+            <div className="hidden md:block md:col-span-2" />
             {showPlannedInternalFields ? (
               <>
                 <div>
