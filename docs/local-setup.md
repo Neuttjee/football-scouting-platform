@@ -47,7 +47,16 @@ npx prisma generate
 npx prisma migrate dev --name init
 ```
 
-*Optioneel*: Draai de seed om basisdata (zoals de SUPERADMIN user) en eventuele testdata in de `dev` database te plaatsen:
+*Optioneel*: Draai de seed om basisdata (zoals de SUPERADMIN user) en eventuele testdata in de `dev` database te plaatsen.
+
+Voor een veilige seed zet je eerst in je environment (bijv. in je `.env` / `.env.local`):
+
+```env
+SUPERADMIN_EMAIL="admin@example.com"
+SUPERADMIN_PASSWORD="vul-een-sterk-wachtwoord-in"
+```
+
+Daarna:
 ```bash
 npx prisma db seed
 ```
