@@ -5,8 +5,9 @@ import { useRouter } from "next/navigation"
 import { Search, User } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { searchPlayers } from "@/app/players/actions"
+import AccountDialog from "@/components/AccountDialog"
 
-export function Topbar() {
+export function Topbar({ role }: { role: string }) {
   const router = useRouter()
   const [query, setQuery] = React.useState("")
   const [results, setResults] = React.useState<any[]>([])
@@ -111,7 +112,7 @@ export function Topbar() {
       </div>
       
       <div className="flex items-center gap-4">
-        {/* Optionele toekomstige acties kunnen hier */}
+        <AccountDialog role={role} />
       </div>
     </header>
   )
