@@ -37,6 +37,13 @@ type ClubProfileClientProps = {
     email: string | null;
     role: string;
     isActive: boolean;
+    loginCount: number;
+    lastLoginAt: string | Date | null;
+    twoFactorEnabled: boolean;
+    twoFactorVerifiedAt: string | Date | null;
+    passwordHash: string | null;
+    inviteToken: string | null;
+    inviteTokenExpires: string | Date | null;
   }[];
 };
 
@@ -95,6 +102,53 @@ export function ClubProfileClient({
         return "neutral";
     }
   })();
+
+  const formatLastLogin = (value: string | Date | null | undefined) => {
+    if (!value) return "—";
+    const date = value instanceof Date ? value : new Date(value);
+    if (Number.isNaN(date.getTime())) return "—";
+
+    return new Intl.DateTimeFormat("nl-NL", {
+      dateStyle: "short",
+      timeStyle: "short",
+    }).format(date);
+  };
+
+  const getTwoFactorStatus = (u: ClubProfileClientProps["clubUsers"][number]) => {
+    if (!u.twoFactorEnabled) {
+      return { label: "Uit", tone: "neutral" as const };
+    }
+    if (u.twoFactorEnabled && !u.twoFactorVerifiedAt) {
+      return { label: "Vereist – nog niet ingesteld", tone: "warning" as const };
+    }
+    return { label: "Actief", tone: "success" as const };
+  };
+
+  const getInviteStatus = (u: ClubProfileClientProps["clubUsers"][number]) => {
+    // Invites zijn alleen relevant als de gebruiker nog geen account heeft aangemaakt.
+    if (!u.passwordHash && u.inviteToken && u.inviteTokenExpires) {
+      const expires =
+        u.inviteTokenExpires instanceof Date
+          ? u.inviteTokenExpires
+          : new Date(u.inviteTokenExpires);
+
+      if (Number.isNaN(expires.getTime())) {
+        return { label: "Uitgenodigd", tone: "warning" as const };
+      }
+
+      const now = new Date();
+      if (expires < now) {
+        return { label: "Uitnodiging verlopen", tone: "neutral" as const };
+      }
+
+      return {
+        label: `Uitgenodigd`,
+        tone: "warning" as const,
+      };
+    }
+
+    return { label: "—", tone: "neutral" as const };
+  };
 
   return (
     <div className="space-y-6">
@@ -406,13 +460,28 @@ export function ClubProfileClient({
                           <th className="px-3 py-2 text-left text-xs font-semibold text-text-secondary uppercase tracking-wide">
                             Status
                           </th>
+                            <th className="px-3 py-2 text-right text-xs font-semibold text-text-secondary uppercase tracking-wide">
+                              Aantal logins
+                            </th>
+                            <th className="px-3 py-2 text-left text-xs font-semibold text-text-secondary uppercase tracking-wide">
+                              Laatste login
+                            </th>
+                            <th className="px-3 py-2 text-left text-xs font-semibold text-text-secondary uppercase tracking-wide">
+                              2FA actief
+                            </th>
+                          <th className="px-3 py-2 text-left text-xs font-semibold text-text-secondary uppercase tracking-wide">
+                            2FA bevestigd op
+                          </th>
+                          <th className="px-3 py-2 text-left text-xs font-semibold text-text-secondary uppercase tracking-wide">
+                            Uitnodiging
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
                         {clubUsers.length === 0 ? (
                           <tr>
                             <td
-                              colSpan={4}
+                                colSpan={9}
                               className="px-3 py-4 text-center text-xs text-text-muted"
                             >
                               Geen gebruikers gekoppeld aan deze club.
@@ -441,6 +510,31 @@ export function ClubProfileClient({
                                   {u.isActive ? "Actief" : "Inactief"}
                                 </span>
                               </td>
+                                <td className="px-3 py-2 text-right text-text-secondary">
+                                  {u.loginCount ?? 0}
+                                </td>
+                                <td className="px-3 py-2 text-muted-foreground">
+                                  {formatLastLogin(u.lastLoginAt)}
+                                </td>
+                                <td className="px-3 py-2">
+                                  {(() => {
+                                    const status = getTwoFactorStatus(u);
+                                    return (
+                                      <StatusPill tone={status.tone}>
+                                        {status.label}
+                                      </StatusPill>
+                                    );
+                                  })()}
+                                </td>
+                                <td className="px-3 py-2 text-muted-foreground">
+                                  {formatLastLogin(u.twoFactorVerifiedAt)}
+                                </td>
+                                <td className="px-3 py-2">
+                                  {(() => {
+                                    const invite = getInviteStatus(u);
+                                    return <StatusPill tone={invite.tone}>{invite.label}</StatusPill>;
+                                  })()}
+                                </td>
                             </tr>
                           ))
                         )}

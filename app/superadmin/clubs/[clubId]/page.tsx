@@ -33,7 +33,20 @@ export default async function ClubProfilePage({ params }: PageProps) {
       subscription: true,
       internalNote: true,
       users: {
-        select: { id: true, name: true, email: true, role: true, isActive: true },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          isActive: true,
+          loginCount: true,
+          lastLoginAt: true,
+          twoFactorEnabled: true,
+          twoFactorVerifiedAt: true,
+          passwordHash: true,
+          inviteToken: true,
+          inviteTokenExpires: true,
+        },
       },
     },
   });
