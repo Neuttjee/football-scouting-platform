@@ -340,15 +340,6 @@ export default async function PlayerProfilePage({
 
                 <div>
                   <div className="text-text-muted uppercase tracking-wider text-xs mb-1">
-                    Processtap
-                  </div>
-                  <div className="font-bold text-lg text-text-primary">
-                    {player.step || '-'}
-                  </div>
-                </div>
-
-                <div>
-                  <div className="text-text-muted uppercase tracking-wider text-xs mb-1">
                     Advies
                   </div>
                   <div className="font-bold text-lg text-text-primary">

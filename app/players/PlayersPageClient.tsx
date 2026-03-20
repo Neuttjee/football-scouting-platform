@@ -22,6 +22,7 @@ type ExternalPlayer = {
   advies: string | null;
   notes: string | null;
   plannedInternalFromSeasonYear?: number | null;
+  plannedInternalTeamId?: string | null;
 };
 
 type InternalPlayer = {
@@ -126,6 +127,7 @@ export function PlayersPageClient({
           data={externalPlayers as any}
           clubUsers={clubUsers}
           clubName={clubName}
+          teams={teams}
           canBulkDelete={canBulkDelete}
           canDeletePlayers={canDeletePlayers}
           initialSorting={initialPlayersSorting}

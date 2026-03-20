@@ -104,6 +104,7 @@ function InlineInput({
 export function getColumns(
   clubUsers: any[],
   clubName: string | null,
+  teams: { id: string; name: string; code: string | null; niveau?: string | null }[],
   canBulkDelete: boolean,
   canDeletePlayers: boolean
 ): ColumnDef<Player>[] {
@@ -288,6 +289,7 @@ export function getColumns(
           player={row.original}
           clubUsers={clubUsers}
           clubName={clubName}
+          teams={teams}
           canDelete={canDeletePlayers}
         />
       ),
@@ -396,6 +398,7 @@ export type PlayersTableProps = {
   data: Player[];
   clubUsers?: any[];
   clubName?: string | null;
+  teams?: { id: string; name: string; code: string | null; niveau?: string | null }[];
   canBulkDelete?: boolean;
   canDeletePlayers?: boolean;
   initialSorting?: SortingState;
@@ -406,6 +409,7 @@ export function PlayersTable({
   data,
   clubUsers = [],
   clubName = null,
+  teams = [],
   canBulkDelete = false,
   canDeletePlayers = false,
   initialSorting = [],
@@ -421,8 +425,8 @@ export function PlayersTable({
   })
 
   const columns = React.useMemo(
-    () => getColumns(clubUsers, clubName, canBulkDelete, canDeletePlayers),
-    [clubUsers, clubName, canBulkDelete, canDeletePlayers]
+    () => getColumns(clubUsers, clubName, teams, canBulkDelete, canDeletePlayers),
+    [clubUsers, clubName, teams, canBulkDelete, canDeletePlayers]
   );
 
   const table = useReactTable({
