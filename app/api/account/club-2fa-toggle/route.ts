@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getEffectiveClubId, getSession } from "@/lib/auth";
+import { getEffectiveClubId, getSession, setSession } from "@/lib/auth";
 
 export async function POST(req: Request) {
   try {
@@ -76,6 +76,16 @@ export async function POST(req: Request) {
           });
         }
       }
+    });
+
+    const self = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { twoFactorSecret: true, twoFactorVerifiedAt: true },
+    });
+    const isConfigured = Boolean(self?.twoFactorSecret && self?.twoFactorVerifiedAt);
+    await setSession({
+      ...session.user,
+      twoFactorSetupRequired: enabled && !isConfigured,
     });
 
     return NextResponse.json({ success: true, enabled });

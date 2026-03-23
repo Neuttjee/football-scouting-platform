@@ -10,9 +10,10 @@ interface SidebarProps {
   role: string;
   clubName?: string | null;
   clubLogo?: string | null;
+  twoFactorSetupRequired?: boolean;
 }
 
-export function Sidebar({ role, clubName, clubLogo }: SidebarProps) {
+export function Sidebar({ role, clubName, clubLogo, twoFactorSetupRequired = false }: SidebarProps) {
   const pathname = usePathname();
   const hasTasks = useHasFeature('tasks');
   const hasContacts = useHasFeature('contact_logs');
@@ -53,7 +54,13 @@ export function Sidebar({ role, clubName, clubLogo }: SidebarProps) {
         </span>
       </div>
       <nav className="flex-1 p-4 space-y-2 mt-4">
+        {twoFactorSetupRequired && (
+          <p className="text-xs text-text-muted px-2 py-1">
+            Rond eerst je 2FA-setup af om menu-items te openen.
+          </p>
+        )}
         {navItems.map((item) => {
+          if (twoFactorSetupRequired) return null;
           if (item.featureKey === 'dashboard' && !hasDashboard) return null;
           if (item.featureKey === 'internal_players' && !hasSquadPlanning) return null;
           if (item.featureKey === 'tasks' && !hasTasks) return null;
@@ -76,7 +83,7 @@ export function Sidebar({ role, clubName, clubLogo }: SidebarProps) {
         })}
       </nav>
       <div className="p-4 space-y-2">
-        {role === 'SUPERADMIN' && (
+        {role === 'SUPERADMIN' && !twoFactorSetupRequired && (
           <Link
             href="/superadmin"
             className={`relative block pl-3 p-2 rounded transition-colors ${

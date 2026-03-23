@@ -63,29 +63,37 @@ export default async function RootLayout({
   const effectiveClubId = getEffectiveClubId(session);
   let club = null;
   let clubConfig = null;
+  let twoFactorSetupRequired = false;
 
-  if (session && effectiveClubId) {
-    const [clubRecord, config, twoFactorUser] = await Promise.all([
-      prisma.club.findUnique({
-        where: { id: effectiveClubId },
-      }),
-      getClubConfigByClubId(effectiveClubId),
+  if (session) {
+    const policyClubId = session.user.clubId;
+    const [configForPolicy, twoFactorUser] = await Promise.all([
+      getClubConfigByClubId(policyClubId),
       prisma.user.findUnique({
         where: { id: session.user.id },
         select: { twoFactorSecret: true, twoFactorVerifiedAt: true },
       }),
     ]);
-    club = clubRecord;
-    clubConfig = config;
 
     // 2FA setup is mandatory before navigating further.
-    const hasTwoFactorModule = config?.features.two_factor_auth ?? false;
+    const hasTwoFactorModule = configForPolicy?.features.two_factor_auth ?? false;
     const isConfigured = !!twoFactorUser?.twoFactorSecret && !!twoFactorUser?.twoFactorVerifiedAt;
-    const twoFactorSetupRequired = hasTwoFactorModule && !isConfigured;
+    twoFactorSetupRequired = hasTwoFactorModule && !isConfigured;
 
     if (twoFactorSetupRequired && pathname && !pathname.startsWith('/setup')) {
       redirect('/setup');
     }
+  }
+
+  if (session && effectiveClubId) {
+    const [clubRecord, config] = await Promise.all([
+      prisma.club.findUnique({
+        where: { id: effectiveClubId },
+      }),
+      getClubConfigByClubId(effectiveClubId),
+    ]);
+    club = clubRecord;
+    clubConfig = config;
   }
 
   // Auto-promote club when a trial ends (no background job needed).
@@ -126,7 +134,12 @@ export default async function RootLayout({
           {session ? (
             <ClubConfigProvider value={clubConfig}>
               <div className="flex h-screen overflow-hidden">
-                <Sidebar role={session.user.role} clubName={club?.name} clubLogo={club?.logo} />
+                <Sidebar
+                  role={session.user.role}
+                  clubName={club?.name}
+                  clubLogo={club?.logo}
+                  twoFactorSetupRequired={twoFactorSetupRequired}
+                />
                 <div className="flex-1 flex flex-col overflow-hidden">
                   <Topbar role={session.user.role} />
                   <main className="flex-1 overflow-y-auto pb-16 md:pb-0 relative bg-bg-secondary">
@@ -136,7 +149,10 @@ export default async function RootLayout({
                     </div>
                   </main>
                 </div>
-                <MobileNav role={session.user.role} />
+                <MobileNav
+                  role={session.user.role}
+                  twoFactorSetupRequired={twoFactorSetupRequired}
+                />
               </div>
             </ClubConfigProvider>
           ) : (

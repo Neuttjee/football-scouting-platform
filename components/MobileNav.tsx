@@ -6,11 +6,21 @@ import { Home, Users, CheckSquare, Settings, ClipboardList, Shield } from 'lucid
 import { useHasFeature } from '@/components/club/ClubConfigProvider';
 import type { ClubFeatureKey } from '@/lib/clubFeatures';
 
-export function MobileNav({ role }: { role: string }) {
+export function MobileNav({
+  role,
+  twoFactorSetupRequired = false,
+}: {
+  role: string;
+  twoFactorSetupRequired?: boolean;
+}) {
   const pathname = usePathname();
   const hasDashboard = useHasFeature('dashboard');
   const hasInternalPlayers = useHasFeature('internal_players');
   const hasTasks = useHasFeature('tasks');
+
+  if (twoFactorSetupRequired) {
+    return null;
+  }
 
   const navItems: { href: string; label: string; icon: React.ComponentType<{ size?: number }>; featureKey?: ClubFeatureKey }[] = [
     ...(role === 'SUPERADMIN' ? [{ href: '/superadmin', label: 'Admin', icon: Shield }] : []),

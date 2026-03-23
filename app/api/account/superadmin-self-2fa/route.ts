@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { getSession } from "@/lib/auth";
+import { getSession, setSession } from "@/lib/auth";
 import { getClubConfigByClubId } from "@/lib/clubConfig";
 
 type SuperadminSelfTwoFactorResponse = {
@@ -69,6 +69,11 @@ export async function POST(req: Request) {
       hasTwoFactorModule,
       isConfigured,
     };
+
+    await setSession({
+      ...session.user,
+      twoFactorSetupRequired: hasTwoFactorModule && !isConfigured,
+    });
 
     return NextResponse.json({ success: true, ...response });
   } catch (error) {
