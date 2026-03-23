@@ -77,21 +77,27 @@ export default async function DashboardPage() {
         </div>
 
         {hasExternalPlayersFeature && (
-          <div className="card-premium p-6 rounded-xl flex flex-col items-start justify-center transition-all duration-300 hover:border-accent-primary hover:shadow-[0_0_20px_rgba(var(--primary-rgb),0.15)]">
+          <Link
+            href="/players"
+            className="card-premium p-6 rounded-xl flex flex-col items-start justify-center transition-all duration-300 hover:border-accent-primary hover:shadow-[0_0_20px_rgba(var(--primary-rgb),0.15)] no-underline"
+          >
             <h2 className="text-xs font-medium text-text-muted uppercase tracking-wider">
               Aantal spelers <span className="text-accent-primary">Extern</span>
             </h2>
             <p className="text-4xl font-bold mt-2 text-text-primary font-mono">{externalCount}</p>
-          </div>
+          </Link>
         )}
 
         {hasInternalPlayersFeature && (
-          <div className="card-premium p-6 rounded-xl flex flex-col items-start justify-center transition-all duration-300 hover:border-accent-primary hover:shadow-[0_0_20px_rgba(var(--primary-rgb),0.15)]">
+          <Link
+            href="/players?view=internal"
+            className="card-premium p-6 rounded-xl flex flex-col items-start justify-center transition-all duration-300 hover:border-accent-primary hover:shadow-[0_0_20px_rgba(var(--primary-rgb),0.15)] no-underline"
+          >
             <h2 className="text-xs font-medium text-text-muted uppercase tracking-wider">
               Aantal spelers <span className="text-accent-primary">Intern</span>
             </h2>
             <p className="text-4xl font-bold mt-2 text-text-primary font-mono">{internalCount}</p>
-          </div>
+          </Link>
         )}
       </div>
 
