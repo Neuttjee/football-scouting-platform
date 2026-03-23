@@ -6,7 +6,13 @@ import { User } from "lucide-react";
 import { LogoutButton } from "@/components/LogoutButton";
 import PasswordChangeFormClient from "@/components/account/PasswordChangeFormClient";
 
-export default function AccountDialog() {
+import SuperadminSelfTwoFactorToggleClient from "@/components/account/SuperadminSelfTwoFactorToggleClient";
+
+export default function AccountDialog({
+  role,
+}: {
+  role: string;
+}) {
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -21,6 +27,10 @@ export default function AccountDialog() {
       <DialogContent className="w-full max-w-xl bg-bg-card border-accent-primary text-text-primary shadow-[0_0_15px_rgba(var(--primary-rgb),0.3)]">
         <div className="space-y-6">
           <PasswordChangeFormClient />
+
+          {role === "SUPERADMIN" && (
+            <SuperadminSelfTwoFactorToggleClient />
+          )}
 
           <div className="pt-2">
             <LogoutButton />
