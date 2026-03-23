@@ -55,6 +55,7 @@ export async function POST(req: Request) {
           email: user.email,
           role: user.role,
           clubId: user.clubId,
+          twoFactorSetupRequired,
         });
 
         return NextResponse.json({
@@ -135,6 +136,7 @@ export async function POST(req: Request) {
         email: user.email,
         role: user.role,
         clubId: user.clubId,
+        twoFactorSetupRequired: false,
       });
 
       cookieStore.delete('twofa_pending');

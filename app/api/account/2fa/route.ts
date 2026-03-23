@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { authenticator } from "otplib";
 import QRCode from "qrcode";
 import prisma from "@/lib/prisma";
-import { getSession, getEffectiveClubId } from "@/lib/auth";
+import { getSession, getEffectiveClubId, setSession } from "@/lib/auth";
 import { getClubConfigByClubId } from "@/lib/clubConfig";
 
 export async function GET() {
@@ -130,6 +130,16 @@ export async function POST(req: Request) {
         // Als de club-module actief is, zorg dat 2FA vanaf de volgende login ook daadwerkelijk afgedwongen wordt.
         twoFactorEnabled: true,
       },
+    });
+
+    // Update de actieve sessie direct zodat route-guards de gebruiker niet
+    // onnodig op /setup blijven houden na succesvolle verificatie.
+    await setSession({
+      id: session.user.id,
+      email: session.user.email,
+      role: session.user.role,
+      clubId: session.user.clubId,
+      twoFactorSetupRequired: false,
     });
 
     return NextResponse.json({ success: true });

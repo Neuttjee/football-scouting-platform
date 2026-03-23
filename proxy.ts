@@ -30,6 +30,14 @@ export async function proxy(request: NextRequest) {
     if (!payload) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const twoFactorSetupRequired = Boolean(payload?.user?.twoFactorSetupRequired);
+    const isAllowedSetupApi =
+      pathname.startsWith('/api/account/2fa') || pathname.startsWith('/api/auth');
+    if (twoFactorSetupRequired && !isAllowedSetupApi) {
+      return NextResponse.json({ error: '2FA setup required' }, { status: 403 });
+    }
+
     return NextResponse.next();
   }
 
@@ -41,6 +49,11 @@ export async function proxy(request: NextRequest) {
   const payload = await decrypt(session);
   if (!payload) {
     return NextResponse.redirect(new URL('/login', request.url));
+  }
+
+  const twoFactorSetupRequired = Boolean(payload?.user?.twoFactorSetupRequired);
+  if (twoFactorSetupRequired && pathname !== '/setup') {
+    return NextResponse.redirect(new URL('/setup', request.url));
   }
 
   // Update session expiration
