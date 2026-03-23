@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import prisma from '@/lib/prisma';
 import bcrypt from 'bcrypt';
-import { setSession, clearSession, decrypt } from '@/lib/auth';
+import { setSession, clearSession } from '@/lib/auth';
 import { getClubConfigByClubId } from '@/lib/clubConfig';
 import { authenticator } from 'otplib';
 

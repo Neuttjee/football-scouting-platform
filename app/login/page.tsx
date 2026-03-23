@@ -39,14 +39,14 @@ export default function LoginPage() {
         setPassword('')
       } else {
         const nextPath = data?.twoFactorSetupRequired
-          ? '/account'
+          ? '/setup'
           : data?.user?.role === 'SUPERADMIN'
             ? '/superadmin'
             : '/dashboard'
         router.push(nextPath)
         router.refresh()
       }
-    } catch (err) {
+    } catch {
       setError('Er is een onverwachte fout opgetreden.')
     } finally {
       setLoading(false)
@@ -71,7 +71,7 @@ export default function LoginPage() {
         router.push(nextPath)
         router.refresh()
       }
-    } catch (err) {
+    } catch {
       setTwoFactorError('Er is een onverwachte fout opgetreden tijdens 2FA.')
     } finally {
       setLoading(false)
