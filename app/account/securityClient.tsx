@@ -98,7 +98,7 @@ export default function AccountSecurityClient() {
         ) : (
           <div className="space-y-4 max-w-xl">
             <p className="text-sm text-muted-foreground">
-              Verhoog de veiligheid van je account door bij het inloggen naast je wachtzin ook een code uit een
+              Verhoog de veiligheid van je account door bij het inloggen naast je wachtwoord ook een code uit een
               authenticator-app (zoals Google Authenticator) in te vullen.
             </p>
 

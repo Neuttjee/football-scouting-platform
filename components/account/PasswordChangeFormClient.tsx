@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { Button } from "@/components/ui/button";
 
 function isStrongPassphrase(value: string): boolean {
   const trimmed = value.trim();
@@ -26,12 +27,12 @@ export default function PasswordChangeFormClient() {
     setSuccess(null);
 
     if (!isStrongPassphrase(newPassword)) {
-      setError("Gebruik een sterke wachtzin van minimaal 16 tekens en 4 woorden.");
+      setError("Gebruik een sterk wachtwoord van minimaal 16 tekens en 4 woorden.");
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      setError("Nieuwe wachtzinnen komen niet overeen.");
+      setError("Nieuwe wachtwoorden komen niet overeen.");
       return;
     }
 
@@ -49,7 +50,7 @@ export default function PasswordChangeFormClient() {
         return;
       }
 
-      setSuccess("Je wachtzin is succesvol gewijzigd.");
+      setSuccess("Je wachtwoord is succesvol gewijzigd.");
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
@@ -64,7 +65,7 @@ export default function PasswordChangeFormClient() {
   return (
     <div>
       <h3 className="text-lg font-semibold mb-2">Wachtwoord wijzigen</h3>
-      <p className="text-sm text-muted-foreground mb-4">Gebruik een sterke wachtzin, bijvoorbeeld een zin van minimaal 4 woorden en 16+ tekens.</p>
+      <p className="text-sm text-muted-foreground mb-4">Gebruik een sterk wachtwoord, bijvoorbeeld een zin van minimaal 4 woorden en 16+ tekens.</p>
 
       <form onSubmit={handleSubmit} className="space-y-4 max-w-md">
         {error && (
@@ -93,7 +94,7 @@ export default function PasswordChangeFormClient() {
 
         <div className="space-y-1">
           <label className="block text-xs font-semibold uppercase tracking-wide text-text-muted">
-            Nieuwe wachtzin
+            Nieuwe wachtwoord
           </label>
           <input
             type="password"
@@ -106,7 +107,7 @@ export default function PasswordChangeFormClient() {
 
         <div className="space-y-1">
           <label className="block text-xs font-semibold uppercase tracking-wide text-text-muted">
-            Bevestig nieuwe wachtzin
+            Bevestig nieuwe wachtwoord
           </label>
           <input
             type="password"
@@ -117,13 +118,13 @@ export default function PasswordChangeFormClient() {
           />
         </div>
 
-        <button
+        <Button
           type="submit"
           disabled={isSubmitting}
-          className="inline-flex items-center justify-center px-4 py-2 rounded-full bg-accent-primary text-white text-sm font-medium hover:bg-accent-glow disabled:opacity-50 transition-colors"
+          className="btn-premium text-white transition"
         >
-          {isSubmitting ? "Wachtzin wijzigen..." : "Wachtzin wijzigen"}
-        </button>
+          {isSubmitting ? "Wachtwoord wijzigen..." : "Wachtwoord wijzigen"}
+        </Button>
       </form>
     </div>
   );

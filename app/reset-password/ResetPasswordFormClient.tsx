@@ -28,7 +28,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
     setError(null);
 
     if (!isStrongPassphrase(password)) {
-      setError("Gebruik een sterke wachtzin van minimaal 16 tekens en 4 woorden.");
+      setError("Gebruik een sterk wachtwoord van minimaal 16 tekens en 4 woorden.");
       return;
     }
     if (password !== confirmPassword) {
@@ -61,7 +61,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
     return (
       <div className="space-y-4">
         <p className="text-sm text-text-primary">
-          Je wachtzin is succesvol bijgewerkt. Je kunt nu inloggen met je nieuwe gegevens.
+          Je wachtwoord is succesvol bijgewerkt. Je kunt nu inloggen met je nieuwe gegevens.
         </p>
         <a
           href="/login"
@@ -83,7 +83,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
 
       <div className="space-y-1">
         <label className="block text-xs font-semibold uppercase tracking-wide text-text-muted">
-          Nieuwe wachtzin
+          Nieuwe wachtwoord
         </label>
         <input
           type="password"
@@ -96,7 +96,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
 
       <div className="space-y-1">
         <label className="block text-xs font-semibold uppercase tracking-wide text-text-muted">
-          Bevestig wachtzin
+          Bevestig wachtwoord
         </label>
         <input
           type="password"
@@ -112,7 +112,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
         disabled={isSubmitting}
         className="w-full mt-2 inline-flex items-center justify-center px-4 py-2 rounded-full bg-accent-primary text-white text-sm font-medium hover:bg-accent-glow disabled:opacity-50 transition-colors"
       >
-        {isSubmitting ? "Wachtzin instellen..." : "Wachtzin instellen"}
+        {isSubmitting ? "Wachtwoord instellen..." : "Wachtwoord instellen"}
       </button>
     </form>
   );

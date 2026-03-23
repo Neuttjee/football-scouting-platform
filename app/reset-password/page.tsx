@@ -62,7 +62,7 @@ export default async function ResetPasswordPage({ searchParams }: ResetPasswordP
       <div className="max-w-md w-full card-premium p-8 rounded-xl border border-border-dark shadow-lg">
         <h1 className="text-2xl font-bold mb-2 text-text-primary">Nieuw wachtwoord instellen</h1>
         <p className="text-sm text-muted-foreground mb-4">
-          Stel een nieuwe, sterke wachtzin in voor{" "}
+          Stel een nieuwe, sterke wachtwoord in voor{" "}
           <span className="font-semibold text-text-primary">{user.email}</span>.
         </p>
         <p className="text-xs text-muted-foreground mb-4">

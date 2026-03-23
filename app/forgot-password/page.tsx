@@ -40,8 +40,8 @@ export default function ForgotPasswordPage() {
           Wachtwoord vergeten
         </h1>
         <p className="text-sm text-muted-foreground mb-6">
-          Vul je e-mailadres in. Als we een account vinden, sturen we een link om je wachtzin opnieuw in te
-          stellen.
+          Vul je e-mailadres in. Als we een account vinden, sturen we een link om je wachtwoord opnieuw in
+          te stellen.
         </p>
 
         {submitted ? (
@@ -92,7 +92,7 @@ export default function ForgotPasswordPage() {
 
             <div className="pt-2 flex items-center justify-between text-xs text-muted-foreground">
               <span>
-                Tip: kies straks een sterke wachtzin, bijvoorbeeld een zin van minimaal 4 woorden en 16+ tekens.
+                Tip: kies straks een sterk wachtwoord, bijvoorbeeld een zin van minimaal 4 woorden en 16+ tekens.
               </span>
               <Link
                 href="/login"

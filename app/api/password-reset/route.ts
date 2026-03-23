@@ -53,12 +53,12 @@ export async function PUT(req: Request) {
       return NextResponse.json({ error: 'Ongeldig wachtwoord' }, { status: 400 });
     }
 
-    // Basis wachtzinregels (ook server-side afgedwongen)
+    // Basis wachtwoordregels (ook server-side afgedwongen)
     if (!isStrongPassphrase(password)) {
       return NextResponse.json(
         {
           error:
-            'Gebruik een sterke wachtzin van minimaal 16 tekens en 4 woorden.',
+            'Gebruik een sterk wachtwoord van minimaal 16 tekens en 4 woorden.',
         },
         { status: 400 },
       );

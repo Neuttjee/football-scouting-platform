@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { searchPlayers } from "@/app/players/actions"
 import AccountDialog from "@/components/AccountDialog"
 
-export function Topbar({ role }: { role: string }) {
+export function Topbar() {
   const router = useRouter()
   const [query, setQuery] = React.useState("")
   const [results, setResults] = React.useState<any[]>([])
@@ -112,7 +112,7 @@ export function Topbar({ role }: { role: string }) {
       </div>
       
       <div className="flex items-center gap-4">
-        <AccountDialog role={role} />
+        <AccountDialog />
       </div>
     </header>
   )

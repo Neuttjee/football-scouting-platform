@@ -107,7 +107,7 @@ export async function sendPasswordResetEmail(email: string, token: string) {
           <td style="font-size:14px;line-height:1.6;color:#e5e7eb;">
             <p style="margin:0 0 12px 0;">We hebben een verzoek ontvangen om je wachtwoord te wijzigen.</p>
             <p style="margin:0 0 12px 0;">
-              Klik op de knop hieronder om een nieuwe wachtzin in te stellen. Deze link is 30 minuten geldig.
+              Klik op de knop hieronder om een nieuw wachtwoord in te stellen. Deze link is 30 minuten geldig.
             </p>
             <p style="margin:0 0 24px 0;text-align:center;">
               <a href="${resetUrl}"
@@ -132,7 +132,7 @@ export async function sendPasswordResetEmail(email: string, token: string) {
 
   const text = `We hebben een verzoek ontvangen om je wachtwoord te wijzigen.
 
-Klik op de volgende link om een nieuwe wachtzin in te stellen (30 minuten geldig):
+Klik op de volgende link om een nieuw wachtwoord in te stellen (30 minuten geldig):
 ${resetUrl}
 
 Heb je dit niet zelf aangevraagd? Negeer deze e-mail dan.`;

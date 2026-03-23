@@ -43,7 +43,7 @@ export async function POST(req: Request) {
       return NextResponse.json(
         {
           error:
-            'Gebruik een sterke wachtzin van minimaal 16 tekens en 4 woorden.',
+            'Gebruik een sterk wachtwoord van minimaal 16 tekens en 4 woorden.',
         },
         { status: 400 },
       );
