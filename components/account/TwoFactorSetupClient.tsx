@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
 type TwoFactorStatusResponse = {
   hasTwoFactorModule: boolean;
@@ -161,13 +162,13 @@ export default function TwoFactorSetupClient({ role }: { role: string }) {
                   />
                 </div>
 
-                <button
+                <Button
                   type="submit"
                   disabled={setupLoading}
-                  className="inline-flex items-center justify-center px-4 py-2 rounded-full bg-accent-primary text-white text-sm font-medium hover:bg-accent-glow disabled:opacity-50 transition-colors"
+                  className="btn-premium text-white transition"
                 >
                   {setupLoading ? "Code controleren..." : "Code bevestigen"}
-                </button>
+                </Button>
               </form>
             </div>
           </>

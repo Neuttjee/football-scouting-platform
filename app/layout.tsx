@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter, JetBrains_Mono } from 'next/font/google';
+import { headers } from 'next/headers';
+import { redirect } from 'next/navigation';
 import './globals.css';
 import { getSession, getEffectiveClubId } from '@/lib/auth';
 import prisma from '@/lib/prisma';
@@ -28,20 +30,62 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const nextUrlHeaders = await headers();
+  const nextUrl = nextUrlHeaders.get('next-url');
+  let pathname = '';
+  if (nextUrl) {
+    try {
+      pathname = new URL(nextUrl).pathname;
+    } catch {
+      // Fallback if Next sends just a path string.
+      pathname = nextUrl;
+    }
+  }
+
   const session = await getSession();
+
+  // Global auth guard: without a valid session you shouldn't be able to "bypass"
+  // login by navigating to protected app pages.
+  if (!session) {
+    const isPublicPath =
+      pathname === '/login' ||
+      pathname === '/forgot-password' ||
+      pathname === '/reset-password' ||
+      pathname === '/accept-invite';
+
+    const isProbablyStaticAsset = pathname.includes('.');
+
+    if (pathname && !isPublicPath && !isProbablyStaticAsset) {
+      redirect('/login');
+    }
+  }
+
   const effectiveClubId = getEffectiveClubId(session);
   let club = null;
   let clubConfig = null;
 
   if (session && effectiveClubId) {
-    const [clubRecord, config] = await Promise.all([
+    const [clubRecord, config, twoFactorUser] = await Promise.all([
       prisma.club.findUnique({
         where: { id: effectiveClubId },
       }),
       getClubConfigByClubId(effectiveClubId),
+      prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: { twoFactorSecret: true, twoFactorVerifiedAt: true },
+      }),
     ]);
     club = clubRecord;
     clubConfig = config;
+
+    // 2FA setup is mandatory before navigating further.
+    const hasTwoFactorModule = config?.features.two_factor_auth ?? false;
+    const isConfigured = !!twoFactorUser?.twoFactorSecret && !!twoFactorUser?.twoFactorVerifiedAt;
+    const twoFactorSetupRequired = hasTwoFactorModule && !isConfigured;
+
+    if (twoFactorSetupRequired && pathname && !pathname.startsWith('/setup')) {
+      redirect('/setup');
+    }
   }
 
   // Auto-promote club when a trial ends (no background job needed).
