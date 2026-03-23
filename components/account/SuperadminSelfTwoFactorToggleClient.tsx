@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Checkbox } from "@/components/ui/checkbox";
+import { SegmentedToggle } from "@/components/SegmentedToggle";
 
 type SuperadminSelfTwoFactorStatus = {
   twoFactorEnabled: boolean;
@@ -65,7 +65,11 @@ export default function SuperadminSelfTwoFactorToggleClient() {
   };
 
   const checked = status?.twoFactorEnabled ?? false;
-  const disabled = updating || loading || !(status?.hasTwoFactorModule ?? false);
+  const disabledByModule = !(status?.hasTwoFactorModule ?? false);
+  const disabled = updating || loading || disabledByModule;
+
+  type ToggleValue = "enabled" | "disabled";
+  const value: ToggleValue = checked ? "enabled" : "disabled";
 
   return (
     <div className="mt-8 border-t border-border-dark pt-5">
@@ -85,28 +89,26 @@ export default function SuperadminSelfTwoFactorToggleClient() {
             </div>
           )}
 
-          <div className="flex items-center gap-3 mb-2">
-            <Checkbox
-              checked={checked}
-              onCheckedChange={(val) => toggleTwoFactor(Boolean(val))}
-              aria-label="2FA voor superadmin aan/uit"
-              disabled={disabled}
+          <div className={disabled ? "pointer-events-none opacity-50" : undefined}>
+            <SegmentedToggle<ToggleValue>
+              value={value}
+              onChange={(nextValue) => toggleTwoFactor(nextValue === "enabled")}
+              size="sm"
+              options={[
+                { value: "enabled", label: "Aan" },
+                { value: "disabled", label: "Uit" },
+              ]}
             />
-            <div className="text-sm">
-              <span className={checked ? "text-emerald-400 font-medium" : "text-text-secondary font-medium"}>
-                {checked ? "Aan" : "Uit"}
-              </span>
-            </div>
           </div>
 
-          {!status?.hasTwoFactorModule && (
-            <p className="text-xs text-muted-foreground">
+          {disabledByModule && (
+            <p className="text-xs text-muted-foreground mt-2">
               Tip: de 2FA-module staat uit voor Platform; daarom kun je deze toggle niet inschakelen.
             </p>
           )}
 
           {status?.hasTwoFactorModule && status?.twoFactorEnabled && !status?.isConfigured && (
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground mt-2">
               Let op: 2FA is (nog) niet volledig ingesteld voor dit account, waardoor login mogelijk geen 2FA vereist.
             </p>
           )}

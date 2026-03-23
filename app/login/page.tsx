@@ -38,7 +38,11 @@ export default function LoginPage() {
         setTwoFactorRequired(true)
         setPassword('')
       } else {
-        const nextPath = data?.user?.role === 'SUPERADMIN' ? '/superadmin' : '/dashboard'
+        const nextPath = data?.twoFactorSetupRequired
+          ? '/account'
+          : data?.user?.role === 'SUPERADMIN'
+            ? '/superadmin'
+            : '/dashboard'
         router.push(nextPath)
         router.refresh()
       }

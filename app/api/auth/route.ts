@@ -33,6 +33,8 @@ export async function POST(req: Request) {
 
       const clubConfig = await getClubConfigByClubId(user.clubId);
       const hasTwoFactorModule = clubConfig?.features.two_factor_auth ?? false;
+      const isConfigured = !!user.twoFactorSecret && !!user.twoFactorVerifiedAt;
+      const twoFactorSetupRequired = hasTwoFactorModule && !isConfigured;
       const requiresTwoFactor =
         hasTwoFactorModule &&
         !!user.twoFactorEnabled &&
@@ -55,7 +57,11 @@ export async function POST(req: Request) {
           clubId: user.clubId,
         });
 
-        return NextResponse.json({ success: true, user: { id: user.id, name: user.name, role: user.role } });
+        return NextResponse.json({
+          success: true,
+          user: { id: user.id, name: user.name, role: user.role },
+          twoFactorSetupRequired,
+        });
       }
 
       const cookieStore = await cookies();

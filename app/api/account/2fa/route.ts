@@ -11,7 +11,10 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const clubId = getEffectiveClubId(session);
+  const clubId =
+    session.user.role === "SUPERADMIN"
+      ? session.user.clubId
+      : getEffectiveClubId(session);
   if (!clubId) {
     return NextResponse.json({ error: "Geen club geselecteerd" }, { status: 400 });
   }
@@ -48,7 +51,10 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const clubId = getEffectiveClubId(session);
+  const clubId =
+    session.user.role === "SUPERADMIN"
+      ? session.user.clubId
+      : getEffectiveClubId(session);
   if (!clubId) {
     return NextResponse.json({ error: "Geen club geselecteerd" }, { status: 400 });
   }
@@ -121,6 +127,8 @@ export async function POST(req: Request) {
       where: { id: session.user.id },
       data: {
         twoFactorVerifiedAt: new Date(),
+        // Als de club-module actief is, zorg dat 2FA vanaf de volgende login ook daadwerkelijk afgedwongen wordt.
+        twoFactorEnabled: true,
       },
     });
 

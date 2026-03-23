@@ -7,6 +7,7 @@ import { LogoutButton } from "@/components/LogoutButton";
 import PasswordChangeFormClient from "@/components/account/PasswordChangeFormClient";
 
 import SuperadminSelfTwoFactorToggleClient from "@/components/account/SuperadminSelfTwoFactorToggleClient";
+import AccountSecurityClient from "@/app/account/securityClient";
 
 export default function AccountDialog({
   role,
@@ -26,10 +27,12 @@ export default function AccountDialog({
       </DialogTrigger>
       <DialogContent className="w-full max-w-xl bg-bg-card border-accent-primary text-text-primary shadow-[0_0_15px_rgba(var(--primary-rgb),0.3)]">
         <div className="space-y-6">
-          <PasswordChangeFormClient />
-
-          {role === "SUPERADMIN" && (
-            <SuperadminSelfTwoFactorToggleClient />
+          {role === "SUPERADMIN" ? (
+            <AccountSecurityClient>
+              <SuperadminSelfTwoFactorToggleClient />
+            </AccountSecurityClient>
+          ) : (
+            <PasswordChangeFormClient />
           )}
 
           <div className="pt-2">

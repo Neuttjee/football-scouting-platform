@@ -3,7 +3,7 @@
 import * as React from "react";
 import PasswordChangeFormClient from "@/components/account/PasswordChangeFormClient";
 
-export default function AccountSecurityClient() {
+export default function AccountSecurityClient({ children }: { children?: React.ReactNode }) {
   const [twoFaSupported, setTwoFaSupported] = React.useState(false);
   const [twoFaEnabled, setTwoFaEnabled] = React.useState(false);
   const [twoFaConfigured, setTwoFaConfigured] = React.useState(false);
@@ -88,6 +88,8 @@ export default function AccountSecurityClient() {
   return (
     <div className="mt-6 border-t border-border-dark pt-6">
       <PasswordChangeFormClient />
+
+      {children}
 
       <div className="mt-10 border-t border-border-dark pt-6">
         <h3 className="text-lg font-semibold mb-2">Tweefactor authenticatie (2FA)</h3>
