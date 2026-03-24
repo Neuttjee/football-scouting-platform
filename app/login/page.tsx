@@ -103,7 +103,7 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-xs font-semibold uppercase tracking-wide text-text-muted">Email</Label>
                 <Input
                   id="email"
                   type="email"
@@ -114,7 +114,7 @@ export default function LoginPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">Wachtwoord</Label>
+              <Label htmlFor="password" className="text-xs font-semibold uppercase tracking-wide text-text-muted">Wachtwoord</Label>
                 <Input
                   id="password"
                   type="password"
@@ -130,13 +130,13 @@ export default function LoginPage() {
               )}
             </CardContent>
             <CardFooter className="pt-8 pb-6 flex flex-col gap-3">
-              <Button type="submit" className="w-full h-11 text-base" disabled={loading}>
+              <Button type="submit" className="w-full btn-premium text-white" disabled={loading}>
                 {loading ? 'Bezig met inloggen...' : 'Inloggen'}
               </Button>
               <button
                 type="button"
                 onClick={() => router.push('/forgot-password')}
-                className="text-xs text-muted-foreground hover:text-text-primary underline-offset-4 hover:underline self-center"
+                className="self-center text-xs text-muted-foreground underline-offset-4 transition-all duration-200 hover:-translate-y-0.5 hover:text-accent-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/40 rounded-sm"
               >
                 Wachtwoord vergeten?
               </button>
@@ -146,7 +146,7 @@ export default function LoginPage() {
           <form onSubmit={handleSubmitTwoFactor}>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="twofactor">2FA-code</Label>
+              <Label htmlFor="twofactor" className="text-xs font-semibold uppercase tracking-wide text-text-muted">2FA-code</Label>
                 <Input
                   id="twofactor"
                   type="text"
@@ -167,7 +167,7 @@ export default function LoginPage() {
               )}
             </CardContent>
             <CardFooter className="pt-8 pb-6 flex flex-col gap-3">
-              <Button type="submit" className="w-full h-11 text-base" disabled={loading}>
+              <Button type="submit" className="w-full btn-premium text-white" disabled={loading}>
                 {loading ? 'Code controleren...' : 'Inloggen met 2FA'}
               </Button>
             </CardFooter>
