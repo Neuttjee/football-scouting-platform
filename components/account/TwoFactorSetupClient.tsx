@@ -106,7 +106,7 @@ export default function TwoFactorSetupClient({ role }: { role: string }) {
 
   return (
     <main className="min-h-screen w-full flex items-center justify-center bg-background p-4">
-      <div className="w-full max-w-md card-premium rounded-xl border border-border-dark p-6 shadow-lg">
+      <div className="w-full max-w-md card-premium rounded-xl border border-border-dark p-6 shadow-lg transition-all duration-300 hover:border-accent-primary hover:shadow-[0_0_20px_rgba(var(--primary-rgb),0.15)] focus-within:border-accent-primary focus-within:shadow-[0_0_20px_rgba(var(--primary-rgb),0.15)] active:border-accent-primary active:shadow-[0_0_20px_rgba(var(--primary-rgb),0.15)]">
         <h1 className="text-2xl font-bold tracking-tight mb-2 text-text-primary">2FA instellen</h1>
         <p className="text-sm text-muted-foreground mb-6">
           Scan de QR-code met je authenticator-app en bevestig daarna de 6-cijferige code.

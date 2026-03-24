@@ -35,7 +35,7 @@ export default function ForgotPasswordPage() {
 
   return (
     <main className="flex min-h-screen w-full items-center justify-center bg-background p-4">
-      <div className="w-full max-w-md card-premium rounded-xl border border-border-dark p-6 shadow-lg">
+      <div className="w-full max-w-md card-premium rounded-xl border border-border-dark p-6 shadow-lg transition-all duration-300 hover:border-accent-primary hover:shadow-[0_0_20px_rgba(var(--primary-rgb),0.15)] focus-within:border-accent-primary focus-within:shadow-[0_0_20px_rgba(var(--primary-rgb),0.15)] active:border-accent-primary active:shadow-[0_0_20px_rgba(var(--primary-rgb),0.15)]">
         <h1 className="text-2xl font-bold tracking-tight mb-2 text-text-primary">
           Wachtwoord vergeten
         </h1>
@@ -55,7 +55,7 @@ export default function ForgotPasswordPage() {
             </p>
             <Link
               href="/login"
-              className="inline-flex items-center text-xs text-accent-primary hover:text-accent-glow mt-4"
+              className="inline-flex items-center text-xs text-accent-primary hover:text-accent-glow mt-4 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/40 focus-visible:text-accent-glow rounded-sm"
             >
               ← Terug naar inloggen
             </Link>
@@ -96,7 +96,7 @@ export default function ForgotPasswordPage() {
               </span>
               <Link
                 href="/login"
-                className="ml-4 text-accent-primary hover:text-accent-glow whitespace-nowrap"
+                className="ml-4 text-accent-primary hover:text-accent-glow whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/40 focus-visible:text-accent-glow rounded-sm"
               >
                 ← Terug naar inloggen
               </Link>

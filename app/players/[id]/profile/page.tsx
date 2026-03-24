@@ -143,7 +143,7 @@ export default async function PlayerProfilePage({
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="md:col-span-2 space-y-6">
-          <Card>
+        <Card className="border-border-dark transition-all duration-300 hover:border-accent-primary hover:shadow-[0_0_20px_rgba(var(--primary-rgb),0.15)] focus-within:border-accent-primary focus-within:shadow-[0_0_20px_rgba(var(--primary-rgb),0.15)] active:border-accent-primary active:shadow-[0_0_20px_rgba(var(--primary-rgb),0.15)]">
             <CardHeader>
               <CardTitle className="text-accent-primary uppercase tracking-widest text-xs">Algemene Info</CardTitle>
             </CardHeader>
@@ -203,7 +203,7 @@ export default async function PlayerProfilePage({
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="border-border-dark transition-all duration-300 hover:border-accent-primary hover:shadow-[0_0_20px_rgba(var(--primary-rgb),0.15)] focus-within:border-accent-primary focus-within:shadow-[0_0_20px_rgba(var(--primary-rgb),0.15)] active:border-accent-primary active:shadow-[0_0_20px_rgba(var(--primary-rgb),0.15)]">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="text-accent-primary uppercase tracking-widest text-xs">
@@ -227,7 +227,7 @@ export default async function PlayerProfilePage({
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="border-border-dark transition-all duration-300 hover:border-accent-primary hover:shadow-[0_0_20px_rgba(var(--primary-rgb),0.15)] focus-within:border-accent-primary focus-within:shadow-[0_0_20px_rgba(var(--primary-rgb),0.15)] active:border-accent-primary active:shadow-[0_0_20px_rgba(var(--primary-rgb),0.15)]">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="text-accent-primary uppercase tracking-widest text-xs">
@@ -280,7 +280,7 @@ export default async function PlayerProfilePage({
 
         <div className="space-y-6">
           {player.type === 'INTERNAL' ? (
-            <Card>
+            <Card className="border-border-dark transition-all duration-300 hover:border-accent-primary hover:shadow-[0_0_20px_rgba(var(--primary-rgb),0.15)] focus-within:border-accent-primary focus-within:shadow-[0_0_20px_rgba(var(--primary-rgb),0.15)] active:border-accent-primary active:shadow-[0_0_20px_rgba(var(--primary-rgb),0.15)]">
               <CardHeader>
                 <CardTitle className="text-accent-primary uppercase tracking-widest text-xs">
                   Interne Situatie
@@ -322,7 +322,7 @@ export default async function PlayerProfilePage({
               </CardContent>
             </Card>
           ) : (
-            <Card>
+            <Card className="border-border-dark transition-all duration-300 hover:border-accent-primary hover:shadow-[0_0_20px_rgba(var(--primary-rgb),0.15)] focus-within:border-accent-primary focus-within:shadow-[0_0_20px_rgba(var(--primary-rgb),0.15)] active:border-accent-primary active:shadow-[0_0_20px_rgba(var(--primary-rgb),0.15)]" >
               <CardHeader>
                 <CardTitle className="text-accent-primary uppercase tracking-widest text-xs">
                   Scouting Status
@@ -373,7 +373,7 @@ export default async function PlayerProfilePage({
 
           {/* Radar chart voorlopig verborgen; component en import blijven bestaan voor toekomstige activatie */}
           {false && (
-            <Card className="border-border-dark border-dashed hover:border-accent-primary/50 shadow-[0_0_30px_rgba(var(--primary-rgb),0.05)]">
+            <Card className="border-border-dark transition-all duration-300 hover:border-accent-primary hover:shadow-[0_0_20px_rgba(var(--primary-rgb),0.15)] focus-within:border-accent-primary focus-within:shadow-[0_0_20px_rgba(var(--primary-rgb),0.15)] active:border-accent-primary active:shadow-[0_0_20px_rgba(var(--primary-rgb),0.15)]">
               <CardHeader>
                 <CardTitle className="text-text-muted font-normal uppercase tracking-widest text-xs">
                   Radar Chart (Binnenkort)

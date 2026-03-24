@@ -74,7 +74,7 @@ export function Sidebar({ role, clubName, clubLogo, twoFactorSetupRequired = fal
               className={`relative block pl-3 p-2 rounded transition-colors ${
                 isActive 
                   ? 'nav-item-active text-primary-brand font-medium rounded-md'
-                  : 'text-text-secondary hover:text-primary-brand hover:bg-bg-hover rounded-md'
+                  : 'text-text-secondary hover:text-primary-brand hover:bg-bg-hover active:text-primary-brand active:bg-bg-hover focus-visible:text-primary-brand focus-visible:bg-bg-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/40 rounded-md'
               }`}
             >
               {item.label}

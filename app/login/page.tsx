@@ -80,7 +80,7 @@ export default function LoginPage() {
 
   return (
     <div className="flex h-screen w-full items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md shadow-lg">
+      <Card className="w-full max-w-md shadow-lg transition-all duration-300 hover:border-accent-primary hover:shadow-[0_0_20px_rgba(var(--primary-rgb),0.15)] focus-within:border-accent-primary focus-within:shadow-[0_0_20px_rgba(var(--primary-rgb),0.15)] active:border-accent-primary active:shadow-[0_0_20px_rgba(var(--primary-rgb),0.15)]">
         <CardHeader className="space-y-4 text-center">
           <div className="flex justify-center mb-2">
             {/* Placeholder voor het statische logo in de public map */}
@@ -136,7 +136,7 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => router.push('/forgot-password')}
-                className="self-center text-xs text-muted-foreground underline-offset-4 transition-all duration-200 hover:-translate-y-0.5 hover:text-accent-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/40 rounded-sm"
+                className="self-center text-xs text-accent-primary hover:text-accent-glow transition-colors underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/40 focus-visible:text-accent-glow rounded-sm"
               >
                 Wachtwoord vergeten?
               </button>
