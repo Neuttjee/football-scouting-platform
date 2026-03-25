@@ -139,7 +139,7 @@ export default function LoginPage() {
                 href="/forgot-password"
                 className="self-center text-xs text-accent-primary hover:text-accent-glow transition-colors underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/40 focus-visible:ring-accent-glow rounded-sm"
               >
-                ← Wachtwoord vergeten?
+                Wachtwoord vergeten?
               </Link>
             </CardFooter>
           </form>
