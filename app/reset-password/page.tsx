@@ -28,9 +28,6 @@ export default async function ResetPasswordPage({ searchParams }: ResetPasswordP
                 alt="Football Scouting Platform Logo"
                 className="h-16 w-auto object-contain"
                 style={{ filter: "brightness(0) invert(1)" }}
-                onError={(e) => {
-                  (e.target as HTMLImageElement).style.display = "none";
-                }}
               />
             </div>
             <CardTitle className="text-2xl font-bold tracking-tight">Football Scouting Platform</CardTitle>
@@ -75,9 +72,6 @@ export default async function ResetPasswordPage({ searchParams }: ResetPasswordP
                 alt="Football Scouting Platform Logo"
                 className="h-16 w-auto object-contain"
                 style={{ filter: "brightness(0) invert(1)" }}
-                onError={(e) => {
-                  (e.target as HTMLImageElement).style.display = "none";
-                }}
               />
             </div>
             <CardTitle className="text-2xl font-bold tracking-tight">Football Scouting Platform</CardTitle>
@@ -108,9 +102,6 @@ export default async function ResetPasswordPage({ searchParams }: ResetPasswordP
               alt="Football Scouting Platform Logo"
               className="h-16 w-auto object-contain"
               style={{ filter: "brightness(0) invert(1)" }}
-              onError={(e) => {
-                (e.target as HTMLImageElement).style.display = "none";
-              }}
             />
           </div>
           <CardTitle className="text-2xl font-bold tracking-tight">Football Scouting Platform</CardTitle>

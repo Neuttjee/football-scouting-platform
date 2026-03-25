@@ -72,9 +72,8 @@ export default function ForgotPasswordPage() {
               <div className="text-sm text-text-primary space-y-2">
                 <p>
                   Als het ingevulde e-mailadres bij ons bekend is, is er een e-mail verzonden met verdere
-                  instructies.
+                  instructies. Controleer ook je spamfolder als je niets ziet verschijnen.
                 </p>
-                <p className="text-xs text-muted-foreground">Controleer ook je spamfolder als je niets ziet verschijnen.</p>
               </div>
             </CardContent>
 
