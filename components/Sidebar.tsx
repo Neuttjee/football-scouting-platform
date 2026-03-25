@@ -34,6 +34,7 @@ export function Sidebar({ role, clubName, clubLogo, twoFactorSetupRequired = fal
   }
 
   const appLogo = clubLogo || '/football-scouting-platform-logo.png';
+  const isPlatformLogo = !clubLogo;
   const logoAltText = clubLogo ? 'Club Logo' : 'Football Scouting Platform Logo';
 
   return (
@@ -44,7 +45,7 @@ export function Sidebar({ role, clubName, clubLogo, twoFactorSetupRequired = fal
             src={appLogo}
             alt={logoAltText}
             className="h-24 w-24 object-contain rounded-md"
-            style={{ filter: 'brightness(0) invert(1)' }}
+            style={isPlatformLogo ? { filter: 'brightness(0) invert(1)' } : undefined}
             onError={(e) => {
               (e.target as HTMLImageElement).style.display = 'none';
             }}

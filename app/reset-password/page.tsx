@@ -31,18 +31,19 @@ export default async function ResetPasswordPage({ searchParams }: ResetPasswordP
               />
             </div>
             <CardTitle className="text-2xl font-bold tracking-tight">Football Scouting Platform</CardTitle>
-            <CardDescription>Resetlink ongeldig</CardDescription>
+            <CardDescription>
+              <div className="space-y-2">
+                <div>Er is geen geldige resetlink gevonden.</div>
+                <div>Vraag een nieuwe link aan via</div>
+                <a
+                  href="/forgot-password"
+                  className="inline-flex items-center text-accent-primary hover:text-accent-glow underline underline-offset-4"
+                >
+                  Wachtwoord vergeten
+                </a>
+              </div>
+            </CardDescription>
           </CardHeader>
-
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              Er is geen geldige resetlink gevonden. Vraag een nieuwe link aan via{" "}
-              <a href="/forgot-password" className="text-accent-primary hover:text-accent-glow underline">
-                Wachtwoord vergeten
-              </a>
-              .
-            </p>
-          </CardContent>
         </Card>
       </div>
     );
@@ -75,18 +76,19 @@ export default async function ResetPasswordPage({ searchParams }: ResetPasswordP
               />
             </div>
             <CardTitle className="text-2xl font-bold tracking-tight">Football Scouting Platform</CardTitle>
-            <CardDescription>Resetlink verlopen of ongeldig</CardDescription>
+            <CardDescription>
+              <div className="space-y-2">
+                <div>Deze resetlink is ongeldig of verlopen.</div>
+                <div>Vraag een nieuwe link aan via</div>
+                <a
+                  href="/forgot-password"
+                  className="inline-flex items-center text-accent-primary hover:text-accent-glow underline underline-offset-4"
+                >
+                  Wachtwoord vergeten
+                </a>
+              </div>
+            </CardDescription>
           </CardHeader>
-
-          <CardContent>
-            <p className="text-sm text-muted-foreground mb-4">
-              Deze resetlink is ongeldig of verlopen. Vraag een nieuwe link aan via{" "}
-              <a href="/forgot-password" className="text-accent-primary hover:text-accent-glow underline">
-                Wachtwoord vergeten
-              </a>
-              .
-            </p>
-          </CardContent>
         </Card>
       </div>
     );
