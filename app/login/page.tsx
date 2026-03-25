@@ -6,6 +6,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import Link from 'next/link' 
 
 export default function LoginPage() {
   const router = useRouter()
@@ -85,18 +86,19 @@ export default function LoginPage() {
           <div className="flex justify-center mb-2">
             {/* Placeholder voor het statische logo in de public map */}
             <img 
-              src="/logo.png" 
-              alt="Scouting Platform Logo" 
+              src="/football-scouting-platform-logo.png" 
+              alt="Football Scouting Platform Logo" 
               className="h-16 w-auto object-contain"
+              style={{ filter: 'brightness(0) invert(1)' }}
               onError={(e) => {
                 // Fallback als logo.png nog niet bestaat
                 (e.target as HTMLImageElement).style.display = 'none';
               }}
             />
           </div>
-          <CardTitle className="text-2xl font-bold tracking-tight">Welkom</CardTitle>
+          <CardTitle className="text-2xl font-bold tracking-tight">Football Scouting Platform</CardTitle>
           <CardDescription>
-            Log in op je club dashboard
+            {twoFactorRequired ? 'Voer je 2FA-code in om verder te gaan' : 'Log in op je club dashboard'}
           </CardDescription>
         </CardHeader>
         {!twoFactorRequired ? (
@@ -129,17 +131,16 @@ export default function LoginPage() {
                 </div>
               )}
             </CardContent>
-            <CardFooter className="pt-8 pb-6 flex flex-col gap-3">
+            <CardFooter className="pt-8 pb-6 flex flex-col gap-3 items-center">
               <Button type="submit" className="w-full btn-premium text-white" disabled={loading}>
                 {loading ? 'Bezig met inloggen...' : 'Inloggen'}
               </Button>
-              <button
-                type="button"
-                onClick={() => router.push('/forgot-password')}
-                className="self-center text-xs text-accent-primary hover:text-accent-glow transition-colors underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/40 focus-visible:text-accent-glow rounded-sm"
+              <Link
+                href="/forgot-password"
+                className="self-center text-xs text-accent-primary hover:text-accent-glow transition-colors underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/40 focus-visible:ring-accent-glow rounded-sm"
               >
-                Wachtwoord vergeten?
-              </button>
+                ← Wachtwoord vergeten?
+              </Link>
             </CardFooter>
           </form>
         ) : (
@@ -156,9 +157,6 @@ export default function LoginPage() {
                   onChange={(e) => setTwoFactorCode(e.target.value)}
                   required
                 />
-                <p className="text-xs text-muted-foreground">
-                  Voer de 6-cijferige code in uit je authenticator-app.
-                </p>
               </div>
               {twoFactorError && (
                 <div className="text-sm text-destructive font-medium">
@@ -166,10 +164,24 @@ export default function LoginPage() {
                 </div>
               )}
             </CardContent>
-            <CardFooter className="pt-8 pb-6 flex flex-col gap-3">
+            <CardFooter className="pt-8 pb-6 flex flex-col gap-3 items-center">
               <Button type="submit" className="w-full btn-premium text-white" disabled={loading}>
-                {loading ? 'Code controleren...' : 'Inloggen met 2FA'}
+                {loading ? 'Code controleren...' : 'Inloggen'}
               </Button>
+
+              <Link
+                href="/login"
+                onClick={(e) => {
+                  e.preventDefault()
+                  setTwoFactorRequired(false)
+                  setTwoFactorCode('')
+                  setTwoFactorError('')
+                  setError('')
+                }}
+                className="self-center cursor-pointer text-xs text-accent-primary hover:text-accent-glow transition-colors underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary/40 focus-visible:ring-accent-glow rounded-sm"
+              >
+                ← Terug naar inloggen
+              </Link>
             </CardFooter>
           </form>
         )}

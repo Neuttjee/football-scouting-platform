@@ -33,8 +33,8 @@ export function Sidebar({ role, clubName, clubLogo, twoFactorSetupRequired = fal
     navItems.push({ href: '/settings', label: 'Instellingen' });
   }
 
-  const appLogo = clubLogo || '/logo.png';
-  const logoAltText = clubLogo ? 'Club Logo' : 'Scouting Platform Logo';
+  const appLogo = clubLogo || '/football-scouting-platform-logo.png';
+  const logoAltText = clubLogo ? 'Club Logo' : 'Football Scouting Platform Logo';
 
   return (
     <aside className="w-48 flex-col hidden md:flex min-h-screen bg-bg-primary border-r border-border-dark">
@@ -44,13 +44,14 @@ export function Sidebar({ role, clubName, clubLogo, twoFactorSetupRequired = fal
             src={appLogo}
             alt={logoAltText}
             className="h-24 w-24 object-contain rounded-md"
+            style={{ filter: 'brightness(0) invert(1)' }}
             onError={(e) => {
               (e.target as HTMLImageElement).style.display = 'none';
             }}
           />
         )}
         <span className="leading-tight text-text-primary text-lg font-bold">
-          {clubName || 'Scouting Platform'}
+          {clubName || 'Football Scouting Platform'}
         </span>
       </div>
       <nav className="flex-1 p-4 space-y-2 mt-4">

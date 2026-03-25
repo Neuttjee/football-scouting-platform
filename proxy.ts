@@ -41,6 +41,9 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
+  const isAssetRequest = pathname.match(/\.(png|jpg|jpeg|svg|webp|gif|ico)$/i);
+  if (isAssetRequest) return NextResponse.next();
+  
   // Pages
   if (!session) {
     return NextResponse.redirect(new URL('/login', request.url));
