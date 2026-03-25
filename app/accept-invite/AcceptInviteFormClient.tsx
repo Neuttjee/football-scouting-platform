@@ -2,12 +2,16 @@
 
 import * as React from "react";
 import { Eye, EyeOff } from "lucide-react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 import { isStrongPassword, PASSWORD_POLICY_ERROR } from "@/lib/passwordPolicy";
 
 type AcceptInviteFormProps = {
   token: string;
-  defaultName: string;
+  defaultName: string | null;
   email: string;
 };
 
@@ -66,18 +70,15 @@ export function AcceptInviteForm({ token, defaultName, email }: AcceptInviteForm
         <p className="text-sm text-muted-foreground">
           Je kunt nu inloggen met je e-mailadres en gekozen wachtwoord.
         </p>
-        <a
-          href="/login"
-          className="inline-flex items-center justify-center mt-2 px-4 py-2 rounded-full bg-accent-primary text-white text-sm font-medium hover:bg-accent-glow transition-colors"
-        >
-          Naar de loginpagina
-        </a>
+        <Button asChild className="w-full btn-premium text-white">
+          <Link href="/login">Naar de loginpagina</Link>
+        </Button>
       </div>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+    <form onSubmit={handleSubmit} className="space-y-4">
       {error && (
         <div className="text-sm text-destructive font-medium bg-destructive/10 border border-destructive/40 px-3 py-2 rounded">
           {error}
@@ -85,47 +86,57 @@ export function AcceptInviteForm({ token, defaultName, email }: AcceptInviteForm
       )}
 
       <div className="space-y-1">
-        <label className="block text-xs font-semibold uppercase tracking-wide text-text-muted">
+        <Label htmlFor="name" className="text-xs font-semibold uppercase tracking-wide text-text-muted">
           Naam
-        </label>
-        <input
+        </Label>
+        <Input
+          id="name"
           type="text"
           name="name"
           required
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none text-sm"
+          className="bg-bg-primary text-text-primary"
         />
       </div>
 
       <div className="space-y-1">
-        <label className="block text-xs font-semibold uppercase tracking-wide text-text-muted">
+        <Label htmlFor="email" className="text-xs font-semibold uppercase tracking-wide text-text-muted">
           E-mailadres
-        </label>
-        <input
+        </Label>
+        <Input
+          id="email"
           type="email"
           value={email}
           disabled
-          className="w-full border border-border-dark rounded p-2 bg-bg-secondary text-text-secondary text-sm cursor-not-allowed"
+          className="bg-bg-secondary text-text-secondary cursor-not-allowed"
         />
       </div>
 
       <div className="space-y-1">
-        <label className="block text-xs font-semibold uppercase tracking-wide text-text-muted">
+        <Label htmlFor="password" className="text-xs font-semibold uppercase tracking-wide text-text-muted">
           Wachtwoord
-        </label>
+        </Label>
         <div className="relative">
-          <input
+          <Input
+            id="password"
             type={showPassword ? "text" : "password"}
             name="password"
+            autoComplete="new-password"
+            data-lpignore="true"
+            data-1p-ignore="true"
+            data-form-type="other"
+            spellCheck={false}
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none text-sm pr-10"
+            className="bg-bg-primary text-text-primary pr-10"
           />
           <button
             type="button"
             onClick={() => setShowPassword((v) => !v)}
+            onMouseDown={(e) => e.preventDefault()}
+            tabIndex={-1}
             className="absolute inset-y-0 right-3 flex items-center text-text-muted hover:text-accent-primary"
             aria-label={showPassword ? "Wachtwoord verbergen" : "Wachtwoord tonen"}
           >
@@ -135,21 +146,29 @@ export function AcceptInviteForm({ token, defaultName, email }: AcceptInviteForm
       </div>
 
       <div className="space-y-1">
-        <label className="block text-xs font-semibold uppercase tracking-wide text-text-muted">
+        <Label htmlFor="confirmPassword" className="text-xs font-semibold uppercase tracking-wide text-text-muted">
           Wachtwoord bevestigen
-        </label>
+        </Label>
         <div className="relative">
-          <input
+          <Input
+            id="confirmPassword"
             type={showConfirmPassword ? "text" : "password"}
             name="confirmPassword"
+            autoComplete="new-password"
+            data-lpignore="true"
+            data-1p-ignore="true"
+            data-form-type="other"
+            spellCheck={false}
             required
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none text-sm pr-10"
+            className="bg-bg-primary text-text-primary pr-10"
           />
           <button
             type="button"
             onClick={() => setShowConfirmPassword((v) => !v)}
+            onMouseDown={(e) => e.preventDefault()}
+            tabIndex={-1}
             className="absolute inset-y-0 right-3 flex items-center text-text-muted hover:text-accent-primary"
             aria-label={showConfirmPassword ? "Bevestig wachtwoord verbergen" : "Bevestig wachtwoord tonen"}
           >
@@ -158,13 +177,9 @@ export function AcceptInviteForm({ token, defaultName, email }: AcceptInviteForm
         </div>
       </div>
 
-      <button
-        type="submit"
-        disabled={isSubmitting}
-        className="w-full mt-2 inline-flex items-center justify-center px-4 py-2 rounded-full bg-accent-primary text-white text-sm font-medium hover:bg-accent-glow disabled:opacity-50 transition-colors"
-      >
+      <Button type="submit" className="w-full btn-premium text-white" disabled={isSubmitting}>
         {isSubmitting ? "Account aanmaken..." : "Account aanmaken"}
-      </button>
+      </Button>
     </form>
   );
 }
