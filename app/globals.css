@@ -179,11 +179,14 @@
 }
 
 @layer utilities {
+  input[type="password"]::-ms-reveal,
+  input[type="password"]::-ms-clear,
   .hide-password-reveal::-ms-reveal,
   .hide-password-reveal::-ms-clear {
     display: none;
   }
 
+  input[type="password"]::-webkit-credentials-auto-fill-button,
   .hide-password-reveal::-webkit-credentials-auto-fill-button {
     visibility: hidden;
     display: none !important;

@@ -66,7 +66,7 @@ export function AcceptInviteForm({ token, defaultName, email, clubName, role }: 
   if (success) {
     return (
       <div className="space-y-4">
-        <p className="text-sm text-text-primary">
+        <p className="text-sm text-muted-foreground">
           Je account is succesvol aangemaakt. Je kunt nu inloggen met je e-mailadres en gekozen wachtwoord.
         </p>
         <Button asChild className="w-full btn-premium text-white">

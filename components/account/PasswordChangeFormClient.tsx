@@ -83,14 +83,22 @@ export default function PasswordChangeFormClient() {
           <div className="relative">
             <input
               type={showCurrentPassword ? "text" : "password"}
+              autoComplete="current-password"
+              data-lpignore="true"
+              data-1p-ignore="true"
+              data-form-type="other"
+              data-bwignore="true"
+              spellCheck={false}
               required
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
-              className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none text-sm pr-10"
+              className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none text-sm pr-10 hide-password-reveal"
             />
             <button
               type="button"
               onClick={() => setShowCurrentPassword((v) => !v)}
+              onMouseDown={(e) => e.preventDefault()}
+              tabIndex={-1}
               className="absolute inset-y-0 right-3 flex items-center text-text-muted hover:text-accent-primary"
               aria-label={showCurrentPassword ? "Huidig wachtwoord verbergen" : "Huidig wachtwoord tonen"}
             >
@@ -106,14 +114,22 @@ export default function PasswordChangeFormClient() {
           <div className="relative">
             <input
               type={showNewPassword ? "text" : "password"}
+              autoComplete="new-password"
+              data-lpignore="true"
+              data-1p-ignore="true"
+              data-form-type="other"
+              data-bwignore="true"
+              spellCheck={false}
               required
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none text-sm pr-10"
+              className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none text-sm pr-10 hide-password-reveal"
             />
             <button
               type="button"
               onClick={() => setShowNewPassword((v) => !v)}
+              onMouseDown={(e) => e.preventDefault()}
+              tabIndex={-1}
               className="absolute inset-y-0 right-3 flex items-center text-text-muted hover:text-accent-primary"
               aria-label={showNewPassword ? "Nieuwe wachtwoord verbergen" : "Nieuwe wachtwoord tonen"}
             >
@@ -129,14 +145,22 @@ export default function PasswordChangeFormClient() {
           <div className="relative">
             <input
               type={showConfirmPassword ? "text" : "password"}
+              autoComplete="new-password"
+              data-lpignore="true"
+              data-1p-ignore="true"
+              data-form-type="other"
+              data-bwignore="true"
+              spellCheck={false}
               required
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none text-sm pr-10"
+              className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none text-sm pr-10 hide-password-reveal"
             />
             <button
               type="button"
               onClick={() => setShowConfirmPassword((v) => !v)}
+              onMouseDown={(e) => e.preventDefault()}
+              tabIndex={-1}
               className="absolute inset-y-0 right-3 flex items-center text-text-muted hover:text-accent-primary"
               aria-label={
                 showConfirmPassword ? "Bevestig wachtwoord verbergen" : "Bevestig wachtwoord tonen"

@@ -81,7 +81,7 @@ export async function PUT(req: Request) {
     const tokenHash = hashInviteToken(token);
     const user = await prisma.user.findUnique({ where: { inviteToken: tokenHash } });
     if (!user || !user.inviteTokenExpires || user.inviteTokenExpires < new Date()) {
-      return NextResponse.json({ error: 'Invalid or expired token' }, { status: 400 });
+      return NextResponse.json({ error: 'Uitnodigingslink is ongeldig of verlopen.' }, { status: 400 });
     }
 
     const passwordHash = await bcrypt.hash(password, 10);

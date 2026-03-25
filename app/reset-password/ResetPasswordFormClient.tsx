@@ -84,11 +84,12 @@ export function ResetPasswordForm({ token, onSuccess }: ResetPasswordFormProps) 
             data-lpignore="true"
             data-1p-ignore="true"
             data-form-type="other"
+            data-bwignore="true"
             spellCheck={false}
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none text-sm pr-10"
+            className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none text-sm pr-10 hide-password-reveal"
           />
           <button
             type="button"
@@ -114,11 +115,12 @@ export function ResetPasswordForm({ token, onSuccess }: ResetPasswordFormProps) 
             data-lpignore="true"
             data-1p-ignore="true"
             data-form-type="other"
+            data-bwignore="true"
             spellCheck={false}
             required
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none text-sm pr-10"
+            className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none text-sm pr-10 hide-password-reveal"
           />
           <button
             type="button"
