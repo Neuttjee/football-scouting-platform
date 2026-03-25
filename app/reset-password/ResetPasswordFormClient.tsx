@@ -3,20 +3,11 @@
 import * as React from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { isStrongPassword, PASSWORD_POLICY_ERROR } from "@/lib/passwordPolicy";
 
 type ResetPasswordFormProps = {
   token: string;
 };
-
-function isStrongPassphrase(value: string): boolean {
-  const trimmed = value.trim();
-  if (trimmed.length < 16) return false;
-  const words = trimmed.split(/\s+/);
-  if (words.length < 4) return false;
-  const hasLetter = /[A-Za-z]/.test(trimmed);
-  if (!hasLetter) return false;
-  return true;
-}
 
 export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
   const [password, setPassword] = React.useState("");
@@ -31,8 +22,8 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
     e.preventDefault();
     setError(null);
 
-    if (!isStrongPassphrase(password)) {
-      setError("Gebruik een sterk wachtwoord van minimaal 16 tekens en 4 woorden.");
+    if (!isStrongPassword(password)) {
+      setError(PASSWORD_POLICY_ERROR);
       return;
     }
     if (password !== confirmPassword) {
@@ -92,6 +83,11 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
         <div className="relative">
           <input
             type={showPassword ? "text" : "password"}
+            autoComplete="new-password"
+            data-lpignore="true"
+            data-1p-ignore="true"
+            data-form-type="other"
+            spellCheck={false}
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -115,6 +111,11 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
         <div className="relative">
           <input
             type={showConfirmPassword ? "text" : "password"}
+            autoComplete="new-password"
+            data-lpignore="true"
+            data-1p-ignore="true"
+            data-form-type="other"
+            spellCheck={false}
             required
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
