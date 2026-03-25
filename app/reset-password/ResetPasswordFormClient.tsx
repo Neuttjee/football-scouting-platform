@@ -113,7 +113,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
           <button
             type="button"
             onClick={() => setShowConfirmPassword((v) => !v)}
-            className="absolute inset-y-0 right-3 flex items-center text-text-muted hover:text-accent-primary"
+            className="w-full btn-premium text-white"
             aria-label={showConfirmPassword ? "Wachtwoord verbergen" : "Wachtwoord tonen"}
           >
             {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}

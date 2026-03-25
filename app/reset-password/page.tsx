@@ -107,14 +107,10 @@ export default async function ResetPasswordPage({ searchParams }: ResetPasswordP
             />
           </div>
           <CardTitle className="text-2xl font-bold tracking-tight">Football Scouting Platform</CardTitle>
-          <CardDescription>Nieuw wachtwoord instellen</CardDescription>
+          <CardDescription>Stel een nieuw, sterk wachtwoord in</CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-4">
-          <p className="text-sm text-muted-foreground">
-            Stel een nieuw, sterk wachtwoord in voor{" "}
-            <span className="font-semibold text-text-primary">{user.email}</span>.
-          </p>
           <ResetPasswordForm token={rawToken} />
         </CardContent>
       </Card>
