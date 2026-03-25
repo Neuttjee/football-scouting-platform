@@ -55,6 +55,7 @@ export async function POST(req: Request) {
           email: user.email,
           role: user.role,
           clubId: user.clubId,
+          sessionVersion: user.sessionVersion,
           twoFactorSetupRequired,
         });
 
@@ -136,6 +137,7 @@ export async function POST(req: Request) {
         email: user.email,
         role: user.role,
         clubId: user.clubId,
+        sessionVersion: user.sessionVersion,
         twoFactorSetupRequired: false,
       });
 

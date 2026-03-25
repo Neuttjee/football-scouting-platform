@@ -5,6 +5,7 @@ import { sendInviteEmail } from '@/lib/email';
 import { generateInviteToken, hashInviteToken } from '@/lib/inviteTokens';
 import { isAllowedRole } from '@/lib/roles';
 import bcrypt from 'bcrypt';
+import { isStrongPassword, PASSWORD_POLICY_ERROR } from '@/lib/passwordPolicy';
 
 export async function POST(req: Request) {
   try {
@@ -72,6 +73,10 @@ export async function POST(req: Request) {
 export async function PUT(req: Request) {
   try {
     const { token, password, name } = await req.json();
+
+    if (!password || typeof password !== 'string' || !isStrongPassword(password)) {
+      return NextResponse.json({ error: PASSWORD_POLICY_ERROR }, { status: 400 });
+    }
     
     const tokenHash = hashInviteToken(token);
     const user = await prisma.user.findUnique({ where: { inviteToken: tokenHash } });
@@ -86,6 +91,7 @@ export async function PUT(req: Request) {
       data: {
         name: name || user.name,
         passwordHash,
+        sessionVersion: { increment: 1 },
         inviteToken: null,
         inviteTokenExpires: null,
       },

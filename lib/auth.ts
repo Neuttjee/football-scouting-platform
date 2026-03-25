@@ -32,6 +32,35 @@ export async function getSession() {
   if (!session) return null;
   const payload = await decrypt(session);
   if (!payload) return null;
+
+  // Invalidate sessions when the password has been changed after the session was issued.
+  // We do this by comparing a sessionVersion included in the JWT payload with the current value in the DB.
+  try {
+    const userId = payload?.user?.id as string | undefined;
+    if (userId) {
+      const tokenSessionVersion =
+        typeof payload?.user?.sessionVersion === 'number' ? payload.user.sessionVersion : 0;
+
+      // Ensure the value exists on the returned payload so downstream code can safely re-issue sessions.
+      payload.user.sessionVersion = tokenSessionVersion;
+
+      // Dynamic import so middleware/edge code paths that don't call `getSession()` don't need Prisma.
+      const prismaMod = await import('@/lib/prisma');
+      const prisma = prismaMod.default;
+
+      const dbUser = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { sessionVersion: true, isActive: true },
+      });
+
+      if (!dbUser || !dbUser.isActive) return null;
+      if (dbUser.sessionVersion !== tokenSessionVersion) return null;
+    }
+  } catch {
+    // For security: if validation fails, treat session as invalid.
+    return null;
+  }
+
   if (payload.user?.role === 'SUPERADMIN') {
     const activeClubId = cookieStore.get(SUPERADMIN_ACTIVE_CLUB_COOKIE)?.value ?? undefined;
     return { ...payload, activeClubId };

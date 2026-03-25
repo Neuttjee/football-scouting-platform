@@ -2,16 +2,7 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import bcrypt from 'bcrypt';
 import { getSession } from '@/lib/auth';
-
-function isStrongPassphrase(value: string): boolean {
-  const trimmed = value.trim();
-  if (trimmed.length < 16) return false;
-  const words = trimmed.split(/\s+/);
-  if (words.length < 4) return false;
-  const hasLetter = /[A-Za-z]/.test(trimmed);
-  if (!hasLetter) return false;
-  return true;
-}
+import { isStrongPassword, PASSWORD_POLICY_ERROR } from '@/lib/passwordPolicy';
 
 export async function POST(req: Request) {
   try {
@@ -39,11 +30,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Huidig wachtwoord is onjuist.' }, { status: 400 });
     }
 
-    if (!isStrongPassphrase(newPassword)) {
+    if (!isStrongPassword(newPassword)) {
       return NextResponse.json(
         {
-          error:
-            'Gebruik een sterk wachtwoord van minimaal 16 tekens en 4 woorden.',
+          error: PASSWORD_POLICY_ERROR,
         },
         { status: 400 },
       );
@@ -55,6 +45,7 @@ export async function POST(req: Request) {
       where: { id: user.id },
       data: {
         passwordHash: newHash,
+        sessionVersion: { increment: 1 },
       },
     });
 

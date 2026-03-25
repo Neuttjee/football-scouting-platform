@@ -178,6 +178,9 @@ model User {
   role                 String    // "SUPERADMIN", "ADMIN", "TC_LID", "SCOUT", "LEZER"
   isActive             Boolean   @default(true)
 
+  /// Increments on every password change to invalidate existing sessions.
+  sessionVersion       Int       @default(0)
+
   inviteToken          String?   @unique
   inviteTokenExpires   DateTime?
 

@@ -139,6 +139,7 @@ export async function POST(req: Request) {
       email: session.user.email,
       role: session.user.role,
       clubId: session.user.clubId,
+      sessionVersion: session.user.sessionVersion,
       twoFactorSetupRequired: false,
     });
 

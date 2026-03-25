@@ -61,7 +61,9 @@ export default function ForgotPasswordPage() {
 
           <CardTitle className="text-2xl font-bold tracking-tight">Football Scouting Platform</CardTitle>
 
-          <CardDescription>Vul je e-mailadres in om een resetlink te ontvangen</CardDescription>
+          {!submitted && (
+            <CardDescription>Vul je e-mailadres in om een resetlink te ontvangen</CardDescription>
+          )}
         </CardHeader>
 
         {submitted ? (
@@ -69,8 +71,8 @@ export default function ForgotPasswordPage() {
             <CardContent>
               <div className="text-sm text-text-primary space-y-2">
                 <p>
-                  Als er een account bestaat voor <span className="font-semibold">{email}</span>, is er een
-                  e-mail verzonden met verdere instructies.
+                  Als het ingevulde e-mailadres bij ons bekend is, is er een e-mail verzonden met verdere
+                  instructies.
                 </p>
                 <p className="text-xs text-muted-foreground">Controleer ook je spamfolder als je niets ziet verschijnen.</p>
               </div>

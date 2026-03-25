@@ -1,20 +1,12 @@
 "use client";
 
 import * as React from "react";
+import { Eye, EyeOff } from "lucide-react";
+import { isStrongPassword, PASSWORD_POLICY_ERROR } from "@/lib/passwordPolicy";
 
 type ResetPasswordFormProps = {
   token: string;
 };
-
-function isStrongPassphrase(value: string): boolean {
-  const trimmed = value.trim();
-  if (trimmed.length < 16) return false;
-  const words = trimmed.split(/\s+/);
-  if (words.length < 4) return false;
-  const hasLetter = /[A-Za-z]/.test(trimmed);
-  if (!hasLetter) return false;
-  return true;
-}
 
 export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
   const [password, setPassword] = React.useState("");
@@ -22,13 +14,15 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
   const [error, setError] = React.useState<string | null>(null);
   const [success, setSuccess] = React.useState(false);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [showPassword, setShowPassword] = React.useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
-    if (!isStrongPassphrase(password)) {
-      setError("Gebruik een sterk wachtwoord van minimaal 16 tekens en 4 woorden.");
+    if (!isStrongPassword(password)) {
+      setError(PASSWORD_POLICY_ERROR);
       return;
     }
     if (password !== confirmPassword) {
@@ -74,7 +68,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+    <form onSubmit={handleSubmit} className="space-y-4">
       {error && (
         <div className="text-sm text-destructive font-medium bg-destructive/10 border border-destructive/40 px-3 py-2 rounded">
           {error}
@@ -85,32 +79,52 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
         <label className="block text-xs font-semibold uppercase tracking-wide text-text-muted">
           Nieuwe wachtwoord
         </label>
-        <input
-          type="password"
-          required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none text-sm"
-        />
+        <div className="relative">
+          <input
+            type={showPassword ? "text" : "password"}
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none text-sm pr-10"
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword((v) => !v)}
+            className="absolute inset-y-0 right-3 flex items-center text-text-muted hover:text-accent-primary"
+            aria-label={showPassword ? "Wachtwoord verbergen" : "Wachtwoord tonen"}
+          >
+            {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+          </button>
+        </div>
       </div>
 
       <div className="space-y-1">
         <label className="block text-xs font-semibold uppercase tracking-wide text-text-muted">
           Bevestig wachtwoord
         </label>
-        <input
-          type="password"
-          required
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none text-sm"
-        />
+        <div className="relative">
+          <input
+            type={showConfirmPassword ? "text" : "password"}
+            required
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            className="w-full border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none text-sm pr-10"
+          />
+          <button
+            type="button"
+            onClick={() => setShowConfirmPassword((v) => !v)}
+            className="absolute inset-y-0 right-3 flex items-center text-text-muted hover:text-accent-primary"
+            aria-label={showConfirmPassword ? "Wachtwoord verbergen" : "Wachtwoord tonen"}
+          >
+            {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+          </button>
+        </div>
       </div>
 
       <button
         type="submit"
         disabled={isSubmitting}
-        className="w-full mt-2 inline-flex items-center justify-center px-4 py-2 rounded-full bg-accent-primary text-white text-sm font-medium hover:bg-accent-glow disabled:opacity-50 transition-colors"
+        className="w-full btn-premium text-white disabled:opacity-50 transition disabled:pointer-events-none"
       >
         {isSubmitting ? "Wachtwoord instellen..." : "Wachtwoord instellen"}
       </button>
