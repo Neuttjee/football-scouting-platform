@@ -8,9 +8,10 @@ import Link from "next/link";
 
 type ResetPasswordFormProps = {
   token: string;
+  onSuccess?: () => void;
 };
 
-export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
+export function ResetPasswordForm({ token, onSuccess }: ResetPasswordFormProps) {
   const [password, setPassword] = React.useState("");
   const [confirmPassword, setConfirmPassword] = React.useState("");
   const [error, setError] = React.useState<string | null>(null);
@@ -44,6 +45,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
         setError(data.error || "Het instellen van het nieuwe wachtwoord is mislukt.");
         return;
       }
+      onSuccess?.();
       setSuccess(true);
     } catch (err) {
       console.error(err);
@@ -56,9 +58,6 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
   if (success) {
     return (
       <div className="space-y-4">
-        <p className="text-sm text-text-primary">
-          Je wachtwoord is succesvol bijgewerkt. Je kunt nu inloggen met je nieuwe gegevens.
-        </p>
         <Button asChild className="w-full btn-premium text-white">
           <Link href="/login">Naar de loginpagina</Link>
         </Button>
