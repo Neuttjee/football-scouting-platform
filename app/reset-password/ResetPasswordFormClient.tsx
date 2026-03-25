@@ -4,6 +4,7 @@ import * as React from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { isStrongPassword, PASSWORD_POLICY_ERROR } from "@/lib/passwordPolicy";
+import Link from "next/link";
 
 type ResetPasswordFormProps = {
   token: string;
@@ -58,12 +59,9 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
         <p className="text-sm text-text-primary">
           Je wachtwoord is succesvol bijgewerkt. Je kunt nu inloggen met je nieuwe gegevens.
         </p>
-        <a
-          href="/login"
-          className="inline-flex items-center justify-center mt-2 px-4 py-2 rounded-full bg-accent-primary text-white text-sm font-medium hover:bg-accent-glow transition-colors"
-        >
-          Naar de loginpagina
-        </a>
+        <Button asChild className="w-full btn-premium text-white">
+          <Link href="/login">Naar de loginpagina</Link>
+        </Button>
       </div>
     );
   }
@@ -96,6 +94,8 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
           <button
             type="button"
             onClick={() => setShowPassword((v) => !v)}
+            onMouseDown={(e) => e.preventDefault()}
+            tabIndex={-1}
             className="absolute inset-y-0 right-3 flex items-center text-text-muted hover:text-accent-primary"
             aria-label={showPassword ? "Wachtwoord verbergen" : "Wachtwoord tonen"}
           >
@@ -124,6 +124,8 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
           <button
             type="button"
             onClick={() => setShowConfirmPassword((v) => !v)}
+            onMouseDown={(e) => e.preventDefault()}
+            tabIndex={-1}
             className="absolute inset-y-0 right-3 flex items-center text-text-muted hover:text-accent-primary"
             aria-label={showConfirmPassword ? "Wachtwoord verbergen" : "Wachtwoord tonen"}
           >
