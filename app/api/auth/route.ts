@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import prisma from '@/lib/prisma';
 import bcrypt from 'bcrypt';
-import { setSession, clearSession } from '@/lib/auth';
+import { setSession, clearSession, setActiveClubId } from '@/lib/auth';
 import { getClubConfigByClubId } from '@/lib/clubConfig';
 import { authenticator } from 'otplib';
 
@@ -49,6 +49,10 @@ export async function POST(req: Request) {
             lastLoginAt: new Date(),
           },
         });
+
+        if (user.role === 'SUPERADMIN') {
+          await setActiveClubId(null);
+        }
 
         await setSession({
           id: user.id,
@@ -131,6 +135,10 @@ export async function POST(req: Request) {
           lastLoginAt: new Date(),
         },
       });
+
+      if (user.role === 'SUPERADMIN') {
+        await setActiveClubId(null);
+      }
 
       await setSession({
         id: user.id,

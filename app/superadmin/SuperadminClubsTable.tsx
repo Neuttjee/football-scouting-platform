@@ -71,6 +71,17 @@ export function SuperadminClubsTable({
 }) {
   const router = useRouter();
 
+  const handleOpenClubProfile = async (clubId: string) => {
+    try {
+      await selectClub(clubId);
+    } catch (err: any) {
+      // Keep existing behavior: open profile even if selection cannot be applied.
+      console.error(err);
+    }
+    router.push(`/superadmin/clubs/${encodeURIComponent(clubId)}`);
+    router.refresh();
+  };
+
   const handleSelect = async (clubId: string) => {
     await selectClub(clubId);
     router.refresh();
@@ -137,9 +148,9 @@ export function SuperadminClubsTable({
             <DataTable.Cell className="font-medium">
               <button
                 type="button"
-                onClick={() => {
+                onClick={async () => {
                   if (!row.id) return;
-                  router.push(`/superadmin/clubs/${encodeURIComponent(row.id)}`);
+                  await handleOpenClubProfile(row.id);
                 }}
                 disabled={!row.id}
                 className={
@@ -174,9 +185,9 @@ export function SuperadminClubsTable({
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="bg-bg-card border-border-dark min-w-[200px]">
                       <DropdownMenuItem
-                        onClick={() => {
+                        onClick={async () => {
                           if (!row.id) return;
-                          router.push(`/superadmin/clubs/${encodeURIComponent(row.id)}`);
+                          await handleOpenClubProfile(row.id);
                         }}
                         className="cursor-pointer focus:bg-bg-hover focus:text-accent-primary text-text-primary text-xs"
                       >
