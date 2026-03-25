@@ -2,11 +2,21 @@
 
 import * as React from "react";
 import { Eye, EyeOff } from "lucide-react";
-import { isStrongPassword, PASSWORD_POLICY_ERROR } from "@/lib/passwordPolicy";
+import { Button } from "@/components/ui/button";
 
 type ResetPasswordFormProps = {
   token: string;
 };
+
+function isStrongPassphrase(value: string): boolean {
+  const trimmed = value.trim();
+  if (trimmed.length < 16) return false;
+  const words = trimmed.split(/\s+/);
+  if (words.length < 4) return false;
+  const hasLetter = /[A-Za-z]/.test(trimmed);
+  if (!hasLetter) return false;
+  return true;
+}
 
 export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
   const [password, setPassword] = React.useState("");
@@ -21,8 +31,8 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
     e.preventDefault();
     setError(null);
 
-    if (!isStrongPassword(password)) {
-      setError(PASSWORD_POLICY_ERROR);
+    if (!isStrongPassphrase(password)) {
+      setError("Gebruik een sterk wachtwoord van minimaal 16 tekens en 4 woorden.");
       return;
     }
     if (password !== confirmPassword) {
@@ -113,7 +123,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
           <button
             type="button"
             onClick={() => setShowConfirmPassword((v) => !v)}
-            className="w-full btn-premium text-white"
+            className="absolute inset-y-0 right-3 flex items-center text-text-muted hover:text-accent-primary"
             aria-label={showConfirmPassword ? "Wachtwoord verbergen" : "Wachtwoord tonen"}
           >
             {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -121,13 +131,9 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
         </div>
       </div>
 
-      <button
-        type="submit"
-        disabled={isSubmitting}
-        className="w-full btn-premium text-white disabled:opacity-50 transition disabled:pointer-events-none"
-      >
+      <Button type="submit" className="w-full btn-premium text-white" disabled={isSubmitting}>
         {isSubmitting ? "Wachtwoord instellen..." : "Wachtwoord instellen"}
-      </button>
+      </Button>
     </form>
   );
 }
