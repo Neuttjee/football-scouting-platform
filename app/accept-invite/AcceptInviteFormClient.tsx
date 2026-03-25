@@ -13,9 +13,11 @@ type AcceptInviteFormProps = {
   token: string;
   defaultName: string | null;
   email: string;
+  clubName: string;
+  role: string;
 };
 
-export function AcceptInviteForm({ token, defaultName, email }: AcceptInviteFormProps) {
+export function AcceptInviteForm({ token, defaultName, email, clubName, role }: AcceptInviteFormProps) {
   const [name, setName] = React.useState(defaultName || "");
   const [password, setPassword] = React.useState("");
   const [confirmPassword, setConfirmPassword] = React.useState("");
@@ -65,10 +67,7 @@ export function AcceptInviteForm({ token, defaultName, email }: AcceptInviteForm
     return (
       <div className="space-y-4">
         <p className="text-sm text-text-primary">
-          Je account voor <span className="font-semibold">{email}</span> is succesvol aangemaakt.
-        </p>
-        <p className="text-sm text-muted-foreground">
-          Je kunt nu inloggen met je e-mailadres en gekozen wachtwoord.
+          Je account is succesvol aangemaakt. Je kunt nu inloggen met je e-mailadres en gekozen wachtwoord.
         </p>
         <Button asChild className="w-full btn-premium text-white">
           <Link href="/login">Naar de loginpagina</Link>
@@ -78,109 +77,118 @@ export function AcceptInviteForm({ token, defaultName, email }: AcceptInviteForm
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      {error && (
-        <div className="text-sm text-destructive font-medium bg-destructive/10 border border-destructive/40 px-3 py-2 rounded">
-          {error}
-        </div>
-      )}
+    <div className="space-y-4">
+      <p className="text-sm text-muted-foreground">
+        Je bent uitgenodigd voor <span className="font-semibold text-text-primary">{clubName}</span> als rol{" "}
+        <span className="font-semibold text-text-primary">{role}</span>.
+      </p>
 
-      <div className="space-y-1">
-        <Label htmlFor="name" className="text-xs font-semibold uppercase tracking-wide text-text-muted">
-          Naam
-        </Label>
-        <Input
-          id="name"
-          type="text"
-          name="name"
-          required
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="bg-bg-primary text-text-primary"
-        />
-      </div>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {error && (
+          <div className="text-sm text-destructive font-medium bg-destructive/10 border border-destructive/40 px-3 py-2 rounded">
+            {error}
+          </div>
+        )}
 
-      <div className="space-y-1">
-        <Label htmlFor="email" className="text-xs font-semibold uppercase tracking-wide text-text-muted">
-          E-mailadres
-        </Label>
-        <Input
-          id="email"
-          type="email"
-          value={email}
-          disabled
-          className="bg-bg-secondary text-text-secondary cursor-not-allowed"
-        />
-      </div>
-
-      <div className="space-y-1">
-        <Label htmlFor="password" className="text-xs font-semibold uppercase tracking-wide text-text-muted">
-          Wachtwoord
-        </Label>
-        <div className="relative">
+        <div className="space-y-1">
+          <Label htmlFor="name" className="text-xs font-semibold uppercase tracking-wide text-text-muted">
+            Naam
+          </Label>
           <Input
-            id="password"
-            type={showPassword ? "text" : "password"}
-            name="password"
-            autoComplete="new-password"
-            data-lpignore="true"
-            data-1p-ignore="true"
-            data-form-type="other"
-            spellCheck={false}
+            id="name"
+            type="text"
+            name="name"
             required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="bg-bg-primary text-text-primary pr-10"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="bg-bg-primary text-text-primary"
           />
-          <button
-            type="button"
-            onClick={() => setShowPassword((v) => !v)}
-            onMouseDown={(e) => e.preventDefault()}
-            tabIndex={-1}
-            className="absolute inset-y-0 right-3 flex items-center text-text-muted hover:text-accent-primary"
-            aria-label={showPassword ? "Wachtwoord verbergen" : "Wachtwoord tonen"}
-          >
-            {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-          </button>
         </div>
-      </div>
 
-      <div className="space-y-1">
-        <Label htmlFor="confirmPassword" className="text-xs font-semibold uppercase tracking-wide text-text-muted">
-          Wachtwoord bevestigen
-        </Label>
-        <div className="relative">
+        <div className="space-y-1">
+          <Label htmlFor="email" className="text-xs font-semibold uppercase tracking-wide text-text-muted">
+            E-mailadres
+          </Label>
           <Input
-            id="confirmPassword"
-            type={showConfirmPassword ? "text" : "password"}
-            name="confirmPassword"
-            autoComplete="new-password"
-            data-lpignore="true"
-            data-1p-ignore="true"
-            data-form-type="other"
-            spellCheck={false}
-            required
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            className="bg-bg-primary text-text-primary pr-10"
+            id="email"
+            type="email"
+            value={email}
+            disabled
+            className="bg-bg-secondary text-text-secondary cursor-not-allowed"
           />
-          <button
-            type="button"
-            onClick={() => setShowConfirmPassword((v) => !v)}
-            onMouseDown={(e) => e.preventDefault()}
-            tabIndex={-1}
-            className="absolute inset-y-0 right-3 flex items-center text-text-muted hover:text-accent-primary"
-            aria-label={showConfirmPassword ? "Bevestig wachtwoord verbergen" : "Bevestig wachtwoord tonen"}
-          >
-            {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-          </button>
         </div>
-      </div>
 
-      <Button type="submit" className="w-full btn-premium text-white" disabled={isSubmitting}>
-        {isSubmitting ? "Account aanmaken..." : "Account aanmaken"}
-      </Button>
-    </form>
+        <div className="space-y-1">
+          <Label htmlFor="password" className="text-xs font-semibold uppercase tracking-wide text-text-muted">
+            Wachtwoord
+          </Label>
+          <div className="relative">
+            <Input
+              id="password"
+              type={showPassword ? "text" : "password"}
+              name="password"
+              autoComplete="new-password"
+              data-lpignore="true"
+              data-1p-ignore="true"
+              data-form-type="other"
+              data-bwignore="true"
+              spellCheck={false}
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="bg-bg-primary text-text-primary pr-10 hide-password-reveal"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              onMouseDown={(e) => e.preventDefault()}
+              tabIndex={-1}
+              className="absolute inset-y-0 right-3 flex items-center text-text-muted hover:text-accent-primary"
+              aria-label={showPassword ? "Wachtwoord verbergen" : "Wachtwoord tonen"}
+            >
+              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+            </button>
+          </div>
+        </div>
+
+        <div className="space-y-1">
+          <Label htmlFor="confirmPassword" className="text-xs font-semibold uppercase tracking-wide text-text-muted">
+            Wachtwoord bevestigen
+          </Label>
+          <div className="relative">
+            <Input
+              id="confirmPassword"
+              type={showConfirmPassword ? "text" : "password"}
+              name="confirmPassword"
+              autoComplete="new-password"
+              data-lpignore="true"
+              data-1p-ignore="true"
+              data-form-type="other"
+              data-bwignore="true"
+              spellCheck={false}
+              required
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="bg-bg-primary text-text-primary pr-10 hide-password-reveal"
+            />
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword((v) => !v)}
+              onMouseDown={(e) => e.preventDefault()}
+              tabIndex={-1}
+              className="absolute inset-y-0 right-3 flex items-center text-text-muted hover:text-accent-primary"
+              aria-label={showConfirmPassword ? "Bevestig wachtwoord verbergen" : "Bevestig wachtwoord tonen"}
+            >
+              {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+            </button>
+          </div>
+        </div>
+
+        <Button type="submit" className="w-full btn-premium text-white" disabled={isSubmitting}>
+          {isSubmitting ? "Account aanmaken..." : "Account aanmaken"}
+        </Button>
+      </form>
+    </div>
   );
 }
 

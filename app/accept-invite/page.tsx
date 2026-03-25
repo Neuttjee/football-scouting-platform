@@ -4,9 +4,9 @@ import { AcceptInviteForm } from "./AcceptInviteFormClient";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
+  CardDescription,
 } from "@/components/ui/card";
 
 export const dynamic = "force-dynamic";
@@ -120,17 +120,16 @@ export default async function AcceptInvitePage({ searchParams }: AcceptInvitePag
               style={{ filter: "brightness(0) invert(1)" }}
             />
           </div>
-          <CardTitle className="text-2xl font-bold tracking-tight">Uitnodiging accepteren</CardTitle>
-          <CardDescription>
-            Je bent uitgenodigd voor{" "}
-            <span className="font-semibold text-text-primary">
-              {user.club?.name || "een club binnen het Football Scouting Platform"}
-            </span>{" "}
-            als rol <span className="font-semibold text-text-primary">{user.role}</span>.
-          </CardDescription>
+          <CardTitle className="text-2xl font-bold tracking-tight">Football Scouting Platform</CardTitle>
         </CardHeader>
         <CardContent>
-          <AcceptInviteForm token={rawToken} defaultName={user.name} email={user.email} />
+          <AcceptInviteForm
+            token={rawToken}
+            defaultName={user.name}
+            email={user.email}
+            clubName={user.club?.name || "een club binnen het Football Scouting Platform"}
+            role={user.role}
+          />
         </CardContent>
       </Card>
     </div>

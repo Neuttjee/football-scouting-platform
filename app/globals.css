@@ -179,6 +179,17 @@
 }
 
 @layer utilities {
+  .hide-password-reveal::-ms-reveal,
+  .hide-password-reveal::-ms-clear {
+    display: none;
+  }
+
+  .hide-password-reveal::-webkit-credentials-auto-fill-button {
+    visibility: hidden;
+    display: none !important;
+    pointer-events: none;
+  }
+
   .text-primary-brand {
     color: var(--primary-color, #FF6A00);
   }
