@@ -7,6 +7,7 @@ import { AnalyticsPanel } from "./AnalyticsPanel";
 import { Field } from "./Field";
 import { FieldSkeleton } from "./FieldSkeleton";
 import { PlayerPicker } from "./PlayerPicker";
+import { PlayerPickerModal } from "./PlayerPickerModal";
 import { FieldSlot, Formation, PlanningPlayer, TeamOption } from "./types";
 import { type PlayerTypeValue } from "@/components/PlayerTypeToggle";
 import { canEditSquadPlanning } from "@/lib/roles";
@@ -19,6 +20,7 @@ import {
 } from "@/components/ui/dialog";
 import { TeamSettingsForm } from "../settings/TeamSettingsForm";
 import { useDelayedLoading } from "./useDelayedLoading";
+import { useIsPortraitTablet } from "./useIsPortraitTablet";
 
 const DEF_SLOTS: FieldSlot[] = [
   { id: "GK", label: "Keeper", x: 50, y: 92, line: "GK" },
@@ -104,18 +106,17 @@ function addToSlot(
 export default function SquadPlanningPage({
   players,
   teams,
-  agingThreshold,
   defaultSeasonYear,
   userRole,
   userId,
 }: {
   players: PlanningPlayer[];
   teams: TeamOption[];
-  agingThreshold: number;
   defaultSeasonYear: number;
   userRole: string | null;
   userId: string | null;
 }) {
+  const isPortraitTablet = useIsPortraitTablet();
   const initialCanEdit = React.useMemo(() => canEditSquadPlanning(userRole), [userRole]);
   const [selectedTeamId, setSelectedTeamId] = React.useState<string | null>(teams[0]?.id ?? null);
   const [includeFeederTeams, setIncludeFeederTeams] = React.useState(true);
@@ -128,6 +129,7 @@ export default function SquadPlanningPage({
     playerId: string;
     targetSlotId: string;
   } | null>(null);
+  const [pickerTargetSlotId, setPickerTargetSlotId] = React.useState<string | null>(null);
   const [settingsOpen, setSettingsOpen] = React.useState(false);
   const [analyticsOpen, setAnalyticsOpen] = React.useState(false);
   const [isSaving, setIsSaving] = React.useState(false);
@@ -387,6 +389,17 @@ export default function SquadPlanningPage({
       );
   };
 
+  const handleSlotClick = (slotId: string) => {
+    if (!canEdit) return;
+    setPickerTargetSlotId(slotId);
+  };
+
+  const handlePickerSelectPlayer = (playerId: string) => {
+    if (!pickerTargetSlotId) return;
+    handleDrop(pickerTargetSlotId, playerId);
+    setPickerTargetSlotId(null);
+  };
+
   const applyMove = (mode: "move" | "duplicate") => {
     if (!pendingDrop) return;
     const { playerId, targetSlotId } = pendingDrop;
@@ -414,6 +427,11 @@ export default function SquadPlanningPage({
       [slotId]: (prev[slotId] || []).filter((id) => id !== playerId),
     }));
   };
+
+  const pickerTargetSlot = React.useMemo(
+    () => slots.find((slot) => slot.id === pickerTargetSlotId) ?? null,
+    [slots, pickerTargetSlotId]
+  );
 
   const getBaseMaxForSlot = (slotId: string) =>
     slots.find((s) => s.id === slotId)?.maxPlayers ?? DEFAULT_MAX_PLAYERS_PER_SLOT;
@@ -711,11 +729,21 @@ export default function SquadPlanningPage({
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1.6fr)_390px] gap-6 items-start">
-        <div className="flex flex-col md:flex-row gap-4 items-start">
+      <div
+        className={cn(
+          "grid grid-cols-1 gap-6 items-start",
+          !isPortraitTablet && "xl:grid-cols-[minmax(0,1.6fr)_390px]"
+        )}
+      >
+        <div className={cn("flex gap-4 items-start", isPortraitTablet ? "flex-col" : "flex-col md:flex-row")}>
           {/* Linkerkolom: teamselectie + filters onder elkaar */}
-          <div className="w-full md:w-60 max-w-xs space-y-3">
-            <div className="inline-flex w-full items-center gap-1 rounded-md bg-bg-secondary/80 border border-border-dark shadow-sm p-0.5">
+          <div className={cn("w-full space-y-3", !isPortraitTablet && "md:w-60 max-w-xs")}>
+            <div
+              className={cn(
+                "inline-flex items-center gap-1 rounded-md bg-bg-secondary/80 border border-border-dark shadow-sm p-0.5",
+                isPortraitTablet ? "w-auto" : "w-full"
+              )}
+            >
               <button
                 type="button"
                 disabled={!canEdit}
@@ -746,7 +774,7 @@ export default function SquadPlanningPage({
               </button>
             </div>
 
-            <div className="space-y-2">
+            <div className={cn("space-y-2", isPortraitTablet && "flex flex-wrap items-center gap-2 space-y-0")}>
               {canEdit && (
                 <>
                   <button
@@ -754,7 +782,8 @@ export default function SquadPlanningPage({
                     disabled={isSaving}
                     onClick={() => void handleOpslaanClick()}
                     className={cn(
-                      "w-full inline-flex items-center justify-center gap-2 px-3 py-1.5 rounded-md border border-border-dark text-xs",
+                      "inline-flex items-center justify-center gap-2 px-3 py-1.5 rounded-md border border-border-dark text-xs",
+                      isPortraitTablet ? "w-auto" : "w-full",
                       isSaving
                         ? "text-text-muted cursor-not-allowed"
                         : "text-text-secondary hover:text-text-primary hover:bg-bg-primary/60"
@@ -798,7 +827,10 @@ export default function SquadPlanningPage({
                       type="button"
                       onClick={() => void pushToClub()}
                       disabled={!userId}
-                      className="w-full inline-flex items-center justify-center gap-2 px-3 py-1.5 rounded-md bg-accent-primary text-primary-foreground text-xs disabled:opacity-60 disabled:cursor-not-allowed"
+                      className={cn(
+                        "inline-flex items-center justify-center gap-2 px-3 py-1.5 rounded-md bg-accent-primary text-primary-foreground text-xs disabled:opacity-60 disabled:cursor-not-allowed",
+                        isPortraitTablet ? "w-auto" : "w-full"
+                      )}
                       title="Zet jouw draft door naar clubplanning"
                     >
                       Push naar club
@@ -908,7 +940,10 @@ export default function SquadPlanningPage({
                     <DialogTrigger asChild>
                       <button
                         type="button"
-                        className="w-full inline-flex items-center justify-center gap-2 px-3 py-1.5 rounded-md border border-border-dark text-xs text-text-secondary hover:text-text-primary hover:bg-bg-primary/60"
+                        className={cn(
+                          "inline-flex items-center justify-center gap-2 px-3 py-1.5 rounded-md border border-border-dark text-xs text-text-secondary hover:text-text-primary hover:bg-bg-primary/60",
+                          isPortraitTablet ? "w-auto" : "w-full"
+                        )}
                       >
                         Versies
                       </button>
@@ -970,7 +1005,63 @@ export default function SquadPlanningPage({
               )}
             </div>
 
-            <div className="inline-flex flex-wrap items-center gap-1 rounded-md bg-bg-secondary/80 border border-border-dark shadow-sm p-0.5">
+            {isPortraitTablet && (
+              <div className="flex items-center justify-end gap-2 flex-wrap">
+                <Dialog open={analyticsOpen} onOpenChange={setAnalyticsOpen}>
+                  <DialogTrigger asChild>
+                    <button
+                      type="button"
+                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-border-dark text-xs text-text-secondary hover:text-text-primary hover:bg-bg-primary/60"
+                    >
+                      <BarChart3 className="w-4 h-4" />
+                      <span>Analyse</span>
+                    </button>
+                  </DialogTrigger>
+                  <DialogContent
+                    size="wide"
+                    className="max-h-[90vh] overflow-y-auto bg-bg-card border-accent-primary text-text-primary"
+                  >
+                    <DialogHeader>
+                      <DialogTitle>Selectie-analyse</DialogTitle>
+                    </DialogHeader>
+                    <AnalyticsPanel
+                      slots={slots}
+                      assignments={assignments}
+                      playersById={playersById}
+                      seasonYear={seasonYear}
+                      effectiveMaxBySlotId={effectiveMaxBySlotId}
+                    />
+                  </DialogContent>
+                </Dialog>
+                <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
+                  <DialogTrigger asChild>
+                    <button
+                      type="button"
+                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-border-dark text-xs text-text-secondary hover:text-text-primary hover:bg-bg-primary/60"
+                    >
+                      <Settings className="w-4 h-4" />
+                      <span>Instellingen</span>
+                    </button>
+                  </DialogTrigger>
+                  <DialogContent
+                    size="wide"
+                    className="max-h-[90vh] overflow-y-auto bg-bg-card border-accent-primary text-text-primary"
+                  >
+                    <DialogHeader>
+                      <DialogTitle>Instellingen</DialogTitle>
+                    </DialogHeader>
+                    <TeamSettingsForm teams={teams} />
+                  </DialogContent>
+                </Dialog>
+              </div>
+            )}
+
+            <div
+              className={cn(
+                "inline-flex flex-wrap items-center gap-1 rounded-md bg-bg-secondary/80 border border-border-dark shadow-sm p-0.5",
+                isPortraitTablet && "w-full"
+              )}
+            >
               {teams.map((team) => {
                 const active = team.id === selectedTeamId;
                 return (
@@ -991,7 +1082,7 @@ export default function SquadPlanningPage({
               })}
             </div>
 
-            <div className="flex flex-col gap-2">
+            <div className={cn("flex gap-2", isPortraitTablet ? "items-center flex-row flex-wrap" : "flex-col")}>
               <label className="text-[11px] uppercase tracking-wide text-text-muted">
                 Seizoen
               </label>
@@ -1008,7 +1099,7 @@ export default function SquadPlanningPage({
               </select>
             </div>
 
-            <div className="flex flex-col gap-2">
+            <div className={cn("flex gap-2", isPortraitTablet ? "items-center flex-row flex-wrap" : "flex-col")}>
               <label className="text-[11px] uppercase tracking-wide text-text-muted">
                 Opstelling
               </label>
@@ -1024,7 +1115,7 @@ export default function SquadPlanningPage({
               </select>
             </div>
 
-            <label className="text-xs text-text-muted flex items-center gap-2">
+            <label className={cn("text-xs text-text-muted flex items-center gap-2", isPortraitTablet && "py-1")}>
               <input
                 type="checkbox"
                 checked={includeFeederTeams}
@@ -1049,6 +1140,7 @@ export default function SquadPlanningPage({
               effectiveMaxBySlotId={effectiveMaxBySlotId}
               canEdit={canEdit}
               onDropPlayer={handleDrop}
+              onSlotClick={handleSlotClick}
               onRemoveFromSlot={removeFromSlot}
               onSlotMaxIncrease={handleSlotMaxIncrease}
               onSlotMaxDecrease={handleSlotMaxDecrease}
@@ -1057,6 +1149,7 @@ export default function SquadPlanningPage({
         </div>
         </div>
 
+        {!isPortraitTablet && (
         <div className="space-y-8">
           <div className="flex justify-end gap-2 flex-wrap">
             <Dialog open={analyticsOpen} onOpenChange={setAnalyticsOpen}>
@@ -1081,7 +1174,6 @@ export default function SquadPlanningPage({
                   assignments={assignments}
                   playersById={playersById}
                   seasonYear={seasonYear}
-                  agingThreshold={agingThreshold}
                   effectiveMaxBySlotId={effectiveMaxBySlotId}
                 />
               </DialogContent>
@@ -1103,7 +1195,7 @@ export default function SquadPlanningPage({
                 <DialogHeader>
                   <DialogTitle>Instellingen</DialogTitle>
                 </DialogHeader>
-                <TeamSettingsForm teams={teams} agingThreshold={agingThreshold} />
+                <TeamSettingsForm teams={teams} />
               </DialogContent>
             </Dialog>
           </div>
@@ -1114,7 +1206,21 @@ export default function SquadPlanningPage({
             seasonYear={seasonYear}
           />
         </div>
+        )}
       </div>
+
+      <PlayerPickerModal
+        open={pickerTargetSlotId != null}
+        onOpenChange={(open) => {
+          if (!open) setPickerTargetSlotId(null);
+        }}
+        slot={pickerTargetSlot}
+        players={pickerPlayers}
+        selectedType={selectedType}
+        onTypeChange={setSelectedType}
+        seasonYear={seasonYear}
+        onSelectPlayer={handlePickerSelectPlayer}
+      />
 
       {pendingDrop && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">

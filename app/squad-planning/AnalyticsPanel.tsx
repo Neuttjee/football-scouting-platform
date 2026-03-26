@@ -18,14 +18,12 @@ export function AnalyticsPanel({
   assignments,
   playersById,
   seasonYear,
-  agingThreshold,
   effectiveMaxBySlotId,
 }: {
   slots: FieldSlot[];
   assignments: Record<string, string[]>;
   playersById: Record<string, PlanningPlayer>;
   seasonYear: number;
-  agingThreshold: number;
   effectiveMaxBySlotId: Record<string, number>;
 }) {
   const firstChoiceIds = slots
@@ -75,9 +73,6 @@ export function AnalyticsPanel({
   const expiringContracts = assignedPlayers.filter((player) =>
     isContractExpired(player, seasonYear)
   ).length;
-  const aboveThreshold = assignedPlayers.filter(
-    (player) => player.age != null && player.age >= agingThreshold
-  ).length;
   const externalInBasis = firstChoiceIds
     .map((id) => playersById[id])
     .filter((player) => player?.type === "EXTERNAL").length;
@@ -96,7 +91,6 @@ export function AnalyticsPanel({
         hint={tekortPosities.slice(0, 3).join(", ") || "Geen"}
       />
       <MetricCard label="Aflopende contracten" value={expiringContracts} />
-      <MetricCard label={`Boven ${agingThreshold} jaar`} value={aboveThreshold} />
       <MetricCard label="Externe spelers in basis" value={externalInBasis} />
       <MetricCard
         label="Unieke spelers vs slots"

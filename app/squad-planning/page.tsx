@@ -11,11 +11,7 @@ export default async function SquadPlanningServerPage() {
   const clubId = getEffectiveClubId(session);
   if (!clubId) redirect("/superadmin");
 
-  const [club, teams, players] = await Promise.all([
-    (prisma as any).club.findUnique({
-      where: { id: clubId },
-      select: { agingThreshold: true },
-    }),
+  const [teams, players] = await Promise.all([
     (prisma as any).team.findMany({
       where: { clubId },
       orderBy: [{ displayOrder: "asc" }, { createdAt: "asc" }],
@@ -39,7 +35,6 @@ export default async function SquadPlanningServerPage() {
     }),
   ]);
 
-  const clubWithAging = club as { agingThreshold?: number | null } | null;
   const playersWithExtras = players as any[];
 
   const preparedPlayers = playersWithExtras.map((player) => ({
@@ -72,7 +67,6 @@ export default async function SquadPlanningServerPage() {
     <SquadPlanningPage
       players={preparedPlayers}
       teams={teams}
-      agingThreshold={clubWithAging?.agingThreshold ?? 30}
       defaultSeasonYear={currentSeasonStartYear}
       userRole={session.user?.role ?? null}
       userId={session.user?.id ?? null}

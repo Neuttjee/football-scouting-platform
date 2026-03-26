@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { createTeam, moveTeam, setTeamActive, updateAgingThreshold, updateTeamNiveau } from "./actions";
+import { createTeam, moveTeam, setTeamActive, updateTeamNiveau } from "./actions";
 import { Button } from "@/components/ui/button";
 
 type Team = {
@@ -15,16 +15,13 @@ type Team = {
 
 export function TeamSettingsForm({
   teams,
-  agingThreshold,
 }: {
   teams: Team[];
-  agingThreshold: number;
 }) {
   const [pending, startTransition] = React.useTransition();
   const [name, setName] = React.useState("");
   const [code, setCode] = React.useState("");
   const [niveau, setNiveau] = React.useState("");
-  const [threshold, setThreshold] = React.useState(String(agingThreshold || 30));
 
   const onCreateTeam = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -37,39 +34,8 @@ export function TeamSettingsForm({
     });
   };
 
-  const onSaveThreshold = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const parsed = parseInt(threshold, 10);
-    if (Number.isNaN(parsed)) return;
-    startTransition(async () => {
-      await updateAgingThreshold(parsed);
-    });
-  };
-
   return (
     <div className="space-y-8">
-      <form onSubmit={onSaveThreshold} className="space-y-3">
-        <label className="block text-text-muted uppercase tracking-wider text-xs mb-1">
-          Leeftijdsgrens (aging threshold)
-        </label>
-        <div className="flex items-center gap-3">
-          <input
-            type="number"
-            min={16}
-            max={45}
-            value={threshold}
-            onChange={(e) => setThreshold(e.target.value)}
-            className="w-28 border border-border-dark rounded p-2 bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
-          />
-          <Button type="submit" className="btn-premium text-white" disabled={pending}>
-            Opslaan
-          </Button>
-        </div>
-        <p className="text-xs text-text-muted">
-          Spelers op of boven deze leeftijd krijgen een subtiele markering.
-        </p>
-      </form>
-
       <div className="space-y-4">
         <h3 className="text-sm font-semibold uppercase tracking-wider text-text-secondary">
           Teams

@@ -36,6 +36,7 @@ export function Field({
   effectiveMaxBySlotId,
   canEdit,
   onDropPlayer,
+  onSlotClick,
   onRemoveFromSlot,
   onSlotMaxIncrease,
   onSlotMaxDecrease,
@@ -49,6 +50,7 @@ export function Field({
   effectiveMaxBySlotId: Record<string, number>;
   canEdit: boolean;
   onDropPlayer: (slotId: string, playerId: string) => void;
+  onSlotClick: (slotId: string) => void;
   onRemoveFromSlot: (slotId: string, playerId: string) => void;
   onSlotMaxIncrease: (slotId: string) => void;
   onSlotMaxDecrease: (slotId: string) => void;
@@ -114,13 +116,20 @@ export function Field({
                         <div key={idx} className="flex items-center gap-1.5">
                           <div
                             className={cn(
-                              "flex-1 min-w-0 h-8 rounded flex items-center justify-between px-2 text-sm",
+                              "flex-1 min-w-0 h-11 rounded flex items-center justify-between px-2 text-sm",
                               !player
-                                ? "border border-dashed border-border-dark/80 bg-bg-primary/40"
+                                ? cn(
+                                    "border border-dashed border-border-dark/80 bg-bg-primary/40",
+                                    canEdit && "cursor-pointer hover:border-accent-primary/70"
+                                  )
                                 : player.type === "INTERNAL"
                                   ? "border border-border-dark bg-bg-secondary/50"
                                   : "border border-border-dark bg-bg-primary/70"
                             )}
+                            onClick={() => {
+                              if (!canEdit || player) return;
+                              onSlotClick(slot.id);
+                            }}
                           >
                             {!player ? null : (
                               <>

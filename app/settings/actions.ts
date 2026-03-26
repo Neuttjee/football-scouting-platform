@@ -161,26 +161,6 @@ export async function deleteUser(userId: string) {
   revalidatePath('/settings');
 }
 
-export async function updateAgingThreshold(agingThreshold: number) {
-  const session = await getSession();
-  if (!session || (session.user.role !== 'ADMIN' && session.user.role !== 'SUPERADMIN')) throw new Error('Unauthorized');
-  const clubId = getEffectiveClubId(session);
-  if (!clubId) throw new Error('Geen club geselecteerd');
-
-  const safeThreshold = Number.isFinite(agingThreshold)
-    ? Math.max(16, Math.min(45, Math.round(agingThreshold)))
-    : 30;
-
-  await (prisma as any).club.update({
-    where: { id: clubId },
-    data: { agingThreshold: safeThreshold } as any,
-  });
-
-  revalidatePath('/settings');
-  revalidatePath('/players');
-  revalidatePath('/squad-planning');
-}
-
 export async function createTeam(name: string, code: string | null, niveau: string | null) {
   const session = await getSession();
   if (!session || (session.user.role !== 'ADMIN' && session.user.role !== 'SUPERADMIN')) throw new Error('Unauthorized');

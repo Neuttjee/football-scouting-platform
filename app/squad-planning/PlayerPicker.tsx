@@ -11,11 +11,13 @@ export function PlayerPicker({
   selectedType,
   onTypeChange,
   seasonYear,
+  onSelectPlayer,
 }: {
   players: PlanningPlayer[];
   selectedType: PlayerTypeValue;
   onTypeChange: (type: PlayerTypeValue) => void;
   seasonYear: number;
+  onSelectPlayer?: (playerId: string) => void;
 }) {
   const [query, setQuery] = React.useState("");
   const [positionFilter, setPositionFilter] = React.useState("");
@@ -135,14 +137,16 @@ export function PlayerPicker({
                 : null;
             const isReady = isPlayerReadyForSeason(player);
             return (
-          <div
+          <button
             key={player.id}
+            type="button"
             draggable
             onDragStart={(e) => {
               e.dataTransfer.setData("text/player-id", player.id);
             }}
+            onClick={() => onSelectPlayer?.(player.id)}
             className={cn(
-              "border rounded p-2 cursor-grab active:cursor-grabbing",
+              "w-full text-left border rounded p-2 cursor-grab active:cursor-grabbing hover:border-accent-primary/60",
               player.type === "INTERNAL" ? "border-border-dark bg-bg-secondary/50" : "border-border-dark bg-bg-primary/70"
             )}
           >
@@ -181,7 +185,7 @@ export function PlayerPicker({
               {(player.teamLabel || "-")} • {player.position || "-"} •{" "}
               {player.age != null ? `${player.age}j` : "-"}
             </div>
-          </div>
+          </button>
             );
           })()
         ))}
