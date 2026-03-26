@@ -7,7 +7,7 @@ import type { FieldSlot } from "./types";
 export function FieldSkeleton({ slots }: { slots: FieldSlot[] }) {
   return (
     <div className="card-premium rounded-lg p-0 overflow-hidden border border-accent-primary/50 bg-bg-secondary/40 shadow-inner w-full max-w-[980px] mx-auto">
-      <div className="relative w-full aspect-[55/100] min-h-[320px] max-h-[92dvh]">
+      <div className="relative w-full aspect-[62/100] min-h-[320px] max-h-[92dvh]">
         <div className="absolute inset-0 rounded-[6px] border border-accent-primary/80" />
         <div className="absolute left-0 right-0 top-1/2 h-0 border-t border-accent-primary/80 -translate-y-px" />
         <div className="absolute left-1/2 top-1/2 w-[22%] aspect-square rounded-full border border-accent-primary/80 -translate-x-1/2 -translate-y-1/2" />

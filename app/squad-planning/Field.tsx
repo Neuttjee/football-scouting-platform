@@ -57,8 +57,8 @@ export function Field({
 }) {
   return (
     <div className="card-premium rounded-lg p-0 overflow-hidden border border-accent-primary/50 bg-bg-secondary/40 shadow-inner w-full max-w-[980px] mx-auto">
-      {/* Veldverhouding 55:100 (breedte:lengte) – meer in lijn met echt veld */}
-      <div className="relative w-full aspect-[55/100] min-h-[320px] max-h-[92dvh]">
+      {/* Iets bredere verhouding voor betere leesbaarheid op tablet portrait */}
+      <div className="relative w-full aspect-[62/100] min-h-[320px] max-h-[92dvh]">
           {/* Veldlijnen: buitenlijn (iets dunner) */}
           <div className="absolute inset-0 rounded-[6px] border border-accent-primary/80" />
 

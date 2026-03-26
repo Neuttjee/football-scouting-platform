@@ -728,20 +728,32 @@ export default function SquadPlanningPage({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 md:space-y-4">
       <div
         className={cn(
           "grid grid-cols-1 gap-6 items-start",
           !isPortraitTablet && "xl:grid-cols-[minmax(0,1.6fr)_390px]"
         )}
       >
-        <div className={cn("flex gap-4 items-start", isPortraitTablet ? "flex-col" : "flex-col md:flex-row")}>
+        <div
+          className={cn(
+            "flex gap-4",
+            isPortraitTablet ? "flex-col items-stretch" : "flex-col md:flex-row items-start"
+          )}
+        >
           {/* Linkerkolom: teamselectie + filters onder elkaar */}
-          <div className={cn("w-full space-y-3", !isPortraitTablet && "md:w-60 max-w-xs")}>
+          <div
+            className={cn(
+              "w-full space-y-3",
+              !isPortraitTablet && "md:w-60 max-w-xs",
+              isPortraitTablet &&
+                "rounded-xl border border-border-dark bg-bg-card/70 backdrop-blur-sm p-3 shadow-sm"
+            )}
+          >
             <div
               className={cn(
                 "inline-flex items-center gap-1 rounded-md bg-bg-secondary/80 border border-border-dark shadow-sm p-0.5",
-                isPortraitTablet ? "w-auto" : "w-full"
+                "w-full"
               )}
             >
               <button
@@ -995,6 +1007,57 @@ export default function SquadPlanningPage({
                 </>
               )}
 
+              {isPortraitTablet && (
+                <>
+                  <Dialog open={analyticsOpen} onOpenChange={setAnalyticsOpen}>
+                    <DialogTrigger asChild>
+                      <button
+                        type="button"
+                        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-border-dark text-xs text-text-secondary hover:text-text-primary hover:bg-bg-primary/60"
+                      >
+                        <BarChart3 className="w-4 h-4" />
+                        <span>Analyse</span>
+                      </button>
+                    </DialogTrigger>
+                    <DialogContent
+                      size="wide"
+                      className="max-h-[90vh] overflow-y-auto bg-bg-card border-accent-primary text-text-primary"
+                    >
+                      <DialogHeader>
+                        <DialogTitle>Selectie-analyse</DialogTitle>
+                      </DialogHeader>
+                      <AnalyticsPanel
+                        slots={slots}
+                        assignments={assignments}
+                        playersById={playersById}
+                        seasonYear={seasonYear}
+                        effectiveMaxBySlotId={effectiveMaxBySlotId}
+                      />
+                    </DialogContent>
+                  </Dialog>
+                  <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
+                    <DialogTrigger asChild>
+                      <button
+                        type="button"
+                        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-border-dark text-xs text-text-secondary hover:text-text-primary hover:bg-bg-primary/60"
+                      >
+                        <Settings className="w-4 h-4" />
+                        <span>Instellingen</span>
+                      </button>
+                    </DialogTrigger>
+                    <DialogContent
+                      size="wide"
+                      className="max-h-[90vh] overflow-y-auto bg-bg-card border-accent-primary text-text-primary"
+                    >
+                      <DialogHeader>
+                        <DialogTitle>Instellingen</DialogTitle>
+                      </DialogHeader>
+                      <TeamSettingsForm teams={teams} />
+                    </DialogContent>
+                  </Dialog>
+                </>
+              )}
+
               {lastSavedAt && (
                 <p className="text-[11px] text-text-muted">
                   Laatst opgeslagen: {lastSavedAt.toLocaleTimeString()}
@@ -1005,61 +1068,10 @@ export default function SquadPlanningPage({
               )}
             </div>
 
-            {isPortraitTablet && (
-              <div className="flex items-center justify-end gap-2 flex-wrap">
-                <Dialog open={analyticsOpen} onOpenChange={setAnalyticsOpen}>
-                  <DialogTrigger asChild>
-                    <button
-                      type="button"
-                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-border-dark text-xs text-text-secondary hover:text-text-primary hover:bg-bg-primary/60"
-                    >
-                      <BarChart3 className="w-4 h-4" />
-                      <span>Analyse</span>
-                    </button>
-                  </DialogTrigger>
-                  <DialogContent
-                    size="wide"
-                    className="max-h-[90vh] overflow-y-auto bg-bg-card border-accent-primary text-text-primary"
-                  >
-                    <DialogHeader>
-                      <DialogTitle>Selectie-analyse</DialogTitle>
-                    </DialogHeader>
-                    <AnalyticsPanel
-                      slots={slots}
-                      assignments={assignments}
-                      playersById={playersById}
-                      seasonYear={seasonYear}
-                      effectiveMaxBySlotId={effectiveMaxBySlotId}
-                    />
-                  </DialogContent>
-                </Dialog>
-                <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
-                  <DialogTrigger asChild>
-                    <button
-                      type="button"
-                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-border-dark text-xs text-text-secondary hover:text-text-primary hover:bg-bg-primary/60"
-                    >
-                      <Settings className="w-4 h-4" />
-                      <span>Instellingen</span>
-                    </button>
-                  </DialogTrigger>
-                  <DialogContent
-                    size="wide"
-                    className="max-h-[90vh] overflow-y-auto bg-bg-card border-accent-primary text-text-primary"
-                  >
-                    <DialogHeader>
-                      <DialogTitle>Instellingen</DialogTitle>
-                    </DialogHeader>
-                    <TeamSettingsForm teams={teams} />
-                  </DialogContent>
-                </Dialog>
-              </div>
-            )}
-
             <div
               className={cn(
                 "inline-flex flex-wrap items-center gap-1 rounded-md bg-bg-secondary/80 border border-border-dark shadow-sm p-0.5",
-                isPortraitTablet && "w-full"
+                isPortraitTablet && "w-full overflow-x-auto whitespace-nowrap"
               )}
             >
               {teams.map((team) => {
@@ -1082,7 +1094,7 @@ export default function SquadPlanningPage({
               })}
             </div>
 
-            <div className={cn("flex gap-2", isPortraitTablet ? "items-center flex-row flex-wrap" : "flex-col")}>
+            <div className={cn("flex gap-2", isPortraitTablet ? "items-center justify-between flex-row" : "flex-col")}>
               <label className="text-[11px] uppercase tracking-wide text-text-muted">
                 Seizoen
               </label>
@@ -1099,7 +1111,7 @@ export default function SquadPlanningPage({
               </select>
             </div>
 
-            <div className={cn("flex gap-2", isPortraitTablet ? "items-center flex-row flex-wrap" : "flex-col")}>
+            <div className={cn("flex gap-2", isPortraitTablet ? "items-center justify-between flex-row" : "flex-col")}>
               <label className="text-[11px] uppercase tracking-wide text-text-muted">
                 Opstelling
               </label>
@@ -1126,7 +1138,7 @@ export default function SquadPlanningPage({
           </div>
 
         {/* Veld */}
-        <div className="flex-1 min-w-0">
+        <div className={cn("min-w-0", isPortraitTablet ? "w-full flex justify-center" : "flex-1")}>
           {showPlanSkeleton ? (
             <FieldSkeleton slots={slots} />
           ) : (
