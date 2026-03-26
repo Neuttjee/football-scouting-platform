@@ -1021,7 +1021,7 @@ export default function SquadPlanningPage({
               </div>
             </div>
 
-            <div className={cn(isPortraitTablet && "flex items-center gap-3 overflow-x-auto whitespace-nowrap pb-1")}>
+            <div className={cn(isPortraitTablet && "flex items-center gap-3 flex-wrap pb-1")}>
               <div
                 className={cn(
                   "inline-flex flex-wrap items-center gap-1 rounded-md bg-bg-secondary/80 border border-border-dark shadow-sm p-0.5",
@@ -1091,7 +1091,11 @@ export default function SquadPlanningPage({
                   checked={includeFeederTeams}
                   onChange={(e) => setIncludeFeederTeams(e.target.checked)}
                 />
-                Onderliggende teams meenemen
+                {isPortraitTablet ? (
+                  <span className="leading-tight">Onderliggende teams</span>
+                ) : (
+                  "Onderliggende teams meenemen"
+                )}
               </label>
             </div>
 

@@ -24,7 +24,7 @@ export function FieldSkeleton({ slots }: { slots: FieldSlot[] }) {
         {slots.map((slot) => (
           <div
             key={slot.id}
-            className="absolute -translate-x-1/2 -translate-y-1/2 w-36 lg:w-48"
+            className="absolute -translate-x-1/2 -translate-y-1/2 w-40 lg:w-48"
             style={{ left: `${slot.x}%`, top: `${slot.y}%` }}
           >
             <div className="rounded-md border border-white/40 bg-bg-secondary/90 p-2 shadow-md backdrop-blur-sm motion-reduce:animate-none">

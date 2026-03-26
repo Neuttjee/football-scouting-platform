@@ -92,7 +92,7 @@ export function Field({
             return (
               <div
                 key={slot.id}
-                className="absolute -translate-x-1/2 -translate-y-1/2 w-36 lg:w-48"
+                className="absolute -translate-x-1/2 -translate-y-1/2 w-40 lg:w-48"
                 style={{ left: `${slot.x}%`, top: `${slot.y}%` }}
                 onDragOver={(e) => {
                   if (!canEdit) return;
