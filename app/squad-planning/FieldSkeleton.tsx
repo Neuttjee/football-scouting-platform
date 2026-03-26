@@ -24,18 +24,18 @@ export function FieldSkeleton({ slots }: { slots: FieldSlot[] }) {
         {slots.map((slot) => (
           <div
             key={slot.id}
-            className="absolute -translate-x-1/2 -translate-y-1/2 w-48 md:w-60"
+            className="absolute -translate-x-1/2 -translate-y-1/2 w-36 lg:w-48"
             style={{ left: `${slot.x}%`, top: `${slot.y}%` }}
           >
             <div className="rounded-md border border-white/40 bg-bg-secondary/90 p-2 shadow-md backdrop-blur-sm motion-reduce:animate-none">
               <div className="flex flex-col gap-1.5">
                 <div className="flex items-center gap-1.5">
-                  <Skeleton className="h-8 flex-1 bg-bg-primary/40 border border-dashed border-border-dark/80 motion-reduce:animate-none" />
-                  <Skeleton className="h-8 w-7 bg-bg-primary/40 border border-border-dark/80 motion-reduce:animate-none" />
+                  <Skeleton className="h-7 flex-1 bg-bg-primary/40 border border-dashed border-border-dark/80 motion-reduce:animate-none" />
+                  <Skeleton className="h-7 w-6 bg-bg-primary/40 border border-border-dark/80 motion-reduce:animate-none" />
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <Skeleton className="h-8 flex-1 bg-bg-primary/40 border border-dashed border-border-dark/80 motion-reduce:animate-none" />
-                  <Skeleton className="h-8 w-7 bg-bg-primary/40 border border-border-dark/80 motion-reduce:animate-none" />
+                  <Skeleton className="h-7 flex-1 bg-bg-primary/40 border border-dashed border-border-dark/80 motion-reduce:animate-none" />
+                  <Skeleton className="h-7 w-6 bg-bg-primary/40 border border-border-dark/80 motion-reduce:animate-none" />
                 </div>
               </div>
             </div>

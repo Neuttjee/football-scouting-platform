@@ -752,41 +752,53 @@ export default function SquadPlanningPage({
           >
             <div
               className={cn(
-                "inline-flex items-center gap-1 rounded-md bg-bg-secondary/80 border border-border-dark shadow-sm p-0.5",
-                "w-full"
+                isPortraitTablet
+                  ? "flex items-center gap-2 overflow-x-auto whitespace-nowrap pb-1"
+                  : "space-y-3"
               )}
             >
-              <button
-                type="button"
-                disabled={!canEdit}
-                onClick={() => requestKeyChange({ mode: "club" })}
+              <div
                 className={cn(
-                  "flex-1 px-3 py-1 text-xs font-medium rounded-md transition-colors",
-                  mode === "club"
-                    ? "bg-accent-primary text-primary-foreground"
-                    : "text-text-muted hover:text-text-primary hover:bg-bg-primary/70",
-                  !canEdit && "opacity-60 cursor-not-allowed"
+                  "inline-flex items-center gap-1 rounded-md bg-bg-secondary/80 border border-border-dark shadow-sm p-0.5",
+                  isPortraitTablet ? "min-w-[320px]" : "w-full"
                 )}
               >
-                Clubplanning
-              </button>
-              <button
-                type="button"
-                disabled={!canEdit || !userId}
-                onClick={() => requestKeyChange({ mode: "user" })}
-                className={cn(
-                  "flex-1 px-3 py-1 text-xs font-medium rounded-md transition-colors",
-                  mode === "user"
-                    ? "bg-accent-primary text-primary-foreground"
-                    : "text-text-muted hover:text-text-primary hover:bg-bg-primary/70",
-                  (!canEdit || !userId) && "opacity-60 cursor-not-allowed"
-                )}
-              >
-                Mijn draft
-              </button>
-            </div>
+                <button
+                  type="button"
+                  disabled={!canEdit}
+                  onClick={() => requestKeyChange({ mode: "club" })}
+                  className={cn(
+                    "flex-1 px-3 py-1 text-xs font-medium rounded-md transition-colors",
+                    mode === "club"
+                      ? "bg-accent-primary text-primary-foreground"
+                      : "text-text-muted hover:text-text-primary hover:bg-bg-primary/70",
+                    !canEdit && "opacity-60 cursor-not-allowed"
+                  )}
+                >
+                  Clubplanning
+                </button>
+                <button
+                  type="button"
+                  disabled={!canEdit || !userId}
+                  onClick={() => requestKeyChange({ mode: "user" })}
+                  className={cn(
+                    "flex-1 px-3 py-1 text-xs font-medium rounded-md transition-colors",
+                    mode === "user"
+                      ? "bg-accent-primary text-primary-foreground"
+                      : "text-text-muted hover:text-text-primary hover:bg-bg-primary/70",
+                    (!canEdit || !userId) && "opacity-60 cursor-not-allowed"
+                  )}
+                >
+                  Mijn draft
+                </button>
+              </div>
 
-            <div className={cn("space-y-2", isPortraitTablet && "flex flex-wrap items-center gap-2 space-y-0")}>
+              <div
+                className={cn(
+                  "space-y-2",
+                  isPortraitTablet && "flex items-center gap-2 flex-nowrap whitespace-nowrap space-y-0"
+                )}
+              >
               {canEdit && (
                 <>
                   <button
@@ -1006,135 +1018,142 @@ export default function SquadPlanningPage({
                   </Dialog>
                 </>
               )}
-
-              {isPortraitTablet && (
-                <>
-                  <Dialog open={analyticsOpen} onOpenChange={setAnalyticsOpen}>
-                    <DialogTrigger asChild>
-                      <button
-                        type="button"
-                        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-border-dark text-xs text-text-secondary hover:text-text-primary hover:bg-bg-primary/60"
-                      >
-                        <BarChart3 className="w-4 h-4" />
-                        <span>Analyse</span>
-                      </button>
-                    </DialogTrigger>
-                    <DialogContent
-                      size="wide"
-                      className="max-h-[90vh] overflow-y-auto bg-bg-card border-accent-primary text-text-primary"
-                    >
-                      <DialogHeader>
-                        <DialogTitle>Selectie-analyse</DialogTitle>
-                      </DialogHeader>
-                      <AnalyticsPanel
-                        slots={slots}
-                        assignments={assignments}
-                        playersById={playersById}
-                        seasonYear={seasonYear}
-                        effectiveMaxBySlotId={effectiveMaxBySlotId}
-                      />
-                    </DialogContent>
-                  </Dialog>
-                  <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
-                    <DialogTrigger asChild>
-                      <button
-                        type="button"
-                        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-border-dark text-xs text-text-secondary hover:text-text-primary hover:bg-bg-primary/60"
-                      >
-                        <Settings className="w-4 h-4" />
-                        <span>Instellingen</span>
-                      </button>
-                    </DialogTrigger>
-                    <DialogContent
-                      size="wide"
-                      className="max-h-[90vh] overflow-y-auto bg-bg-card border-accent-primary text-text-primary"
-                    >
-                      <DialogHeader>
-                        <DialogTitle>Instellingen</DialogTitle>
-                      </DialogHeader>
-                      <TeamSettingsForm teams={teams} />
-                    </DialogContent>
-                  </Dialog>
-                </>
-              )}
-
-              {lastSavedAt && (
-                <p className="text-[11px] text-text-muted">
-                  Laatst opgeslagen: {lastSavedAt.toLocaleTimeString()}
-                </p>
-              )}
-              {loadError && (
-                <p className="text-[11px] text-destructive">{loadError}</p>
-              )}
+              </div>
             </div>
 
-            <div
-              className={cn(
-                "inline-flex flex-wrap items-center gap-1 rounded-md bg-bg-secondary/80 border border-border-dark shadow-sm p-0.5",
-                isPortraitTablet && "w-full overflow-x-auto whitespace-nowrap"
-              )}
-            >
-              {teams.map((team) => {
-                const active = team.id === selectedTeamId;
-                return (
-                  <button
-                    key={team.id}
-                    type="button"
-                    onClick={() => requestKeyChange({ selectedTeamId: team.id })}
-                    className={cn(
-                      "px-3 py-1 text-xs font-medium rounded-md transition-colors",
-                      active
-                        ? "bg-accent-primary text-primary-foreground shadow-[0_0_8px_rgba(var(--primary-rgb,255,106,0),0.5)]"
-                        : "text-text-muted hover:text-text-primary hover:bg-bg-primary/70"
-                    )}
+            <div className={cn(isPortraitTablet && "flex items-center gap-3 overflow-x-auto whitespace-nowrap pb-1")}>
+              <div
+                className={cn(
+                  "inline-flex flex-wrap items-center gap-1 rounded-md bg-bg-secondary/80 border border-border-dark shadow-sm p-0.5",
+                  isPortraitTablet && "flex-nowrap"
+                )}
+              >
+                {teams.map((team) => {
+                  const active = team.id === selectedTeamId;
+                  return (
+                    <button
+                      key={team.id}
+                      type="button"
+                      onClick={() => requestKeyChange({ selectedTeamId: team.id })}
+                      className={cn(
+                        "px-3 py-1 text-xs font-medium rounded-md transition-colors",
+                        active
+                          ? "bg-accent-primary text-primary-foreground shadow-[0_0_8px_rgba(var(--primary-rgb,255,106,0),0.5)]"
+                          : "text-text-muted hover:text-text-primary hover:bg-bg-primary/70"
+                      )}
+                    >
+                      {team.code || team.name}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div
+                className={cn("flex gap-2", isPortraitTablet ? "items-center flex-row" : "flex-col")}
+              >
+                <label className="text-[11px] uppercase tracking-wide text-text-muted">
+                  Seizoen
+                </label>
+                <select
+                  value={seasonYear}
+                  onChange={(e) => requestKeyChange({ seasonYear: parseInt(e.target.value, 10) })}
+                  className="border border-border-dark rounded px-2 py-1.5 text-xs bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
+                >
+                  {seasonOptions.map((year) => (
+                    <option key={year} value={year}>
+                      {year}-{year + 1}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div
+                className={cn("flex gap-2", isPortraitTablet ? "items-center flex-row" : "flex-col")}
+              >
+                <label className="text-[11px] uppercase tracking-wide text-text-muted">
+                  Opstelling
+                </label>
+                <select
+                  value={formation}
+                  onChange={(e) => requestKeyChange({ formation: e.target.value as Formation })}
+                  className="border border-border-dark rounded px-2 py-1.5 text-xs bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
+                >
+                  <option value="4-3-3_POINT_BACK">4-3-3 p.n.a.</option>
+                  <option value="4-3-3_POINT_FORWARD">4-3-3 p.n.v.</option>
+                  <option value="4-4-2_DIAMOND">4-4-2 ruit</option>
+                  <option value="4-4-2_SQUARE">4-4-2 vierkant</option>
+                </select>
+              </div>
+
+              <label className="text-xs text-text-muted flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={includeFeederTeams}
+                  onChange={(e) => setIncludeFeederTeams(e.target.checked)}
+                />
+                Onderliggende teams meenemen
+              </label>
+            </div>
+
+            {isPortraitTablet && (
+              <div className="flex items-center gap-2 justify-end">
+                <Dialog open={analyticsOpen} onOpenChange={setAnalyticsOpen}>
+                  <DialogTrigger asChild>
+                    <button
+                      type="button"
+                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-border-dark text-xs text-text-secondary hover:text-text-primary hover:bg-bg-primary/60"
+                    >
+                      <BarChart3 className="w-4 h-4" />
+                      <span>Analyse</span>
+                    </button>
+                  </DialogTrigger>
+                  <DialogContent
+                    size="wide"
+                    className="max-h-[90vh] overflow-y-auto bg-bg-card border-accent-primary text-text-primary"
                   >
-                    {team.code || team.name}
-                  </button>
-                );
-              })}
-            </div>
+                    <DialogHeader>
+                      <DialogTitle>Selectie-analyse</DialogTitle>
+                    </DialogHeader>
+                    <AnalyticsPanel
+                      slots={slots}
+                      assignments={assignments}
+                      playersById={playersById}
+                      seasonYear={seasonYear}
+                      effectiveMaxBySlotId={effectiveMaxBySlotId}
+                    />
+                  </DialogContent>
+                </Dialog>
+                <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
+                  <DialogTrigger asChild>
+                    <button
+                      type="button"
+                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-border-dark text-xs text-text-secondary hover:text-text-primary hover:bg-bg-primary/60"
+                    >
+                      <Settings className="w-4 h-4" />
+                      <span>Instellingen</span>
+                    </button>
+                  </DialogTrigger>
+                  <DialogContent
+                    size="wide"
+                    className="max-h-[90vh] overflow-y-auto bg-bg-card border-accent-primary text-text-primary"
+                  >
+                    <DialogHeader>
+                      <DialogTitle>Instellingen</DialogTitle>
+                    </DialogHeader>
+                    <TeamSettingsForm teams={teams} />
+                  </DialogContent>
+                </Dialog>
+              </div>
+            )}
 
-            <div className={cn("flex gap-2", isPortraitTablet ? "items-center justify-between flex-row" : "flex-col")}>
-              <label className="text-[11px] uppercase tracking-wide text-text-muted">
-                Seizoen
-              </label>
-              <select
-                value={seasonYear}
-                onChange={(e) => requestKeyChange({ seasonYear: parseInt(e.target.value, 10) })}
-                className="border border-border-dark rounded px-2 py-1.5 text-xs bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
-              >
-                {seasonOptions.map((year) => (
-                  <option key={year} value={year}>
-                    {year}-{year + 1}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className={cn("flex gap-2", isPortraitTablet ? "items-center justify-between flex-row" : "flex-col")}>
-              <label className="text-[11px] uppercase tracking-wide text-text-muted">
-                Opstelling
-              </label>
-              <select
-                value={formation}
-                onChange={(e) => requestKeyChange({ formation: e.target.value as Formation })}
-                className="border border-border-dark rounded px-2 py-1.5 text-xs bg-bg-primary text-text-primary focus:border-accent-primary focus-visible:outline-none"
-              >
-                <option value="4-3-3_POINT_BACK">4-3-3 p.n.a.</option>
-                <option value="4-3-3_POINT_FORWARD">4-3-3 p.n.v.</option>
-                <option value="4-4-2_DIAMOND">4-4-2 ruit</option>
-                <option value="4-4-2_SQUARE">4-4-2 vierkant</option>
-              </select>
-            </div>
-
-            <label className={cn("text-xs text-text-muted flex items-center gap-2", isPortraitTablet && "py-1")}>
-              <input
-                type="checkbox"
-                checked={includeFeederTeams}
-                onChange={(e) => setIncludeFeederTeams(e.target.checked)}
-              />
-              Onderliggende teams meenemen
-            </label>
+            {lastSavedAt && (
+              <p className="text-[11px] text-text-muted">
+                Laatst opgeslagen: {lastSavedAt.toLocaleTimeString()}
+              </p>
+            )}
+            {loadError && (
+              <p className="text-[11px] text-destructive">{loadError}</p>
+            )}
           </div>
 
         {/* Veld */}

@@ -92,7 +92,7 @@ export function Field({
             return (
               <div
                 key={slot.id}
-                className="absolute -translate-x-1/2 -translate-y-1/2 w-48 md:w-60"
+                className="absolute -translate-x-1/2 -translate-y-1/2 w-36 lg:w-48"
                 style={{ left: `${slot.x}%`, top: `${slot.y}%` }}
                 onDragOver={(e) => {
                   if (!canEdit) return;
@@ -116,7 +116,7 @@ export function Field({
                         <div key={idx} className="flex items-center gap-1.5">
                           <div
                             className={cn(
-                              "flex-1 min-w-0 h-11 rounded flex items-center justify-between px-2 text-sm",
+                              "flex-1 min-w-0 h-9 rounded flex items-center justify-between px-2 text-xs",
                               !player
                                 ? cn(
                                     "border border-dashed border-border-dark/80 bg-bg-primary/40",
@@ -182,7 +182,7 @@ export function Field({
                               onClick={() => onSlotMaxDecrease(slot.id)}
                               disabled={decreaseBlocked}
                               className={cn(
-                                "w-7 h-8 rounded border text-xs flex items-center justify-center shrink-0 flex-shrink-0",
+                                "w-6 h-7 rounded border text-xs flex items-center justify-center shrink-0 flex-shrink-0",
                                 !decreaseBlocked
                                   ? "border-border-dark text-text-secondary hover:text-text-primary hover:bg-bg-primary/70"
                                   : "border-border-dark/50 text-text-muted/50 cursor-not-allowed"
@@ -196,7 +196,7 @@ export function Field({
                             <button
                               type="button"
                               onClick={() => onSlotMaxIncrease(slot.id)}
-                              className="w-7 h-8 rounded border border-border-dark text-text-secondary hover:text-text-primary hover:bg-bg-primary/70 text-xs flex items-center justify-center shrink-0 flex-shrink-0"
+                              className="w-6 h-7 rounded border border-border-dark text-text-secondary hover:text-text-primary hover:bg-bg-primary/70 text-xs flex items-center justify-center shrink-0 flex-shrink-0"
                               aria-label="Extra slot toevoegen"
                               title="Extra slot toevoegen"
                             >
