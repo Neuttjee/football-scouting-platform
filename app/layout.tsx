@@ -17,6 +17,10 @@ import { SeasonRolloverNewsModal } from './SeasonRolloverNewsModal';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 
+function isPrismaP1001(error: unknown): boolean {
+  return Boolean(error && typeof error === "object" && "code" in error && (error as any).code === "P1001");
+}
+
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 const jetbrainsMono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono' });
 
@@ -64,40 +68,57 @@ export default async function RootLayout({
   let club = null;
   let clubConfig = null;
   let twoFactorSetupRequired = false;
+  let databaseReachable = true;
 
   if (session) {
     const policyClubId = session.user.clubId;
-    const [configForPolicy, twoFactorUser] = await Promise.all([
-      getClubConfigByClubId(policyClubId),
-      prisma.user.findUnique({
-        where: { id: session.user.id },
-        select: { twoFactorSecret: true, twoFactorVerifiedAt: true },
-      }),
-    ]);
+    try {
+      const [configForPolicy, twoFactorUser] = await Promise.all([
+        getClubConfigByClubId(policyClubId),
+        prisma.user.findUnique({
+          where: { id: session.user.id },
+          select: { twoFactorSecret: true, twoFactorVerifiedAt: true },
+        }),
+      ]);
 
-    // 2FA setup is mandatory before navigating further.
-    const hasTwoFactorModule = configForPolicy?.features.two_factor_auth ?? false;
-    const isConfigured = !!twoFactorUser?.twoFactorSecret && !!twoFactorUser?.twoFactorVerifiedAt;
-    twoFactorSetupRequired = hasTwoFactorModule && !isConfigured;
+      // 2FA setup is mandatory before navigating further.
+      const hasTwoFactorModule = configForPolicy?.features.two_factor_auth ?? false;
+      const isConfigured = !!twoFactorUser?.twoFactorSecret && !!twoFactorUser?.twoFactorVerifiedAt;
+      twoFactorSetupRequired = hasTwoFactorModule && !isConfigured;
 
-    if (twoFactorSetupRequired && pathname && !pathname.startsWith('/setup')) {
-      redirect('/setup');
+      if (twoFactorSetupRequired && pathname && !pathname.startsWith('/setup')) {
+        redirect('/setup');
+      }
+    } catch (error) {
+      if (isPrismaP1001(error)) {
+        databaseReachable = false;
+      } else {
+        throw error;
+      }
     }
   }
 
   if (session && effectiveClubId) {
-    const [clubRecord, config] = await Promise.all([
-      prisma.club.findUnique({
-        where: { id: effectiveClubId },
-      }),
-      getClubConfigByClubId(effectiveClubId),
-    ]);
-    club = clubRecord;
-    clubConfig = config;
+    try {
+      const [clubRecord, config] = await Promise.all([
+        prisma.club.findUnique({
+          where: { id: effectiveClubId },
+        }),
+        getClubConfigByClubId(effectiveClubId),
+      ]);
+      club = clubRecord;
+      clubConfig = config;
+    } catch (error) {
+      if (isPrismaP1001(error)) {
+        databaseReachable = false;
+      } else {
+        throw error;
+      }
+    }
   }
 
   // Auto-promote club when a trial ends (no background job needed).
-  if (club && (club as any).status === 'PROEFPERIODE' && (club as any).trialEndsAt) {
+  if (databaseReachable && club && (club as any).status === 'PROEFPERIODE' && (club as any).trialEndsAt) {
     const endsAt = new Date((club as any).trialEndsAt);
     if (!Number.isNaN(endsAt.getTime()) && endsAt.getTime() <= Date.now()) {
       club = await prisma.club.update({
@@ -114,6 +135,7 @@ export default async function RootLayout({
 
   const basePrimaryColor =
     club?.primaryColor ? sanitizePrimaryColor(club.primaryColor) : DEFAULT_PRIMARY_COLOR;
+  const sidebarClubName = club?.name ?? session?.user?.clubName ?? undefined;
 
   return (
     <RootClientLayout
@@ -136,7 +158,7 @@ export default async function RootLayout({
               <div className="flex h-screen overflow-hidden">
                 <Sidebar
                   role={session.user.role}
-                  clubName={club?.name}
+                  clubName={sidebarClubName}
                   clubLogo={club?.logo}
                   twoFactorSetupRequired={twoFactorSetupRequired}
                 />
@@ -144,6 +166,11 @@ export default async function RootLayout({
                   <Topbar role={session.user.role} />
                   <main className="flex-1 overflow-y-auto pb-16 md:pb-0 relative bg-bg-secondary">
                     <div className="p-4 md:p-8 w-full max-w-[1600px] mx-auto">
+                      {!databaseReachable && (
+                        <div className="mb-4 rounded-md border border-border-dark bg-bg-card/70 px-3 py-2 text-xs text-text-secondary">
+                          Database is momenteel niet bereikbaar. Herlaad de pagina zodra de verbinding hersteld is.
+                        </div>
+                      )}
                       <SeasonRolloverNewsModal />
                       {children}
                     </div>

@@ -1,6 +1,10 @@
 import prisma from "@/lib/prisma";
 import { normalizeFeatureState } from "@/lib/clubFeatures";
 
+function isPrismaP1001(error: unknown): boolean {
+  return Boolean(error && typeof error === "object" && "code" in error && (error as any).code === "P1001");
+}
+
 type SessionLike = {
   user?: {
     role: string;
@@ -28,16 +32,22 @@ export type ClubConfig = {
 export async function getClubConfigByClubId(clubId: string): Promise<ClubConfig | null> {
   if (!clubId) return null;
 
-  const club = await prisma.club.findUnique({
-    where: { id: clubId },
-    include: {
-      settings: true,
-      features: {
-        select: { key: true, enabled: true },
+  let club: any = null;
+  try {
+    club = await prisma.club.findUnique({
+      where: { id: clubId },
+      include: {
+        settings: true,
+        features: {
+          select: { key: true, enabled: true },
+        },
+        subscription: true,
       },
-      subscription: true,
-    },
-  });
+    });
+  } catch (error) {
+    if (isPrismaP1001(error)) return null;
+    throw error;
+  }
 
   if (!club) return null;
 
@@ -67,14 +77,20 @@ export async function getClubFeaturesByClubId(
 ): Promise<ReturnType<typeof normalizeFeatureState> | null> {
   if (!clubId) return null;
 
-  const club = await prisma.club.findUnique({
-    where: { id: clubId },
-    include: {
-      features: {
-        select: { key: true, enabled: true },
+  let club: any = null;
+  try {
+    club = await prisma.club.findUnique({
+      where: { id: clubId },
+      include: {
+        features: {
+          select: { key: true, enabled: true },
+        },
       },
-    },
-  });
+    });
+  } catch (error) {
+    if (isPrismaP1001(error)) return null;
+    throw error;
+  }
 
   if (!club) return null;
 

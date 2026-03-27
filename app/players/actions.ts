@@ -12,6 +12,12 @@ async function savePlayerLogic(playerId: string | null, formData: FormData) {
   const clubId = getEffectiveClubId(session);
   if (!clubId) throw new Error('Geen club geselecteerd');
 
+  const clubRecord = await prisma.club.findUnique({
+    where: { id: clubId },
+    select: { name: true },
+  });
+  const clubNameFallback = clubRecord?.name ?? session.user.clubName ?? null;
+
   const name = formData.get('name') as string;
   const position = formData.get('position') as string;
   const secondaryPosition = formData.get('secondaryPosition') as string;
@@ -25,7 +31,7 @@ async function savePlayerLogic(playerId: string | null, formData: FormData) {
     : undefined;
   const statusInput = formData.get('status') as string || null;
 
-  const currentClub = formData.get('currentClub') as string || null;
+  const currentClubRaw = formData.get('currentClub') as string || null;
   const advies = formData.get('advies') as string || null;
   const niveau = formData.get('niveau') as string || null;
   const contactPerson = formData.get('contactPerson') as string || null;
@@ -61,6 +67,10 @@ async function savePlayerLogic(playerId: string | null, formData: FormData) {
 
   const safeType = playerTypeInput === 'INTERNAL' ? 'INTERNAL' : 'EXTERNAL';
   const isInternalType = safeType === 'INTERNAL';
+  const currentClub =
+    isInternalType
+      ? (currentClubRaw && currentClubRaw.trim() !== "" ? currentClubRaw : clubNameFallback)
+      : currentClubRaw;
 
   let resolvedTeamId: string | null = null;
   let resolvedTeamName: string | null = team || null;
