@@ -5,13 +5,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 import type { FieldSlot } from "./types";
 
 export function FieldSkeleton({ slots }: { slots: FieldSlot[] }) {
-  const slotWidthClass = "w-[clamp(8.5rem,11vw,12.5rem)]";
-  const slotRowHeightClass = "h-[clamp(1.9rem,2.2vw,2.5rem)]";
+  const slotWidthClass = "w-[clamp(10rem,13vw,14.5rem)]";
+  const slotRowHeightClass = "h-[clamp(2.2rem,2.6vw,2.9rem)]";
   const slotControlButtonClass =
-    "w-[clamp(1.35rem,1.6vw,1.75rem)] h-[clamp(1.7rem,2vw,2.1rem)]";
+    "w-[clamp(1.6rem,1.9vw,2rem)] h-[clamp(1.9rem,2.2vw,2.4rem)]";
 
   return (
-    <div className="card-premium rounded-lg p-0 overflow-hidden border border-accent-primary/50 bg-bg-secondary/40 shadow-inner w-full max-w-[980px] mx-auto">
+    <div className="card-premium rounded-lg p-0 overflow-hidden border border-accent-primary/50 bg-bg-secondary/40 shadow-inner w-full max-w-[1180px] mx-auto">
       <div className="relative w-full aspect-[62/100] min-h-[320px] max-h-[92dvh]">
         <div className="absolute inset-0 rounded-[6px] border border-accent-primary/80" />
         <div className="absolute left-0 right-0 top-1/2 h-0 border-t border-accent-primary/80 -translate-y-px" />

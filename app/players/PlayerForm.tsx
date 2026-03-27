@@ -100,6 +100,15 @@ export function PlayerForm({
     (initialValues.teamId as string | null) ?? null
   );
 
+  React.useEffect(() => {
+    if (!isInternal) return;
+    if (selectedTeamId) return;
+    const fallbackTeamId = (initialValues.teamId as string | null) ?? teams[0]?.id ?? null;
+    if (fallbackTeamId) {
+      setSelectedTeamId(fallbackTeamId);
+    }
+  }, [isInternal, selectedTeamId, initialValues.teamId, teams]);
+
   // Helpers voor seizoens-dropdowns (intern)
   const today = new Date();
   const currentYear = today.getFullYear();
@@ -111,7 +120,7 @@ export function PlayerForm({
 
   const joinedAtOptions = React.useMemo(() => {
     const options: { value: string; label: string }[] = [];
-    for (let year = 2014; year <= currentSeasonStartYear; year++) {
+    for (let year = 2005; year <= currentSeasonStartYear; year++) {
       // opslaan als 1 juli van het startjaar
       const value = `${year}-07-01`;
       options.push({ value, label: seasonLabel(year) });

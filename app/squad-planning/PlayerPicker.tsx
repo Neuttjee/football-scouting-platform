@@ -161,7 +161,7 @@ export function PlayerPicker({
               <div
                 className={cn(
                   "text-sm font-medium truncate",
-                  isReady ? "text-text-primary" : "text-primary-brand"
+                  isReady ? "text-text-primary" : "text-[#FF6A00]"
                 )}
               >
                 {player.name}

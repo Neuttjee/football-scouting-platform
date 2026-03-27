@@ -55,13 +55,13 @@ export function Field({
   onSlotMaxIncrease: (slotId: string) => void;
   onSlotMaxDecrease: (slotId: string) => void;
 }) {
-  const slotWidthClass = "w-[clamp(8.5rem,11vw,12.5rem)]";
-  const slotRowHeightClass = "h-[clamp(1.9rem,2.2vw,2.5rem)]";
+  const slotWidthClass = "w-[clamp(10rem,13vw,14.5rem)]";
+  const slotRowHeightClass = "h-[clamp(2.2rem,2.6vw,2.9rem)]";
   const slotControlButtonClass =
-    "w-[clamp(1.35rem,1.6vw,1.75rem)] h-[clamp(1.7rem,2vw,2.1rem)]";
+    "w-[clamp(1.6rem,1.9vw,2rem)] h-[clamp(1.9rem,2.2vw,2.4rem)]";
 
   return (
-    <div className="card-premium rounded-lg p-0 overflow-hidden border border-accent-primary/50 bg-bg-secondary/40 shadow-inner w-full max-w-[980px] mx-auto">
+    <div className="card-premium rounded-lg p-0 overflow-hidden border border-accent-primary/50 bg-bg-secondary/40 shadow-inner w-full max-w-[1180px] mx-auto">
       {/* Iets bredere verhouding voor betere leesbaarheid op tablet portrait */}
       <div className="relative w-full aspect-[62/100] min-h-[320px] max-h-[92dvh]">
           {/* Veldlijnen: buitenlijn (iets dunner) */}
@@ -145,7 +145,7 @@ export function Field({
                                     <span
                                       className={cn(
                                         "truncate font-medium",
-                                        isReady ? "text-text-primary" : "text-primary-brand"
+                                        isReady ? "text-text-primary" : "text-[#FF6A00]"
                                       )}
                                     >
                                       {player.name}

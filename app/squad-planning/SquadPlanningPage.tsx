@@ -1021,7 +1021,12 @@ export default function SquadPlanningPage({
               </div>
             </div>
 
-            <div className={cn(isPortraitTablet && "flex items-center gap-3 flex-wrap pb-1")}>
+            <div
+              className={cn(
+                "flex flex-wrap gap-3",
+                isPortraitTablet ? "items-center pb-1" : "items-end"
+              )}
+            >
               <div
                 className={cn(
                   "inline-flex flex-wrap items-center gap-1 rounded-md bg-bg-secondary/80 border border-border-dark shadow-sm p-0.5",
@@ -1085,7 +1090,7 @@ export default function SquadPlanningPage({
                 </select>
               </div>
 
-              <label className="text-xs text-text-muted flex items-center gap-2">
+              <label className="text-xs text-text-muted flex items-center gap-2 whitespace-nowrap">
                 <input
                   type="checkbox"
                   checked={includeFeederTeams}
