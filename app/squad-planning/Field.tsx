@@ -55,6 +55,11 @@ export function Field({
   onSlotMaxIncrease: (slotId: string) => void;
   onSlotMaxDecrease: (slotId: string) => void;
 }) {
+  const slotWidthClass = "w-[clamp(8.5rem,11vw,12.5rem)]";
+  const slotRowHeightClass = "h-[clamp(1.9rem,2.2vw,2.5rem)]";
+  const slotControlButtonClass =
+    "w-[clamp(1.35rem,1.6vw,1.75rem)] h-[clamp(1.7rem,2vw,2.1rem)]";
+
   return (
     <div className="card-premium rounded-lg p-0 overflow-hidden border border-accent-primary/50 bg-bg-secondary/40 shadow-inner w-full max-w-[980px] mx-auto">
       {/* Iets bredere verhouding voor betere leesbaarheid op tablet portrait */}
@@ -92,7 +97,7 @@ export function Field({
             return (
               <div
                 key={slot.id}
-                className="absolute -translate-x-1/2 -translate-y-1/2 w-40 lg:w-48"
+                className={cn("absolute -translate-x-1/2 -translate-y-1/2", slotWidthClass)}
                 style={{ left: `${slot.x}%`, top: `${slot.y}%` }}
                 onDragOver={(e) => {
                   if (!canEdit) return;
@@ -116,7 +121,8 @@ export function Field({
                         <div key={idx} className="flex items-center gap-1.5">
                           <div
                             className={cn(
-                              "flex-1 min-w-0 h-9 rounded flex items-center justify-between px-2 text-xs",
+                              "flex-1 min-w-0 rounded flex items-center justify-between px-2 text-xs",
+                              slotRowHeightClass,
                               !player
                                 ? cn(
                                     "border border-dashed border-border-dark/80 bg-bg-primary/40",
@@ -139,7 +145,7 @@ export function Field({
                                     <span
                                       className={cn(
                                         "truncate font-medium",
-                                        isReady ? "text-text-primary" : "text-amber-300"
+                                        isReady ? "text-text-primary" : "text-primary-brand"
                                       )}
                                     >
                                       {player.name}
@@ -182,7 +188,8 @@ export function Field({
                               onClick={() => onSlotMaxDecrease(slot.id)}
                               disabled={decreaseBlocked}
                               className={cn(
-                                "w-6 h-7 rounded border text-xs flex items-center justify-center shrink-0 flex-shrink-0",
+                                "rounded border text-xs flex items-center justify-center shrink-0 flex-shrink-0",
+                                slotControlButtonClass,
                                 !decreaseBlocked
                                   ? "border-border-dark text-text-secondary hover:text-text-primary hover:bg-bg-primary/70"
                                   : "border-border-dark/50 text-text-muted/50 cursor-not-allowed"
@@ -196,7 +203,10 @@ export function Field({
                             <button
                               type="button"
                               onClick={() => onSlotMaxIncrease(slot.id)}
-                              className="w-6 h-7 rounded border border-border-dark text-text-secondary hover:text-text-primary hover:bg-bg-primary/70 text-xs flex items-center justify-center shrink-0 flex-shrink-0"
+                              className={cn(
+                                "rounded border border-border-dark text-text-secondary hover:text-text-primary hover:bg-bg-primary/70 text-xs flex items-center justify-center shrink-0 flex-shrink-0",
+                                slotControlButtonClass
+                              )}
                               aria-label="Extra slot toevoegen"
                               title="Extra slot toevoegen"
                             >

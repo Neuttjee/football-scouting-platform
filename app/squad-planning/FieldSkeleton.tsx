@@ -5,6 +5,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import type { FieldSlot } from "./types";
 
 export function FieldSkeleton({ slots }: { slots: FieldSlot[] }) {
+  const slotWidthClass = "w-[clamp(8.5rem,11vw,12.5rem)]";
+  const slotRowHeightClass = "h-[clamp(1.9rem,2.2vw,2.5rem)]";
+  const slotControlButtonClass =
+    "w-[clamp(1.35rem,1.6vw,1.75rem)] h-[clamp(1.7rem,2vw,2.1rem)]";
+
   return (
     <div className="card-premium rounded-lg p-0 overflow-hidden border border-accent-primary/50 bg-bg-secondary/40 shadow-inner w-full max-w-[980px] mx-auto">
       <div className="relative w-full aspect-[62/100] min-h-[320px] max-h-[92dvh]">
@@ -24,18 +29,26 @@ export function FieldSkeleton({ slots }: { slots: FieldSlot[] }) {
         {slots.map((slot) => (
           <div
             key={slot.id}
-            className="absolute -translate-x-1/2 -translate-y-1/2 w-40 lg:w-48"
+            className={`absolute -translate-x-1/2 -translate-y-1/2 ${slotWidthClass}`}
             style={{ left: `${slot.x}%`, top: `${slot.y}%` }}
           >
             <div className="rounded-md border border-white/40 bg-bg-secondary/90 p-2 shadow-md backdrop-blur-sm motion-reduce:animate-none">
               <div className="flex flex-col gap-1.5">
                 <div className="flex items-center gap-1.5">
-                  <Skeleton className="h-7 flex-1 bg-bg-primary/40 border border-dashed border-border-dark/80 motion-reduce:animate-none" />
-                  <Skeleton className="h-7 w-6 bg-bg-primary/40 border border-border-dark/80 motion-reduce:animate-none" />
+                  <Skeleton
+                    className={`${slotRowHeightClass} flex-1 bg-bg-primary/40 border border-dashed border-border-dark/80 motion-reduce:animate-none`}
+                  />
+                  <Skeleton
+                    className={`${slotControlButtonClass} bg-bg-primary/40 border border-border-dark/80 motion-reduce:animate-none`}
+                  />
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <Skeleton className="h-7 flex-1 bg-bg-primary/40 border border-dashed border-border-dark/80 motion-reduce:animate-none" />
-                  <Skeleton className="h-7 w-6 bg-bg-primary/40 border border-border-dark/80 motion-reduce:animate-none" />
+                  <Skeleton
+                    className={`${slotRowHeightClass} flex-1 bg-bg-primary/40 border border-dashed border-border-dark/80 motion-reduce:animate-none`}
+                  />
+                  <Skeleton
+                    className={`${slotControlButtonClass} bg-bg-primary/40 border border-border-dark/80 motion-reduce:animate-none`}
+                  />
                 </div>
               </div>
             </div>

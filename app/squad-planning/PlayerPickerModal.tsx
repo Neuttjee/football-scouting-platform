@@ -27,8 +27,8 @@ export function PlayerPickerModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        size="wide"
-        className="max-h-[90vh] overflow-y-auto bg-bg-card border-accent-primary text-text-primary"
+        size="default"
+        className="max-h-[90vh] overflow-y-auto p-4 bg-bg-card border-accent-primary text-text-primary"
       >
         <DialogHeader>
           <DialogTitle>
@@ -41,6 +41,7 @@ export function PlayerPickerModal({
           onTypeChange={onTypeChange}
           seasonYear={seasonYear}
           onSelectPlayer={onSelectPlayer}
+          listScrollable={false}
         />
       </DialogContent>
     </Dialog>

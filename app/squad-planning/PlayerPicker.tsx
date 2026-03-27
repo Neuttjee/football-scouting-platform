@@ -12,12 +12,14 @@ export function PlayerPicker({
   onTypeChange,
   seasonYear,
   onSelectPlayer,
+  listScrollable = true,
 }: {
   players: PlanningPlayer[];
   selectedType: PlayerTypeValue;
   onTypeChange: (type: PlayerTypeValue) => void;
   seasonYear: number;
   onSelectPlayer?: (playerId: string) => void;
+  listScrollable?: boolean;
 }) {
   const [query, setQuery] = React.useState("");
   const [positionFilter, setPositionFilter] = React.useState("");
@@ -126,7 +128,12 @@ export function PlayerPicker({
         )}
       </div>
 
-      <div className="space-y-2 max-h-[560px] overflow-y-auto">
+      <div
+        className={cn(
+          "space-y-2",
+          listScrollable && "max-h-[560px] overflow-y-auto"
+        )}
+      >
         {filtered.map((player) => (
           (() => {
             const plannedSeasonYear =
@@ -154,7 +161,7 @@ export function PlayerPicker({
               <div
                 className={cn(
                   "text-sm font-medium truncate",
-                  isReady ? "text-text-primary" : "text-amber-300"
+                  isReady ? "text-text-primary" : "text-primary-brand"
                 )}
               >
                 {player.name}
