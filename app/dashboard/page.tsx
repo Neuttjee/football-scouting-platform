@@ -4,6 +4,10 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { getClubConfigByClubId } from '@/lib/clubConfig';
 
+function isPrismaP1001(error: unknown): boolean {
+  return Boolean(error && typeof error === "object" && "code" in error && (error as any).code === "P1001");
+}
+
 export default async function DashboardPage() {
   const session = await getSession();
   if (!session) return null;
@@ -16,48 +20,66 @@ export default async function DashboardPage() {
 
   const clubConfig = await getClubConfigByClubId(clubId);
 
-  const [
-    totalPlayers,
-    internalCount,
-    externalCount,
-    taskCount,
-    myTasks,
-    recentContacts,
-    externalStatusCounts,
-    internalPositionCounts,
-  ] = await Promise.all([
-    prisma.player.count({ where: { clubId } }),
-    prisma.player.count({ where: { clubId, type: 'INTERNAL' } }),
-    prisma.player.count({ where: { clubId, type: 'EXTERNAL' } }),
-    prisma.task.count({ where: { clubId, isCompleted: false } }),
-    prisma.task.findMany({
-      where: {
-        clubId,
-        assignedToId: session.user.id,
-        isCompleted: false,
-      },
-      orderBy: { createdAt: 'desc' },
-      take: 5,
-    }),
-    prisma.contactMoment.findMany({
-      where: { clubId },
-      orderBy: { createdAt: 'desc' },
-      take: 5,
-      include: {
-        player: { select: { id: true, name: true } },
-      },
-    }),
-    prisma.player.groupBy({
-      by: ['status'],
-      where: { clubId, type: 'EXTERNAL' },
-      _count: { _all: true },
-    }),
-    prisma.player.groupBy({
-      by: ['position'],
-      where: { clubId, type: 'INTERNAL' },
-      _count: { _all: true },
-    }),
-  ]);
+  let databaseReachable = true;
+  let totalPlayers = 0;
+  let internalCount = 0;
+  let externalCount = 0;
+  let taskCount = 0;
+  let myTasks: Awaited<ReturnType<typeof prisma.task.findMany>> = [];
+  let recentContacts: Awaited<ReturnType<typeof prisma.contactMoment.findMany>> = [];
+  let externalStatusCounts: Awaited<ReturnType<typeof prisma.player.groupBy>> = [];
+  let internalPositionCounts: Awaited<ReturnType<typeof prisma.player.groupBy>> = [];
+
+  try {
+    [
+      totalPlayers,
+      internalCount,
+      externalCount,
+      taskCount,
+      myTasks,
+      recentContacts,
+      externalStatusCounts,
+      internalPositionCounts,
+    ] = await Promise.all([
+      prisma.player.count({ where: { clubId } }),
+      prisma.player.count({ where: { clubId, type: 'INTERNAL' } }),
+      prisma.player.count({ where: { clubId, type: 'EXTERNAL' } }),
+      prisma.task.count({ where: { clubId, isCompleted: false } }),
+      prisma.task.findMany({
+        where: {
+          clubId,
+          assignedToId: session.user.id,
+          isCompleted: false,
+        },
+        orderBy: { createdAt: 'desc' },
+        take: 5,
+      }),
+      prisma.contactMoment.findMany({
+        where: { clubId },
+        orderBy: { createdAt: 'desc' },
+        take: 5,
+        include: {
+          player: { select: { id: true, name: true } },
+        },
+      }),
+      prisma.player.groupBy({
+        by: ['status'],
+        where: { clubId, type: 'EXTERNAL' },
+        _count: { _all: true },
+      }),
+      prisma.player.groupBy({
+        by: ['position'],
+        where: { clubId, type: 'INTERNAL' },
+        _count: { _all: true },
+      }),
+    ]);
+  } catch (error) {
+    if (isPrismaP1001(error)) {
+      databaseReachable = false;
+    } else {
+      throw error;
+    }
+  }
 
   const hasTasksFeature = clubConfig?.features.tasks ?? true;
   const hasContactsFeature = clubConfig?.features.contact_logs ?? true;
@@ -66,6 +88,11 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-6">
+      {!databaseReachable && (
+        <div className="rounded-md border border-border-dark bg-bg-card/70 px-3 py-2 text-xs text-text-secondary">
+          Database is momenteel niet bereikbaar. Dashboard toont tijdelijk lege waarden.
+        </div>
+      )}
       <h1 className="text-3xl font-bold text-text-primary">Dashboard</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
