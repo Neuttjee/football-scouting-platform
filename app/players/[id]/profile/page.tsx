@@ -97,6 +97,7 @@ export default async function PlayerProfilePage({
     player.type === 'INTERNAL' && typeof player.distanceFromClubKm === 'number'
       ? `${player.distanceFromClubKm} km`
       : '-';
+  const clubNameFallback = session.user.clubName ?? null;
 
   return (
     <div className="space-y-8">
@@ -137,7 +138,7 @@ export default async function PlayerProfilePage({
           </div>
         </div>
         <div className="flex space-x-3">
-          <EditPlayerModal player={player} teams={teams} />
+          <EditPlayerModal player={player} teams={teams} clubName={clubNameFallback} />
         </div>
       </div>
 

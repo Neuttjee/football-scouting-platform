@@ -48,9 +48,11 @@ type EditablePlayer = {
 export function EditPlayerModal({
   player,
   teams,
+  clubName,
 }: {
   player: EditablePlayer
   teams: TeamOption[]
+  clubName?: string | null
 }) {
   const [open, setOpen] = React.useState(false)
   const router = useRouter()
@@ -98,7 +100,7 @@ export function EditPlayerModal({
             notes: player.notes,
           }}
           teams={teams}
-          // clubName kun je doorgeven vanuit de page als je die beschikbaar maakt
+          clubName={clubName}
           onSubmit={async (fd) => {
             setOpen(false);
             try {

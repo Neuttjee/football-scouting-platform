@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import { cn } from "@/lib/utils";
 import { FieldSlot, PlanningPlayer } from "./types";
 
@@ -25,6 +26,10 @@ function isPlayerReadyForSeason(player: PlanningPlayer, seasonYear: number): boo
 }
 
 const MAX_SLOT_CAP = 5;
+
+function clamp(value: number, min: number, max: number) {
+  return Math.min(Math.max(value, min), max);
+}
 
 export function Field({
   slots,
@@ -55,15 +60,50 @@ export function Field({
   onSlotMaxIncrease: (slotId: string) => void;
   onSlotMaxDecrease: (slotId: string) => void;
 }) {
-  const slotWidthClass = "w-[clamp(10rem,13vw,14.5rem)]";
-  const slotRowHeightClass = "h-[clamp(2.2rem,2.6vw,2.9rem)]";
-  const slotControlButtonClass =
-    "w-[clamp(1.6rem,1.9vw,2rem)] h-[clamp(1.9rem,2.2vw,2.4rem)]";
+  const fieldRef = React.useRef<HTMLDivElement | null>(null);
+  const [fieldWidthPx, setFieldWidthPx] = React.useState(0);
+
+  React.useEffect(() => {
+    const element = fieldRef.current;
+    if (!element) return;
+
+    const updateWidth = () => {
+      setFieldWidthPx(element.clientWidth);
+    };
+    updateWidth();
+
+    const observer = new ResizeObserver((entries) => {
+      const nextWidth = entries[0]?.contentRect.width ?? element.clientWidth;
+      setFieldWidthPx(nextWidth);
+    });
+    observer.observe(element);
+
+    return () => observer.disconnect();
+  }, []);
+
+  const slotSizingVars = React.useMemo(() => {
+    const width = fieldWidthPx || 980;
+    const slotWidth = clamp(width * 0.245, 170, 290);
+    const slotRowHeight = clamp(slotWidth * 0.22, 36, 52);
+    const slotControlWidth = clamp(slotWidth * 0.12, 24, 36);
+    const slotControlHeight = clamp(slotRowHeight * 0.9, 28, 42);
+
+    return {
+      "--slot-w": `${slotWidth}px`,
+      "--slot-row-h": `${slotRowHeight}px`,
+      "--slot-control-w": `${slotControlWidth}px`,
+      "--slot-control-h": `${slotControlHeight}px`,
+    } as React.CSSProperties;
+  }, [fieldWidthPx]);
 
   return (
     <div className="card-premium rounded-lg p-0 overflow-hidden border border-accent-primary/50 bg-bg-secondary/40 shadow-inner w-full max-w-[1180px] mx-auto">
       {/* Iets bredere verhouding voor betere leesbaarheid op tablet portrait */}
-      <div className="relative w-full aspect-[62/100] min-h-[320px] max-h-[92dvh]">
+      <div
+        ref={fieldRef}
+        style={slotSizingVars}
+        className="relative w-full aspect-[62/100] min-h-[320px] max-h-[92dvh]"
+      >
           {/* Veldlijnen: buitenlijn (iets dunner) */}
           <div className="absolute inset-0 rounded-[6px] border border-accent-primary/80" />
 
@@ -97,7 +137,7 @@ export function Field({
             return (
               <div
                 key={slot.id}
-                className={cn("absolute -translate-x-1/2 -translate-y-1/2", slotWidthClass)}
+                className="absolute -translate-x-1/2 -translate-y-1/2 w-[var(--slot-w)]"
                 style={{ left: `${slot.x}%`, top: `${slot.y}%` }}
                 onDragOver={(e) => {
                   if (!canEdit) return;
@@ -122,7 +162,7 @@ export function Field({
                           <div
                             className={cn(
                               "flex-1 min-w-0 rounded flex items-center justify-between px-2 text-xs",
-                              slotRowHeightClass,
+                              "h-[var(--slot-row-h)]",
                               !player
                                 ? cn(
                                     "border border-dashed border-border-dark/80 bg-bg-primary/40",
@@ -189,7 +229,7 @@ export function Field({
                               disabled={decreaseBlocked}
                               className={cn(
                                 "rounded border text-xs flex items-center justify-center shrink-0 flex-shrink-0",
-                                slotControlButtonClass,
+                                "w-[var(--slot-control-w)] h-[var(--slot-control-h)]",
                                 !decreaseBlocked
                                   ? "border-border-dark text-text-secondary hover:text-text-primary hover:bg-bg-primary/70"
                                   : "border-border-dark/50 text-text-muted/50 cursor-not-allowed"
@@ -205,7 +245,7 @@ export function Field({
                               onClick={() => onSlotMaxIncrease(slot.id)}
                               className={cn(
                                 "rounded border border-border-dark text-text-secondary hover:text-text-primary hover:bg-bg-primary/70 text-xs flex items-center justify-center shrink-0 flex-shrink-0",
-                                slotControlButtonClass
+                                "w-[var(--slot-control-w)] h-[var(--slot-control-h)]"
                               )}
                               aria-label="Extra slot toevoegen"
                               title="Extra slot toevoegen"

@@ -4,15 +4,54 @@ import * as React from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { FieldSlot } from "./types";
 
+function clamp(value: number, min: number, max: number) {
+  return Math.min(Math.max(value, min), max);
+}
+
 export function FieldSkeleton({ slots }: { slots: FieldSlot[] }) {
-  const slotWidthClass = "w-[clamp(10rem,13vw,14.5rem)]";
-  const slotRowHeightClass = "h-[clamp(2.2rem,2.6vw,2.9rem)]";
-  const slotControlButtonClass =
-    "w-[clamp(1.6rem,1.9vw,2rem)] h-[clamp(1.9rem,2.2vw,2.4rem)]";
+  const fieldRef = React.useRef<HTMLDivElement | null>(null);
+  const [fieldWidthPx, setFieldWidthPx] = React.useState(0);
+
+  React.useEffect(() => {
+    const element = fieldRef.current;
+    if (!element) return;
+
+    const updateWidth = () => {
+      setFieldWidthPx(element.clientWidth);
+    };
+    updateWidth();
+
+    const observer = new ResizeObserver((entries) => {
+      const nextWidth = entries[0]?.contentRect.width ?? element.clientWidth;
+      setFieldWidthPx(nextWidth);
+    });
+    observer.observe(element);
+
+    return () => observer.disconnect();
+  }, []);
+
+  const slotSizingVars = React.useMemo(() => {
+    const width = fieldWidthPx || 980;
+    const slotWidth = clamp(width * 0.245, 170, 290);
+    const slotRowHeight = clamp(slotWidth * 0.22, 36, 52);
+    const slotControlWidth = clamp(slotWidth * 0.12, 24, 36);
+    const slotControlHeight = clamp(slotRowHeight * 0.9, 28, 42);
+
+    return {
+      "--slot-w": `${slotWidth}px`,
+      "--slot-row-h": `${slotRowHeight}px`,
+      "--slot-control-w": `${slotControlWidth}px`,
+      "--slot-control-h": `${slotControlHeight}px`,
+    } as React.CSSProperties;
+  }, [fieldWidthPx]);
 
   return (
     <div className="card-premium rounded-lg p-0 overflow-hidden border border-accent-primary/50 bg-bg-secondary/40 shadow-inner w-full max-w-[1180px] mx-auto">
-      <div className="relative w-full aspect-[62/100] min-h-[320px] max-h-[92dvh]">
+      <div
+        ref={fieldRef}
+        style={slotSizingVars}
+        className="relative w-full aspect-[62/100] min-h-[320px] max-h-[92dvh]"
+      >
         <div className="absolute inset-0 rounded-[6px] border border-accent-primary/80" />
         <div className="absolute left-0 right-0 top-1/2 h-0 border-t border-accent-primary/80 -translate-y-px" />
         <div className="absolute left-1/2 top-1/2 w-[22%] aspect-square rounded-full border border-accent-primary/80 -translate-x-1/2 -translate-y-1/2" />
@@ -29,25 +68,25 @@ export function FieldSkeleton({ slots }: { slots: FieldSlot[] }) {
         {slots.map((slot) => (
           <div
             key={slot.id}
-            className={`absolute -translate-x-1/2 -translate-y-1/2 ${slotWidthClass}`}
+            className="absolute -translate-x-1/2 -translate-y-1/2 w-[var(--slot-w)]"
             style={{ left: `${slot.x}%`, top: `${slot.y}%` }}
           >
             <div className="rounded-md border border-white/40 bg-bg-secondary/90 p-2 shadow-md backdrop-blur-sm motion-reduce:animate-none">
               <div className="flex flex-col gap-1.5">
                 <div className="flex items-center gap-1.5">
                   <Skeleton
-                    className={`${slotRowHeightClass} flex-1 bg-bg-primary/40 border border-dashed border-border-dark/80 motion-reduce:animate-none`}
+                    className="h-[var(--slot-row-h)] flex-1 bg-bg-primary/40 border border-dashed border-border-dark/80 motion-reduce:animate-none"
                   />
                   <Skeleton
-                    className={`${slotControlButtonClass} bg-bg-primary/40 border border-border-dark/80 motion-reduce:animate-none`}
+                    className="w-[var(--slot-control-w)] h-[var(--slot-control-h)] bg-bg-primary/40 border border-border-dark/80 motion-reduce:animate-none"
                   />
                 </div>
                 <div className="flex items-center gap-1.5">
                   <Skeleton
-                    className={`${slotRowHeightClass} flex-1 bg-bg-primary/40 border border-dashed border-border-dark/80 motion-reduce:animate-none`}
+                    className="h-[var(--slot-row-h)] flex-1 bg-bg-primary/40 border border-dashed border-border-dark/80 motion-reduce:animate-none"
                   />
                   <Skeleton
-                    className={`${slotControlButtonClass} bg-bg-primary/40 border border-border-dark/80 motion-reduce:animate-none`}
+                    className="w-[var(--slot-control-w)] h-[var(--slot-control-h)] bg-bg-primary/40 border border-border-dark/80 motion-reduce:animate-none"
                   />
                 </div>
               </div>
