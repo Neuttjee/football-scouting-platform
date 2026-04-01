@@ -303,6 +303,10 @@ export default function SquadPlanningPage({
     [teams]
   );
   const selectedTeamOrder = selectedTeamId ? teamsById[selectedTeamId]?.displayOrder ?? 999 : 999;
+  const firstTeamOrder = React.useMemo(() => {
+    if (teams.length === 0) return null;
+    return teams.reduce((lowest, team) => Math.min(lowest, team.displayOrder), Number.POSITIVE_INFINITY);
+  }, [teams]);
 
   const filteredPlayers = React.useMemo(() => {
     return players.filter((player) => {
@@ -320,10 +324,14 @@ export default function SquadPlanningPage({
         return true;
       }
       if (!selectedTeamId) return true;
-      if (!includeFeederTeams) return player.teamId === selectedTeamId;
+      if (!includeFeederTeams) {
+        const isSelectedTeam = player.teamId === selectedTeamId;
+        const isFirstTeam = firstTeamOrder != null && player.teamOrder === firstTeamOrder;
+        return isSelectedTeam || isFirstTeam;
+      }
       return player.teamOrder >= selectedTeamOrder;
     });
-  }, [players, selectedTeamId, includeFeederTeams, selectedTeamOrder, seasonYear]);
+  }, [players, selectedTeamId, includeFeederTeams, selectedTeamOrder, seasonYear, firstTeamOrder]);
 
   const assignedPlayerIds = React.useMemo(() => {
     return new Set(Object.values(assignments).flat());

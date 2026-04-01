@@ -31,6 +31,11 @@ function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
 }
 
+function formatInternalTeamBadge(teamLabel: string | null) {
+  if (!teamLabel) return null;
+  return teamLabel.trim().toLowerCase() === "1e elftal" ? "INT" : teamLabel;
+}
+
 export function Field({
   slots,
   assignments,
@@ -200,7 +205,7 @@ export function Field({
                                         "border-border-dark text-text-muted"
                                       )}
                                     >
-                                      {player.teamLabel}
+                                      {formatInternalTeamBadge(player.teamLabel)}
                                     </span>
                                   )}
                                   {player.type === "EXTERNAL" && (
