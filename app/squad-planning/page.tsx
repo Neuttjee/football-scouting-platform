@@ -56,6 +56,7 @@ export default async function SquadPlanningServerPage() {
       : null,
     isTopTalent: player.isTopTalent,
     plannedInternalFromSeasonYear: player.plannedInternalFromSeasonYear ?? null,
+    plannedInternalTeamId: player.plannedInternalTeamId ?? null,
   }));
 
   const now = new Date();

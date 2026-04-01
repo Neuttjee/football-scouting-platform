@@ -323,15 +323,33 @@ export default function SquadPlanningPage({
         }
         return true;
       }
+
+      const hasPlannedInternalTeamForSeason =
+        player.plannedInternalTeamId != null &&
+        player.plannedInternalFromSeasonYear != null &&
+        player.plannedInternalFromSeasonYear <= seasonYear;
+      const effectiveTeamId = hasPlannedInternalTeamForSeason ? player.plannedInternalTeamId : player.teamId;
+      const effectiveTeamOrder = hasPlannedInternalTeamForSeason
+        ? teamsById[player.plannedInternalTeamId!]?.displayOrder ?? player.teamOrder
+        : player.teamOrder;
+
       if (!selectedTeamId) return true;
       if (!includeFeederTeams) {
-        const isSelectedTeam = player.teamId === selectedTeamId;
-        const isFirstTeam = firstTeamOrder != null && player.teamOrder === firstTeamOrder;
+        const isSelectedTeam = effectiveTeamId === selectedTeamId;
+        const isFirstTeam = firstTeamOrder != null && effectiveTeamOrder === firstTeamOrder;
         return isSelectedTeam || isFirstTeam;
       }
-      return player.teamOrder >= selectedTeamOrder;
+      return effectiveTeamOrder >= selectedTeamOrder;
     });
-  }, [players, selectedTeamId, includeFeederTeams, selectedTeamOrder, seasonYear, firstTeamOrder]);
+  }, [
+    players,
+    selectedTeamId,
+    includeFeederTeams,
+    selectedTeamOrder,
+    seasonYear,
+    firstTeamOrder,
+    teamsById,
+  ]);
 
   const assignedPlayerIds = React.useMemo(() => {
     return new Set(Object.values(assignments).flat());
