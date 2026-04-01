@@ -307,6 +307,11 @@ export default function SquadPlanningPage({
     if (teams.length === 0) return null;
     return teams.reduce((lowest, team) => Math.min(lowest, team.displayOrder), Number.POSITIVE_INFINITY);
   }, [teams]);
+  /** Hoogste displayOrder = onderaan de ladder (bijv. O23); daar geen 1e-elftal-uitzondering bij vinkje uit. */
+  const lastTeamOrder = React.useMemo(() => {
+    if (teams.length === 0) return null;
+    return teams.reduce((highest, team) => Math.max(highest, team.displayOrder), Number.NEGATIVE_INFINITY);
+  }, [teams]);
 
   const filteredPlayers = React.useMemo(() => {
     return players.filter((player) => {
@@ -336,7 +341,12 @@ export default function SquadPlanningPage({
       if (!selectedTeamId) return true;
       if (!includeFeederTeams) {
         const isSelectedTeam = effectiveTeamId === selectedTeamId;
-        const isFirstTeam = firstTeamOrder != null && effectiveTeamOrder === firstTeamOrder;
+        const isBottomTeam =
+          lastTeamOrder != null && selectedTeamOrder === lastTeamOrder;
+        const isFirstTeam =
+          !isBottomTeam &&
+          firstTeamOrder != null &&
+          effectiveTeamOrder === firstTeamOrder;
         return isSelectedTeam || isFirstTeam;
       }
       return effectiveTeamOrder >= selectedTeamOrder;
@@ -348,6 +358,7 @@ export default function SquadPlanningPage({
     selectedTeamOrder,
     seasonYear,
     firstTeamOrder,
+    lastTeamOrder,
     teamsById,
   ]);
 
