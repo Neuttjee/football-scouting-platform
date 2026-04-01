@@ -1,5 +1,6 @@
 import { getSession, getEffectiveClubId } from '@/lib/auth';
 import prisma from '@/lib/prisma';
+import type { Prisma } from '@prisma/client';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { getClubConfigByClubId } from '@/lib/clubConfig';
@@ -7,6 +8,14 @@ import { getClubConfigByClubId } from '@/lib/clubConfig';
 function isPrismaP1001(error: unknown): boolean {
   return Boolean(error && typeof error === "object" && "code" in error && (error as any).code === "P1001");
 }
+
+const dashboardContactInclude = {
+  player: { select: { id: true, name: true } },
+} satisfies Prisma.ContactMomentInclude;
+
+type DashboardContactMoment = Prisma.ContactMomentGetPayload<{
+  include: typeof dashboardContactInclude;
+}>;
 
 export default async function DashboardPage() {
   const session = await getSession();
@@ -24,27 +33,20 @@ export default async function DashboardPage() {
   let totalPlayers = 0;
   let internalCount = 0;
   let externalCount = 0;
-  let taskCount = 0;
   let myTasks: Awaited<ReturnType<typeof prisma.task.findMany>> = [];
-  let recentContacts: Awaited<ReturnType<typeof prisma.contactMoment.findMany>> = [];
-  let externalStatusCounts: Awaited<ReturnType<typeof prisma.player.groupBy>> = [];
-  let internalPositionCounts: Awaited<ReturnType<typeof prisma.player.groupBy>> = [];
+  let recentContacts: DashboardContactMoment[] = [];
 
   try {
     [
       totalPlayers,
       internalCount,
       externalCount,
-      taskCount,
       myTasks,
       recentContacts,
-      externalStatusCounts,
-      internalPositionCounts,
     ] = await Promise.all([
       prisma.player.count({ where: { clubId } }),
       prisma.player.count({ where: { clubId, type: 'INTERNAL' } }),
       prisma.player.count({ where: { clubId, type: 'EXTERNAL' } }),
-      prisma.task.count({ where: { clubId, isCompleted: false } }),
       prisma.task.findMany({
         where: {
           clubId,
@@ -58,19 +60,7 @@ export default async function DashboardPage() {
         where: { clubId },
         orderBy: { createdAt: 'desc' },
         take: 5,
-        include: {
-          player: { select: { id: true, name: true } },
-        },
-      }),
-      prisma.player.groupBy({
-        by: ['status'],
-        where: { clubId, type: 'EXTERNAL' },
-        _count: { _all: true },
-      }),
-      prisma.player.groupBy({
-        by: ['position'],
-        where: { clubId, type: 'INTERNAL' },
-        _count: { _all: true },
+        include: dashboardContactInclude,
       }),
     ]);
   } catch (error) {
