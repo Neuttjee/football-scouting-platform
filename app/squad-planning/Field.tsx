@@ -83,7 +83,7 @@ export function Field({
 
   const slotSizingVars = React.useMemo(() => {
     const width = fieldWidthPx || 980;
-    const slotWidth = clamp(width * 0.245, 170, 290);
+    const slotWidth = clamp(width * 0.255, 200, 310);
     const slotRowHeight = clamp(slotWidth * 0.22, 36, 52);
     const slotControlWidth = clamp(slotWidth * 0.12, 24, 36);
     const slotControlHeight = clamp(slotRowHeight * 0.9, 28, 42);
