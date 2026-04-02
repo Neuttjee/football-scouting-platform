@@ -154,6 +154,7 @@ export default function LoginPage() {
                   inputMode="numeric"
                   maxLength={6}
                   value={twoFactorCode}
+                  autoFocus
                   onChange={(e) => setTwoFactorCode(e.target.value)}
                   required
                 />
