@@ -14,7 +14,6 @@ function average(values: number[]) {
   return values.reduce((sum, value) => sum + value, 0) / values.length;
 }
 
-type AnalysisMode = "first" | "firstSecond";
 type LineKey = FieldSlot["line"];
 
 const LINES: Array<{ key: LineKey; label: string }> = [
@@ -33,16 +32,13 @@ function normalizePreferredFoot(value: string | null | undefined) {
   return "Onbekend";
 }
 
-function getSlotPlayerIds(slot: FieldSlot, assignments: Record<string, string[]>, mode: AnalysisMode) {
-  const ids = assignments[slot.id] ?? [];
-  if (mode === "first") return ids.slice(0, 1).filter(Boolean);
-  return ids.slice(0, 2).filter(Boolean);
+function getSlotPlayerIds(slot: FieldSlot, assignments: Record<string, string[]>) {
+  return (assignments[slot.id] ?? []).filter(Boolean);
 }
 
-function getExpectedPerSlot(slot: FieldSlot, effectiveMaxBySlotId: Record<string, number>, mode: AnalysisMode) {
+function getExpectedPerSlot(slot: FieldSlot, effectiveMaxBySlotId: Record<string, number>) {
   const max = effectiveMaxBySlotId[slot.id] ?? slot.maxPlayers ?? 2;
-  if (mode === "first") return Math.min(1, max);
-  return Math.min(2, max);
+  return max;
 }
 
 function buildLineMetrics({
@@ -52,7 +48,6 @@ function buildLineMetrics({
   playersById,
   seasonYear,
   effectiveMaxBySlotId,
-  mode,
 }: {
   line: LineKey;
   slots: FieldSlot[];
@@ -60,26 +55,25 @@ function buildLineMetrics({
   playersById: Record<string, PlanningPlayer>;
   seasonYear: number;
   effectiveMaxBySlotId: Record<string, number>;
-  mode: AnalysisMode;
 }) {
   const lineSlots = slots.filter((slot) => slot.line === line);
-  const slotEntries = lineSlots.flatMap((slot) => getSlotPlayerIds(slot, assignments, mode));
+  const slotEntries = lineSlots.flatMap((slot) => getSlotPlayerIds(slot, assignments));
   const uniqueIds = Array.from(new Set(slotEntries));
   const players = uniqueIds.map((id) => playersById[id]).filter(Boolean);
   const ageValues = players.map((player) => player.age).filter((age): age is number => age != null);
   const requiredCapacity = lineSlots.reduce(
-    (sum, slot) => sum + getExpectedPerSlot(slot, effectiveMaxBySlotId, mode),
+    (sum, slot) => sum + getExpectedPerSlot(slot, effectiveMaxBySlotId),
     0
   );
   const filledCapacity = lineSlots.reduce(
-    (sum, slot) => sum + getSlotPlayerIds(slot, assignments, mode).length,
+    (sum, slot) => sum + getSlotPlayerIds(slot, assignments).length,
     0
   );
   const tekort = Math.max(0, requiredCapacity - filledCapacity);
   const tekortPosities = lineSlots
     .filter((slot) => {
-      const filled = getSlotPlayerIds(slot, assignments, mode).length;
-      const expected = getExpectedPerSlot(slot, effectiveMaxBySlotId, mode);
+      const filled = getSlotPlayerIds(slot, assignments).length;
+      const expected = getExpectedPerSlot(slot, effectiveMaxBySlotId);
       return filled < expected;
     })
     .map((slot) => slot.label);
@@ -118,8 +112,6 @@ export function AnalyticsPanel({
   seasonYear: number;
   effectiveMaxBySlotId: Record<string, number>;
 }) {
-  const [mode, setMode] = React.useState<AnalysisMode>("first");
-
   const lineMetrics = React.useMemo(
     () =>
       LINES.map((line) =>
@@ -130,10 +122,9 @@ export function AnalyticsPanel({
           playersById,
           seasonYear,
           effectiveMaxBySlotId,
-          mode,
         })
       ),
-    [slots, assignments, playersById, seasonYear, effectiveMaxBySlotId, mode]
+    [slots, assignments, playersById, seasonYear, effectiveMaxBySlotId]
   );
 
   const uniqueAssignedIds = React.useMemo(
@@ -154,33 +145,9 @@ export function AnalyticsPanel({
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <p className="text-xs text-text-muted">
-          Analyse seizoen {seasonYear}-{seasonYear + 1}
-        </p>
-        <div className="inline-flex rounded-md border border-border-dark bg-bg-secondary/60 p-0.5">
-          <button
-            type="button"
-            onClick={() => setMode("first")}
-            className={`px-2.5 py-1 text-xs rounded ${
-              mode === "first" ? "bg-accent-primary text-primary-foreground" : "text-text-muted"
-            }`}
-          >
-            Basis (1e keuze)
-          </button>
-          <button
-            type="button"
-            onClick={() => setMode("firstSecond")}
-            className={`px-2.5 py-1 text-xs rounded ${
-              mode === "firstSecond"
-                ? "bg-accent-primary text-primary-foreground"
-                : "text-text-muted"
-            }`}
-          >
-            Basis + 2e keuze
-          </button>
-        </div>
-      </div>
+      <p className="text-xs text-text-muted">
+        Analyse seizoen {seasonYear}-{seasonYear + 1} op basis van alle ingevulde spelers in de opstelling
+      </p>
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
         <MetricCard label="Unieke spelers" value={uniqueAssignedIds.length} />
