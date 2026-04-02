@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
@@ -17,6 +17,27 @@ export default function LoginPage() {
   const [twoFactorRequired, setTwoFactorRequired] = useState(false)
   const [twoFactorCode, setTwoFactorCode] = useState('')
   const [twoFactorError, setTwoFactorError] = useState('')
+
+  useEffect(() => {
+    if (!twoFactorRequired) return
+
+    const focusTwoFactorInput = () => {
+      const input = document.getElementById('twofactor') as HTMLInputElement | null
+      if (!input) return
+      input.focus({ preventScroll: true })
+      input.select()
+    }
+
+    const rafId = window.requestAnimationFrame(focusTwoFactorInput)
+    const timeoutA = window.setTimeout(focusTwoFactorInput, 0)
+    const timeoutB = window.setTimeout(focusTwoFactorInput, 150)
+
+    return () => {
+      window.cancelAnimationFrame(rafId)
+      window.clearTimeout(timeoutA)
+      window.clearTimeout(timeoutB)
+    }
+  }, [twoFactorRequired])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
