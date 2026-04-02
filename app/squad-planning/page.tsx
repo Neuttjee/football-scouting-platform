@@ -55,6 +55,7 @@ export default async function SquadPlanningServerPage() {
       ? player.contractEndDate.toISOString()
       : null,
     isTopTalent: player.isTopTalent,
+    preferredFoot: player.preferredFoot ?? null,
     plannedInternalFromSeasonYear: player.plannedInternalFromSeasonYear ?? null,
     plannedInternalTeamId: player.plannedInternalTeamId ?? null,
   }));
